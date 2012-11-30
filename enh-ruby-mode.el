@@ -128,7 +128,7 @@ the value changes.
 (defconst ruby-defun-and-name-re
   (concat "\\(" ruby-defun-beg-re "\\)[ \t]+\\("
                                          ;; \\. and :: for class method
-                                         "\\([A-Za-z_]" ruby-symbol-re "*\\|\\.\\|::" "\\)" 
+                                         "\\([A-Za-z_]" ruby-symbol-re "*\\|\\.\\|::" "\\)"
                                          "+\\)")
   "Regexp to match definitions and their name")
 
@@ -203,8 +203,8 @@ the value changes.
   (when (and erm-ruby-process (not (equal (process-status erm-ruby-process) 'run)))
     (let ((message (and erm-parsing-p erm-response)))
       (erm-reset)
-      (if message 
-          (error "%s" message) 
+      (if message
+          (error "%s" message)
         (throw 'interrupted t))))
   (unless erm-ruby-process
     (let ((process-connection-type nil))
@@ -230,7 +230,7 @@ the value changes.
 
 (defun erm-source-dir ()
   (or erm-source-dir
-    (setq erm-source-dir (file-name-directory (find-lisp-object-file-name 
+    (setq erm-source-dir (file-name-directory (find-lisp-object-file-name
                                                'erm-source-dir (symbol-function 'erm-source-dir))))))
 
 
@@ -252,16 +252,16 @@ the value changes.
 (defun erm-reset ()
   "Reset all enh-ruby-mode buffers and restart the ruby parser."
   (interactive)
-  (erm-reset-syntax-buffers erm-syntax-check-list) 
+  (erm-reset-syntax-buffers erm-syntax-check-list)
   (setq erm-reparse-list nil
         erm-syntax-check-list nil
         erm-parsing-p nil
         erm-parse-buff nil
         erm-next-buff-num 1)
   (when erm-ruby-process
-    (delete-process erm-ruby-process) 
+    (delete-process erm-ruby-process)
     (setq erm-ruby-process nil))
-  
+
   (dolist (buf (buffer-list))
     (with-current-buffer buf
       (when (eq 'enh-ruby-mode major-mode)
@@ -380,7 +380,7 @@ the value changes.
   (set (make-local-variable 'parse-sexp-lookup-properties) t)
   (set (make-local-variable 'paragraph-start) (concat "$\\|" page-delimiter))
   (set (make-local-variable 'paragraph-separate) paragraph-start)
-  (set (make-local-variable 'paragraph-ignore-fill-prefix) t))  
+  (set (make-local-variable 'paragraph-ignore-fill-prefix) t))
 
 (defun enh-ruby-mode ()
   "Enhanced Major mode for editing Ruby code.
@@ -448,7 +448,7 @@ the value changes.
 
       (setq prop (and (setq pos (ruby-next-indent-change pos))
                       (get-text-property pos 'indent))))
-      
+
     index-alist))
 
 (defun ruby-imenu-create-index ()
@@ -594,9 +594,9 @@ modifications to the buffer."
                    (looking-at "#")))
           (current-column))
 
-         (t 
+         (t
           (forward-line -1)
-          
+
           (ruby-skip-non-indentable)
           (ruby-calculate-indent-1 pos (line-beginning-position))))))))
 
@@ -649,7 +649,7 @@ modifications to the buffer."
     (setq max (max pc bc nbc npc))
     (+ (if (eq 'c (get-text-property limit 'indent)) ruby-hanging-indent-level 0)
      (cond
-     ((= max 0) 
+     ((= max 0)
       (if (not (or (eq (get-text-property start-pos 'face) 'ruby-heredoc-delimiter-face)
                    (eq (get-text-property start-pos 'face) 'font-lock-string-face)))
           indent
@@ -658,7 +658,7 @@ modifications to the buffer."
 
      ((= max pc) (if (eq 'c (get-text-property limit 'indent)) (- pc ruby-hanging-indent-level) pc))
 
-     ((= max bc) 
+     ((= max bc)
       (if (eq 'd (get-text-property (+ start-pos bc -1) 'indent))
           (+ (ruby-calculate-indent-1 (+ start-pos bc -1) start-pos) ruby-indent-level)
         (+ bc ruby-indent-level -1)))
@@ -667,12 +667,12 @@ modifications to the buffer."
       (goto-char (+ start-pos npc))
       (ruby-backward-sexp)
       (ruby-calculate-indent-1 (point) (line-beginning-position)))
-     
+
      ((= max nbc)
       (goto-char (+ start-pos nbc -1))
       (ruby-backward-sexp)
       (ruby-calculate-indent-1 (point) (line-beginning-position)))
-      
+
      (t 0)
      ))))
 
@@ -707,7 +707,7 @@ Display contents in mini-buffer."
     (unless (eq last-command 'ruby-find-error)
       (while (and (not messages) (> pos (point-min)))
         (setq messages (ruby-show-errors-at (setq pos (previous-overlay-change pos)) face))))
-    
+
     (unless messages
       (while (and (not messages) (< pos (point-max)))
         (setq messages (ruby-show-errors-at (setq pos (next-overlay-change pos)) face))))
@@ -728,14 +728,14 @@ With ARG, do it that many times."
            (prop (get-text-property pos 'indent))
            (count 1))
 
-      (while (< 0 (setq count 
+      (while (< 0 (setq count
                         (cond
                          ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1- count))
                          ((or (eq prop 'r) (eq prop 'e)) (1+ count))
                          (t count))))
         (setq prop (and (setq pos (ruby-previous-indent-change pos))
                         (get-text-property pos 'indent))))
-      
+
       (goto-char (if prop pos (point-min))))))
 
 (defun ruby-beginning-of-defun (&optional arg)
@@ -748,7 +748,7 @@ With ARG, do it that many times."
     (goto-char
      (save-excursion
        (while (>= (setq arg (1- arg)) 0)
-         (while (and 
+         (while (and
                  (> (point) (point-min))
                  (progn
                   (ruby-backward-sexp 1)
@@ -775,7 +775,7 @@ balanced expression is found."
   (erm-wait-for-parse)
   (let ((end-pos (save-excursion (ruby-forward-sexp 1) (point))))
     (indent-region (point) end-pos)))
-        
+
 
 (defun ruby-beginning-of-block (&optional arg)
   "Move backward across one balanced expression (sexp) looking for a block begining.
@@ -802,13 +802,13 @@ With ARG, do it that many times."
   (let ((cont t)
         prop)
     (while (>= (setq arg (1- arg)) 0)
-         (while (and 
+         (while (and
                  (< (point) (point-max))
                  (progn
                    (ruby-forward-sexp 1)
                    (setq prop (get-text-property (point) 'indent))
                    (not (and (eq prop 'e)
-                             (save-excursion 
+                             (save-excursion
                                (ruby-backward-sexp 1)
                                (looking-at ruby-defun-beg-re))))))))
     (forward-word)
@@ -840,13 +840,13 @@ With ARG, do it that many times."
     (let* ((pos (point))
            (prop (get-text-property pos 'indent))
            (count 0))
-      
+
       (unless (or (eq prop 'r) (eq prop 'e))
         (setq prop (and (setq pos (ruby-previous-indent-change pos))
                         (get-text-property pos 'indent))))
 
-      
-      (while (< 0 (setq count 
+
+      (while (< 0 (setq count
                         (cond
                          ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1- count))
                          ((or (eq prop 'r) (eq prop 'e)) (1+ count))
@@ -856,7 +856,7 @@ With ARG, do it that many times."
         (goto-char pos)
         (setq prop (and (setq pos (ruby-previous-indent-change pos))
                         (get-text-property pos 'indent))))
-      
+
       (goto-char (if prop pos (point-min))))))
 
 (defun ruby-forward-sexp (&optional arg)
@@ -868,13 +868,13 @@ With ARG, do it that many times."
     (let* ((pos (point))
            (prop (get-text-property pos 'indent))
            (count 0))
-      
+
       (unless (or (eq prop 'l) (eq prop 'b) (eq prop 'd))
         (setq prop (and (setq pos (ruby-next-indent-change pos))
                         (get-text-property pos 'indent))))
 
-      
-      (while (< 0 (setq count 
+
+      (while (< 0 (setq count
                         (cond
                          ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1+ count))
                          ((or (eq prop 'r) (eq prop 'e)) (1- count))
@@ -884,7 +884,7 @@ With ARG, do it that many times."
         (goto-char pos)
         (setq prop (and (setq pos (ruby-next-indent-change pos))
                         (get-text-property pos 'indent))))
-      
+
       (goto-char (if prop pos (point-max))))))
 
 (defun ruby-insert-end ()
@@ -950,7 +950,7 @@ With ARG, do it that many times."
 
     (unless (and (= (buffer-size) buf-size))
       (throw 'interrupted t))
-    
+
     (if (or (/= (point-min) istart) (/= (point-max) iend))
         (setq erm-full-parse-p t)
       (when (> iend 0)
@@ -962,12 +962,12 @@ With ARG, do it that many times."
           (put-text-property (cadr ipos) (1+ (cadr ipos)) 'indent (car ipos))
           (setq ipos (cddr ipos))
           )
-        
+
         (while rpos
           (remove-text-properties (car rpos) (cadr rpos) '(face nil))
           (setq rpos (cddr rpos))
           ))
-    
+
       (while (setq list (cdr list))
         (let ((face (nth (caar list) ruby-font-names))
               (pos (cdar list)))
@@ -1003,12 +1003,12 @@ With ARG, do it that many times."
                       (forward-char  (length (match-string 1 response)))
                     (error (goto-char (point-max))))
                   (setq end (point))
-                  
+
                   (condition-case nil
                       (progn
                         (backward-sexp)
                         (forward-sexp))
-                    
+
                     (error (back-to-indentation)))
                   (setq beg (if (>= (point) end)
                                 (1- end)
@@ -1024,7 +1024,7 @@ With ARG, do it that many times."
               (setq end (point))
               (back-to-indentation)
               (setq beg (point)))
-          
+
 
             (if (eq face 'erm-syn-warnline)
                 (setq warn-count (1+ warn-count))
@@ -1054,7 +1054,7 @@ With ARG, do it that many times."
             (when need-syntax-check-p
               (setq need-syntax-check-p nil)
               (setq erm-parsing-p t)
-              (process-send-string (erm-ruby-get-process) (concat "c" (number-to-string erm-buff-num) 
+              (process-send-string (erm-ruby-get-process) (concat "c" (number-to-string erm-buff-num)
                                                                   ":\n\0\0\0\n"))))
         (if erm-syntax-check-list
             (erm-do-syntax-check))))))
@@ -1077,7 +1077,7 @@ With ARG, do it that many times."
           (if interrupted-p
               (setq erm-full-parse-p t)
 
-            (if erm-full-parse-p 
+            (if erm-full-parse-p
                 (ruby-fontify-buffer)
               (if (car erm-reparse-list)
                   (with-current-buffer (car erm-reparse-list)
@@ -1091,7 +1091,7 @@ With ARG, do it that many times."
         (erm-syntax-response (substring response 1)))
       (erm-do-syntax-check))
 
-     (t 
+     (t
       (setq erm-full-parse-p t)
       (error "%s" (substring response 1))))))
 

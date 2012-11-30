@@ -65,4 +65,3 @@ rescue
   # $fixme.flush
   STDERR.puts "e#{$!.message}: #{$!.backtrace.join("\n")}\n\0\0\0\n"
 end
-
