@@ -40,7 +40,7 @@
 ;; file after putting it on your load path:
 ;;
 ;;    (add-to-list 'load-path "(path-to)/Enhanced-Ruby-Mode") ; must be added after any path containing old ruby-mode
-;;    (setq enh-ruby-program "(path-to-ruby1.9.2)/bin/ruby") ; so that still works if ruby points to ruby1.8
+;;    (setq enh-ruby-program "(path-to-ruby1.9)/bin/ruby") ; so that still works if ruby points to ruby1.8
 ;;    (autoload 'enh-ruby-mode "enh-ruby-mode" "Major mode for ruby files" t)
 ;;    (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
 ;;    (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))

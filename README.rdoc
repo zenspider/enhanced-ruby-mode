@@ -1,8 +1,8 @@
 = Enhanced Ruby Mode
 
-* Git: http://github.com/jacott/Enhanced-Ruby-Mode
-* Author: Geoff Jacobsen   
-* Copyright: 2010    
+* Git: http://github.com/zenspider/Enhanced-Ruby-Mode
+* Author: Geoff Jacobsen / forked by Ryan Davis
+* Copyright: 2010 - 2012
 * License: RUBY License
 
 == Description
@@ -23,8 +23,10 @@ Syntax checking is also preformed.
 == Synopsis
 
    (add-to-list 'load-path "(path-to)/Enhanced-Ruby-Mode") ; must be added after any path containing old ruby-mode
-   (setq enh-ruby-program "(path-to-ruby1.9.3)/bin/ruby") ; so that still works if ruby points to ruby1.8
-   (require 'ruby-mode)
+   (setq enh-ruby-program "(path-to-ruby1.9)/bin/ruby") ; so that still works if ruby points to ruby1.8
+   (autoload 'enh-ruby-mode "enh-ruby-mode" "Major mode for ruby files" t)
+   (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 
 == Requirements
 
@@ -32,7 +34,7 @@ Syntax checking is also preformed.
 
 == Install
 
-* git clone git@github.com:jacott/Enhanced-Ruby-Mode.git
+* git clone git@github.com:zenspider/Enhanced-Ruby-Mode.git
 
 == Development
 
