@@ -1,10 +1,11 @@
-;;; ruby-mode.el --- Major mode for editing Ruby files
+;;; enh-ruby-mode.el --- Major mode for editing Ruby files
 
+;; Copyright (C) 2012 -- Ryan Davis
 ;; Copyright (C) 2010, 2011, 2012
 ;;   Geoff Jacobsen
 
 ;; Author: Geoff Jacobsen
-;; URL: http://http://github.com/jacott/Enhanced-Ruby-Mode
+;; URL: http://http://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
 ;; Keywords: languages elisp, ruby
 ;; Version: 1.0
@@ -26,6 +27,13 @@
 
 ;;; Commentary:
 
+;; This is a fork of http://http://github.com/jacott/Enhanced-Ruby-Mode
+;; to provide further enhancements and bug fixes.
+;;
+;; It has been renamed to enh-ruby-mode.el to avoid name conflicts
+;; with ruby-mode that ships with emacs. This also makes it possible
+;; to switch back and forth for testing purposes.
+
 ;; Provides fontification, indentation, syntax checking, and navigation for Ruby code.
 ;;
 ;; If you're installing manually, you should add this to your .emacs
@@ -33,9 +41,9 @@
 ;;
 ;;    (add-to-list 'load-path "(path-to)/Enhanced-Ruby-Mode") ; must be added after any path containing old ruby-mode
 ;;    (setq enh-ruby-program "(path-to-ruby1.9.2)/bin/ruby") ; so that still works if ruby points to ruby1.8
-;;    (autoload 'ruby-mode "ruby-mode" "Major mode for ruby files" t)
-;;    (add-to-list 'auto-mode-alist '("\\.rb$" . ruby-mode))
-;;    (add-to-list 'interpreter-mode-alist '("ruby" . ruby-mode))
+;;    (autoload 'enh-ruby-mode "enh-ruby-mode" "Major mode for ruby files" t)
+;;    (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+;;    (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 ;;
 (defcustom enh-ruby-program "ruby"
   "The ruby program to parse the source."
@@ -156,7 +164,7 @@ the value changes.
   :group 'ruby)
 
 
-(defun ruby-mode-set-encoding ()
+(defun enh-ruby-mode-set-encoding ()
   (save-excursion
     (widen)
     (goto-char (point-min))
@@ -242,7 +250,7 @@ the value changes.
       (erm-reset-syntax-buffers (cdr list)))))
 
 (defun erm-reset ()
-  "Reset all ruby-mode buffers and restart the ruby parser."
+  "Reset all enh-ruby-mode buffers and restart the ruby parser."
   (interactive)
   (erm-reset-syntax-buffers erm-syntax-check-list) 
   (setq erm-reparse-list nil
@@ -256,7 +264,7 @@ the value changes.
   
   (dolist (buf (buffer-list))
     (with-current-buffer buf
-      (when (eq 'ruby-mode major-mode)
+      (when (eq 'enh-ruby-mode major-mode)
         (erm-reset-buffer)))))
 
 (defun erm-major-mode-changed ()
@@ -286,42 +294,42 @@ the value changes.
       t))
 
 
-(defvar ruby-mode-syntax-table nil
-  "Syntax table in use in ruby-mode buffers.")
+(defvar enh-ruby-mode-syntax-table nil
+  "Syntax table in use in enh-ruby-mode buffers.")
 
-(if ruby-mode-syntax-table
+(if enh-ruby-mode-syntax-table
     ()
-  (setq ruby-mode-syntax-table (make-syntax-table))
-  (modify-syntax-entry ?\' "\"" ruby-mode-syntax-table)
-  (modify-syntax-entry ?\" "\"" ruby-mode-syntax-table)
-  (modify-syntax-entry ?\` "\"" ruby-mode-syntax-table)
-  (modify-syntax-entry ?# "<" ruby-mode-syntax-table)
-  (modify-syntax-entry ?\n ">" ruby-mode-syntax-table)
-  (modify-syntax-entry ?\\ "\\" ruby-mode-syntax-table)
-  (modify-syntax-entry ?$ "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?? "_" ruby-mode-syntax-table)
-  (modify-syntax-entry ?_ "_" ruby-mode-syntax-table)
-  (modify-syntax-entry ?< "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?> "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?& "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?| "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?% "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?= "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?/ "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?+ "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?* "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?- "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?\; "." ruby-mode-syntax-table)
-  (modify-syntax-entry ?\( "()" ruby-mode-syntax-table)
-  (modify-syntax-entry ?\) ")(" ruby-mode-syntax-table)
-  (modify-syntax-entry ?\{ "(}" ruby-mode-syntax-table)
-  (modify-syntax-entry ?\} "){" ruby-mode-syntax-table)
-  (modify-syntax-entry ?\[ "(]" ruby-mode-syntax-table)
-  (modify-syntax-entry ?\] ")[" ruby-mode-syntax-table)
+  (setq enh-ruby-mode-syntax-table (make-syntax-table))
+  (modify-syntax-entry ?\' "\"" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\" "\"" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\` "\"" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?# "<" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\n ">" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\\ "\\" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?$ "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?? "_" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?_ "_" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?< "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?> "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?& "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?| "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?% "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?= "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?/ "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?+ "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?* "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?- "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\; "." enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\( "()" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\) ")(" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\{ "(}" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\} "){" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\[ "(]" enh-ruby-mode-syntax-table)
+  (modify-syntax-entry ?\] ")[" enh-ruby-mode-syntax-table)
   )
 
 
-(defvar ruby-mode-map nil "Keymap used in ruby mode.")
+(defvar enh-ruby-mode-map nil "Keymap used in ruby mode.")
 
 (defun ruby-electric-brace (arg)
   (interactive "P")
@@ -330,34 +338,34 @@ the value changes.
   (delete-char -1)
   (self-insert-command (prefix-numeric-value arg)))
 
-(if ruby-mode-map
+(if enh-ruby-mode-map
     nil
-  (setq ruby-mode-map (make-sparse-keymap))
-  (define-key ruby-mode-map "{" 'ruby-electric-brace)
-  (define-key ruby-mode-map "}" 'ruby-electric-brace)
-  (define-key ruby-mode-map "\e\C-a" 'ruby-beginning-of-defun)
-  (define-key ruby-mode-map "\e\C-e" 'ruby-end-of-defun)
-  (define-key ruby-mode-map "\e\C-b" 'ruby-backward-sexp)
-  (define-key ruby-mode-map "\e\C-f" 'ruby-forward-sexp)
-  (define-key ruby-mode-map "\e\C-u" 'ruby-up-sexp)
-  (define-key ruby-mode-map "\e\C-p" 'ruby-beginning-of-block)
-  (define-key ruby-mode-map "\e\C-n" 'ruby-end-of-block)
-  (define-key ruby-mode-map "\e\C-h" 'ruby-mark-defun)
-  (define-key ruby-mode-map "\e\C-q" 'ruby-indent-exp)
-  (define-key ruby-mode-map "\C-c\C-e" 'ruby-find-error)
-  (define-key ruby-mode-map "\C-c\C-f" 'ruby-insert-end)
-  (define-key ruby-mode-map "\C-m" 'newline)
-  (define-key ruby-mode-map "\C-c/" 'ruby-insert-end))
+  (setq enh-ruby-mode-map (make-sparse-keymap))
+  (define-key enh-ruby-mode-map "{" 'ruby-electric-brace)
+  (define-key enh-ruby-mode-map "}" 'ruby-electric-brace)
+  (define-key enh-ruby-mode-map "\e\C-a" 'ruby-beginning-of-defun)
+  (define-key enh-ruby-mode-map "\e\C-e" 'ruby-end-of-defun)
+  (define-key enh-ruby-mode-map "\e\C-b" 'ruby-backward-sexp)
+  (define-key enh-ruby-mode-map "\e\C-f" 'ruby-forward-sexp)
+  (define-key enh-ruby-mode-map "\e\C-u" 'ruby-up-sexp)
+  (define-key enh-ruby-mode-map "\e\C-p" 'ruby-beginning-of-block)
+  (define-key enh-ruby-mode-map "\e\C-n" 'ruby-end-of-block)
+  (define-key enh-ruby-mode-map "\e\C-h" 'ruby-mark-defun)
+  (define-key enh-ruby-mode-map "\e\C-q" 'ruby-indent-exp)
+  (define-key enh-ruby-mode-map "\C-c\C-e" 'ruby-find-error)
+  (define-key enh-ruby-mode-map "\C-c\C-f" 'ruby-insert-end)
+  (define-key enh-ruby-mode-map "\C-m" 'newline)
+  (define-key enh-ruby-mode-map "\C-c/" 'ruby-insert-end))
 
-(defvar ruby-mode-abbrev-table nil
-  "Abbrev table in use in ruby-mode buffers.")
+(defvar enh-ruby-mode-abbrev-table nil
+  "Abbrev table in use in enh-ruby-mode buffers.")
 
-(define-abbrev-table 'ruby-mode-abbrev-table ())
+(define-abbrev-table 'enh-ruby-mode-abbrev-table ())
 
-(defun ruby-mode-variables ()
+(defun enh-ruby-mode-variables ()
   (make-variable-buffer-local 'ruby-extra-keywords)
-  (set-syntax-table ruby-mode-syntax-table)
-  (setq local-abbrev-table ruby-mode-abbrev-table)
+  (set-syntax-table enh-ruby-mode-syntax-table)
+  (setq local-abbrev-table enh-ruby-mode-abbrev-table)
   (set (make-local-variable 'indent-line-function) 'ruby-indent-line)
   (set (make-local-variable 'require-final-newline) t)
   (set (make-variable-buffer-local 'comment-start) "# ")
@@ -374,19 +382,19 @@ the value changes.
   (set (make-local-variable 'paragraph-separate) paragraph-start)
   (set (make-local-variable 'paragraph-ignore-fill-prefix) t))  
 
-(defun ruby-mode ()
-  "Major mode for editing Ruby code.
+(defun enh-ruby-mode ()
+  "Enhanced Major mode for editing Ruby code.
 
-\\{ruby-mode-map}"
+\\{enh-ruby-mode-map}"
   (interactive)
   (kill-all-local-variables)
-  (use-local-map ruby-mode-map)
+  (use-local-map enh-ruby-mode-map)
   (set (make-local-variable 'erm-e-w-status) nil)
-  (setq major-mode 'ruby-mode
+  (setq major-mode 'enh-ruby-mode
         mode-name '("EnhRuby" erm-e-w-status)
         comment-start "#"  ; used by comment-region; don't change it
         comment-end "")
-  (ruby-mode-variables)
+  (enh-ruby-mode-variables)
 
   ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
   ;; for characters inside regexp literals.
@@ -400,7 +408,7 @@ the value changes.
           'before-save-hook)
          ((boundp 'write-contents-functions) 'write-contents-functions)
          ((boundp 'write-contents-hooks) 'write-contents-hooks))
-   'ruby-mode-set-encoding)
+   'enh-ruby-mode-set-encoding)
 
   ;; We do our own syntax highlighting based on the parse tree.
   ;; However, we want minor modes that add keywords to highlight properly
@@ -425,8 +433,8 @@ the value changes.
   (erm-reset-buffer)
 
   (if (fboundp 'run-mode-hooks)
-      (run-mode-hooks 'ruby-mode-hook)
-    (run-hooks 'ruby-mode-hook)))
+      (run-mode-hooks 'enh-ruby-mode-hook)
+    (run-hooks 'enh-ruby-mode-hook)))
 
 (defun ruby-imenu-create-index-in-block (prefix beg end)
   (let* ((index-alist '())
@@ -1089,4 +1097,4 @@ With ARG, do it that many times."
 
 (erm-reset)
 
-(provide 'ruby-mode)
+(provide 'enh-ruby-mode)
