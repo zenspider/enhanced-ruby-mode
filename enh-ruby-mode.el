@@ -31,8 +31,9 @@
 ;; to provide further enhancements and bug fixes.
 ;;
 ;; It has been renamed to enh-ruby-mode.el to avoid name conflicts
-;; with ruby-mode that ships with emacs. This also makes it possible
-;; to switch back and forth for testing purposes.
+;; with ruby-mode that ships with emacs. All symbols that started with
+;; 'ruby now start with 'enh-ruby. This also makes it possible to
+;; switch back and forth for testing purposes.
 
 ;; Provides fontification, indentation, syntax checking, and navigation for Ruby code.
 ;;
@@ -47,16 +48,16 @@
 ;;
 (defcustom enh-ruby-program "ruby"
   "The ruby program to parse the source."
-  :group 'ruby)
+  :group 'enh-ruby)
 
-(defcustom ruby-check-syntax 'errors-and-warnings
+(defcustom enh-ruby-check-syntax 'errors-and-warnings
   "Highlight syntax errors and warnings."
   :type '(radio (const :tag "None" nil)
                 (const :tag "Errors" errors)
                 (const :tag "Errors and warnings" errors-and-warnings))
-  :group 'ruby)
+  :group 'enh-ruby)
 
-(defcustom ruby-extra-keywords
+(defcustom enh-ruby-extra-keywords
   nil
   "List of idents that will be fontified as keywords. `erm-reset'
 will need to be called in order for any global changes to take effect.
@@ -66,102 +67,102 @@ override the global value for the buffer it is local
 to. `ruby-local-enable-extra-keywords' needs to be called after
 the value changes.
 "
-  :group 'ruby
+  :group 'enh-ruby
   :type '(repeat string))
-(put 'ruby-extra-keywords 'safe-local-variable 'listp)
+(put 'enh-ruby-extra-keywords 'safe-local-variable 'listp)
 
-(defcustom ruby-indent-tabs-mode nil
+(defcustom enh-ruby-indent-tabs-mode nil
   "*Indentation can insert tabs in ruby mode if this is non-nil."
-  :type 'boolean :group 'ruby)
-(put 'ruby-indent-tabs-mode 'safe-local-variable 'booleanp)
+  :type 'boolean :group 'enh-ruby)
+(put 'enh-ruby-indent-tabs-mode 'safe-local-variable 'booleanp)
 
-(defcustom ruby-indent-level 2
+(defcustom enh-ruby-indent-level 2
   "*Indentation of ruby statements."
-  :type 'integer :group 'ruby)
-(put 'ruby-indent-level 'safe-local-variable 'integerp)
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-indent-level 'safe-local-variable 'integerp)
 
-(defcustom ruby-hanging-indent-level 1
+(defcustom enh-ruby-hanging-indent-level 1
   "*Extra hanging Indentation for continued ruby statements."
-  :type 'integer :group 'ruby)
-(put 'ruby-hanging-indent-level 'safe-local-variable 'integerp)
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-hanging-indent-level 'safe-local-variable 'integerp)
 
-(defcustom ruby-comment-column 32
+(defcustom enh-ruby-comment-column 32
   "*Indentation column of comments."
-  :type 'integer :group 'ruby)
-(put 'ruby-comment-column 'safe-local-variable 'integerp)
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-comment-column 'safe-local-variable 'integerp)
 
 
-(defcustom ruby-deep-arglist nil
+(defcustom enh-ruby-deep-arglist nil
   "Ignored in enhanced ruby mode."
-  :group 'ruby)
-(put 'ruby-deep-arglist 'safe-local-variable 'booleanp)
+  :group 'enh-ruby)
+(put 'enh-ruby-deep-arglist 'safe-local-variable 'booleanp)
 
-(defcustom ruby-deep-indent-paren t
+(defcustom enh-ruby-deep-indent-paren t
   "*Deep indent lists in parenthesis when non-nil."
-  :group 'ruby)
-(put 'ruby-deep-indent-paren 'safe-local-variable 'booleanp)
+  :group 'enh-ruby)
+(put 'enh-ruby-deep-indent-paren 'safe-local-variable 'booleanp)
 
-(defcustom ruby-deep-indent-paren-style nil
+(defcustom enh-ruby-deep-indent-paren-style nil
   "Ignored in enhanced ruby mode."
-  :options '(t nil space) :group 'ruby)
+  :options '(t nil space) :group 'enh-ruby)
 
 
-(defcustom ruby-encoding-map '((shift_jis . cp932) (shift-jis . cp932))
+(defcustom enh-ruby-encoding-map '((shift_jis . cp932) (shift-jis . cp932))
   "Alist to map encoding name from emacs to ruby."
-  :group 'ruby)
+  :group 'enh-ruby)
 
-(defcustom ruby-use-encoding-map t
+(defcustom enh-ruby-use-encoding-map t
   "*Use `ruby-encoding-map' to set encoding magic comment if this is non-nil."
-  :type 'boolean :group 'ruby)
+  :type 'boolean :group 'enh-ruby)
 
-(defconst ruby-symbol-chars "a-zA-Z0-9_=?!")
-(defconst ruby-symbol-re (concat "[" ruby-symbol-chars "]"))
+(defconst enh-ruby-symbol-chars "a-zA-Z0-9_=?!")
+(defconst enh-ruby-symbol-re (concat "[" ruby-symbol-chars "]"))
 
-(defconst ruby-defun-beg-keywords
+(defconst enh-ruby-defun-beg-keywords
   '("class" "module" "def")
   "Keywords at the beginning of definitions.")
 
-(defconst ruby-defun-beg-re
+(defconst enh-ruby-defun-beg-re
   (regexp-opt ruby-defun-beg-keywords)
   "Regexp to match the beginning of definitions.")
 
-(defconst ruby-defun-and-name-re
+(defconst enh-ruby-defun-and-name-re
   (concat "\\(" ruby-defun-beg-re "\\)[ \t]+\\("
                                          ;; \\. and :: for class method
                                          "\\([A-Za-z_]" ruby-symbol-re "*\\|\\.\\|::" "\\)"
                                          "+\\)")
   "Regexp to match definitions and their name")
 
-(defface ruby-string-delimiter-face
+(defface enh-ruby-string-delimiter-face
   '((t :foreground "PeachPuff3"))
   "Face used to highlight string delimiters like \" and %Q."
-  :group 'ruby)
+  :group 'enh-ruby)
 
-(defface ruby-heredoc-delimiter-face
+(defface enh-ruby-heredoc-delimiter-face
   '((t :foreground "PeachPuff3"))
   "Face used to highlight string heredoc anchor strings like <<END and END"
-  :group 'ruby)
+  :group 'enh-ruby)
 
-(defface ruby-regexp-delimiter-face
+(defface enh-ruby-regexp-delimiter-face
   '((t :foreground "goldenrod"))
   "Face used to highlight regexp delimiters like / and %r."
-  :group 'ruby)
+  :group 'enh-ruby)
 
-(defface ruby-op-face
+(defface enh-ruby-op-face
   '((t :foreground "dark violet" :bold t))
   "Face used to highlight operators like + and ||"
-  :group 'ruby)
+  :group 'enh-ruby)
 
 
 (defface erm-syn-errline
   '((t (:box (:line-width 1 :color "red"))))
   "Face used for marking error lines."
-  :group 'ruby)
+  :group 'enh-ruby)
 
 (defface erm-syn-warnline
   '((t (:box (:line-width 1 :color "orange"))))
   "Face used for marking warning lines."
-  :group 'ruby)
+  :group 'enh-ruby)
 
 
 (defun enh-ruby-mode-set-encoding ()
@@ -217,7 +218,7 @@ the value changes.
       (set-process-filter erm-ruby-process 'erm-filter)
       (set-process-query-on-exit-flag erm-ruby-process nil)
       (process-send-string (erm-ruby-get-process) (concat "x0:"
-                                                          (mapconcat 'identity (default-value 'ruby-extra-keywords) " ")
+                                                          (mapconcat 'identity (default-value 'enh-ruby-extra-keywords) " ")
                                                           ":\n\0\0\0\n"))))
 
   erm-ruby-process)
@@ -278,19 +279,19 @@ the value changes.
   (setq erm-next-buff-num (1+ erm-buff-num))
   (add-hook 'after-change-functions #'erm-req-parse nil t)
   (unless
-      (ruby-local-enable-extra-keywords)
-    (ruby-fontify-buffer)))
+      (enh-ruby-local-enable-extra-keywords)
+    (enh-ruby-fontify-buffer)))
 
-(defun ruby-local-enable-extra-keywords ()
+(defun enh-ruby-local-enable-extra-keywords ()
   "If the variable `ruby-extra-keywords' is buffer local then
   enable the keywords for current buffer."
-  (when (local-variable-p 'ruby-extra-keywords)
+  (when (local-variable-p 'enh-ruby-extra-keywords)
       (process-send-string (erm-ruby-get-process)
                            (concat "x"
                                    (number-to-string erm-buff-num) ":"
                                    (mapconcat 'identity ruby-extra-keywords " ")
                                    ":\n\0\0\0\n"))
-      (ruby-fontify-buffer)
+      (enh-ruby-fontify-buffer)
       t))
 
 
@@ -331,31 +332,31 @@ the value changes.
 
 (defvar enh-ruby-mode-map nil "Keymap used in ruby mode.")
 
-(defun ruby-electric-brace (arg)
+(defun enh-ruby-electric-brace (arg)
   (interactive "P")
   (insert-char last-command-event 1)
-  (ruby-indent-line t)
+  (enh-ruby-indent-line t)
   (delete-char -1)
   (self-insert-command (prefix-numeric-value arg)))
 
 (if enh-ruby-mode-map
     nil
   (setq enh-ruby-mode-map (make-sparse-keymap))
-  (define-key enh-ruby-mode-map "{" 'ruby-electric-brace)
-  (define-key enh-ruby-mode-map "}" 'ruby-electric-brace)
-  (define-key enh-ruby-mode-map "\e\C-a" 'ruby-beginning-of-defun)
-  (define-key enh-ruby-mode-map "\e\C-e" 'ruby-end-of-defun)
-  (define-key enh-ruby-mode-map "\e\C-b" 'ruby-backward-sexp)
-  (define-key enh-ruby-mode-map "\e\C-f" 'ruby-forward-sexp)
-  (define-key enh-ruby-mode-map "\e\C-u" 'ruby-up-sexp)
-  (define-key enh-ruby-mode-map "\e\C-p" 'ruby-beginning-of-block)
-  (define-key enh-ruby-mode-map "\e\C-n" 'ruby-end-of-block)
-  (define-key enh-ruby-mode-map "\e\C-h" 'ruby-mark-defun)
-  (define-key enh-ruby-mode-map "\e\C-q" 'ruby-indent-exp)
-  (define-key enh-ruby-mode-map "\C-c\C-e" 'ruby-find-error)
-  (define-key enh-ruby-mode-map "\C-c\C-f" 'ruby-insert-end)
+  (define-key enh-ruby-mode-map "{" 'enh-ruby-electric-brace)
+  (define-key enh-ruby-mode-map "}" 'enh-ruby-electric-brace)
+  (define-key enh-ruby-mode-map "\e\C-a" 'enh-ruby-beginning-of-defun)
+  (define-key enh-ruby-mode-map "\e\C-e" 'enh-ruby-end-of-defun)
+  (define-key enh-ruby-mode-map "\e\C-b" 'enh-ruby-backward-sexp)
+  (define-key enh-ruby-mode-map "\e\C-f" 'enh-ruby-forward-sexp)
+  (define-key enh-ruby-mode-map "\e\C-u" 'enh-ruby-up-sexp)
+  (define-key enh-ruby-mode-map "\e\C-p" 'enh-ruby-beginning-of-block)
+  (define-key enh-ruby-mode-map "\e\C-n" 'enh-ruby-end-of-block)
+  (define-key enh-ruby-mode-map "\e\C-h" 'enh-ruby-mark-defun)
+  (define-key enh-ruby-mode-map "\e\C-q" 'enh-ruby-indent-exp)
+  (define-key enh-ruby-mode-map "\C-c\C-e" 'enh-ruby-find-error)
+  (define-key enh-ruby-mode-map "\C-c\C-f" 'enh-ruby-insert-end)
   (define-key enh-ruby-mode-map "\C-m" 'newline)
-  (define-key enh-ruby-mode-map "\C-c/" 'ruby-insert-end))
+  (define-key enh-ruby-mode-map "\C-c/" 'enh-ruby-insert-end))
 
 (defvar enh-ruby-mode-abbrev-table nil
   "Abbrev table in use in enh-ruby-mode buffers.")
@@ -363,10 +364,10 @@ the value changes.
 (define-abbrev-table 'enh-ruby-mode-abbrev-table ())
 
 (defun enh-ruby-mode-variables ()
-  (make-variable-buffer-local 'ruby-extra-keywords)
+  (make-variable-buffer-local 'enh-ruby-extra-keywords)
   (set-syntax-table enh-ruby-mode-syntax-table)
   (setq local-abbrev-table enh-ruby-mode-abbrev-table)
-  (set (make-local-variable 'indent-line-function) 'ruby-indent-line)
+  (set (make-local-variable 'indent-line-function) 'enh-ruby-indent-line)
   (set (make-local-variable 'require-final-newline) t)
   (set (make-variable-buffer-local 'comment-start) "# ")
   (set (make-variable-buffer-local 'comment-end) "")
@@ -400,7 +401,7 @@ the value changes.
   ;; for characters inside regexp literals.
 
 
-  (set (make-local-variable 'add-log-current-defun-function) 'ruby-add-log-current-method)
+  (set (make-local-variable 'add-log-current-defun-function) 'enh-ruby-add-log-current-method)
 
   (add-hook
    (cond ((boundp 'before-save-hook)
@@ -425,7 +426,7 @@ the value changes.
        (lambda (state) nil))
 
   (set (make-local-variable 'imenu-create-index-function)
-       'ruby-imenu-create-index)
+       'enh-ruby-imenu-create-index)
 
   (add-hook 'change-major-mode-hook 'erm-major-mode-changed nil t)
   (add-hook 'kill-buffer-hook 'erm-buffer-killed nil t)
@@ -436,7 +437,7 @@ the value changes.
       (run-mode-hooks 'enh-ruby-mode-hook)
     (run-hooks 'enh-ruby-mode-hook)))
 
-(defun ruby-imenu-create-index-in-block (prefix beg end)
+(defun enh-ruby-imenu-create-index-in-block (prefix beg end)
   (let* ((index-alist '())
          (pos beg)
          (prop (get-text-property pos 'indent)))
@@ -446,19 +447,19 @@ the value changes.
       (when (and (eq prop 'b) (looking-at ruby-defun-and-name-re))
         (push (cons (concat (match-string 1) " "(match-string 2)) pos) index-alist))
 
-      (setq prop (and (setq pos (ruby-next-indent-change pos))
+      (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
                       (get-text-property pos 'indent))))
 
     index-alist))
 
-(defun ruby-imenu-create-index ()
-  (nreverse (ruby-imenu-create-index-in-block nil (point-min) nil)))
+(defun enh-ruby-imenu-create-index ()
+  (nreverse (enh-ruby-imenu-create-index-in-block nil (point-min) nil)))
 
-(defun ruby-add-log-current-method ()
+(defun enh-ruby-add-log-current-method ()
   "Return current method string."
   (condition-case nil
       (save-excursion
-        (ruby-beginning-of-defun 1)
+        (enh-ruby-beginning-of-defun 1)
         (when (looking-at ruby-defun-and-name-re)
           (concat (match-string 1) " "(match-string 2))))))
 
@@ -483,7 +484,7 @@ modifications to the buffer."
            (restore-buffer-modified-p nil))))))
 
 
-(defun ruby-fontify-buffer ()
+(defun enh-ruby-fontify-buffer ()
   "Fontify the current buffer. Useful if faces are out of sync"
   (interactive)
   (if (and erm-parsing-p (not (eq erm-parse-buff (current-buffer))))
@@ -541,7 +542,7 @@ modifications to the buffer."
 
 (defsubst erm-ready ()
   (if erm-full-parse-p
-      (ruby-fontify-buffer)
+      (enh-ruby-fontify-buffer)
     (setq erm-parsing-p t)
     (process-send-string (erm-ruby-get-process) (concat "g" (number-to-string erm-buff-num) ":\n\0\0\0\n"))))
 
@@ -561,7 +562,7 @@ modifications to the buffer."
         ruby-op-face
         ))
 
-(defun ruby-calculate-indent (&optional start-point)
+(defun enh-ruby-calculate-indent (&optional start-point)
   "Calculate the indentation of the previous line and its level."
   (save-excursion
     (when start-point (goto-char start-point))
@@ -575,19 +576,19 @@ modifications to the buffer."
         (cond
          ((or (eq 'e prop) (eq 's prop))
           (when (eq 's prop) (forward-char))
-          (ruby-backward-sexp)
+          (enh-ruby-backward-sexp)
           (if (not (eq 'd (get-text-property (point) 'indent)))
               (current-column)
             (setq pos (point))
-            (ruby-skip-non-indentable)
-            (ruby-calculate-indent-1 pos (line-beginning-position))))
+            (enh-ruby-skip-non-indentable)
+            (enh-ruby-calculate-indent-1 pos (line-beginning-position))))
 
          ((eq 'r prop)
           (if ruby-deep-indent-paren
-              (progn (ruby-backward-sexp) (current-column))
+              (progn (enh-ruby-backward-sexp) (current-column))
             (forward-line -1)
-            (ruby-skip-non-indentable)
-            (- (ruby-calculate-indent-1 pos (line-beginning-position)) ruby-indent-level)))
+            (enh-ruby-skip-non-indentable)
+            (- (enh-ruby-calculate-indent-1 pos (line-beginning-position)) ruby-indent-level)))
 
          ((or (memq face '(font-lock-string-face ruby-heredoc-delimiter-face))
               (and (eq 'font-lock-variable-name-face face)
@@ -597,8 +598,8 @@ modifications to the buffer."
          (t
           (forward-line -1)
 
-          (ruby-skip-non-indentable)
-          (ruby-calculate-indent-1 pos (line-beginning-position))))))))
+          (enh-ruby-skip-non-indentable)
+          (enh-ruby-calculate-indent-1 pos (line-beginning-position))))))))
 
 (defun erm-looking-at-not-indentable ()
   (skip-syntax-forward " " (line-end-position))
@@ -607,19 +608,19 @@ modifications to the buffer."
         (memq face '(font-lock-string-face font-lock-comment-face ruby-heredoc-delimiter-face))
         (and (eq 'font-lock-variable-name-face face)
              (looking-at "#"))
-        (and (memq face '(ruby-regexp-delimiter-face ruby-string-delimiter-face))
+        (and (memq face '(enh-ruby-regexp-delimiter-face ruby-string-delimiter-face))
              (> (point) (point-min))
              (eq (get-text-property (1- (point)) 'face) 'font-lock-string-face)))))
 
 
-(defun ruby-skip-non-indentable ()
+(defun enh-ruby-skip-non-indentable ()
   (forward-line 0)
   (while (and (> (point) (point-min))
               (erm-looking-at-not-indentable))
     (skip-chars-backward " \n\t\r\v\f")
     (forward-line 0)))
 
-(defun ruby-calculate-indent-1 (limit pos)
+(defun enh-ruby-calculate-indent-1 (limit pos)
   (goto-char pos)
   (let ((start-pos pos)
         col max
@@ -650,37 +651,37 @@ modifications to the buffer."
     (+ (if (eq 'c (get-text-property limit 'indent)) ruby-hanging-indent-level 0)
      (cond
      ((= max 0)
-      (if (not (or (eq (get-text-property start-pos 'face) 'ruby-heredoc-delimiter-face)
+      (if (not (or (eq (get-text-property start-pos 'face) 'enh-ruby-heredoc-delimiter-face)
                    (eq (get-text-property start-pos 'face) 'font-lock-string-face)))
           indent
-        (goto-char (or (ruby-string-start-pos start-pos) limit))
+        (goto-char (or (enh-ruby-string-start-pos start-pos) limit))
         (current-indentation)))
 
      ((= max pc) (if (eq 'c (get-text-property limit 'indent)) (- pc ruby-hanging-indent-level) pc))
 
      ((= max bc)
       (if (eq 'd (get-text-property (+ start-pos bc -1) 'indent))
-          (+ (ruby-calculate-indent-1 (+ start-pos bc -1) start-pos) ruby-indent-level)
+          (+ (enh-ruby-calculate-indent-1 (+ start-pos bc -1) start-pos) ruby-indent-level)
         (+ bc ruby-indent-level -1)))
 
      ((= max npc)
       (goto-char (+ start-pos npc))
-      (ruby-backward-sexp)
-      (ruby-calculate-indent-1 (point) (line-beginning-position)))
+      (enh-ruby-backward-sexp)
+      (enh-ruby-calculate-indent-1 (point) (line-beginning-position)))
 
      ((= max nbc)
       (goto-char (+ start-pos nbc -1))
-      (ruby-backward-sexp)
-      (ruby-calculate-indent-1 (point) (line-beginning-position)))
+      (enh-ruby-backward-sexp)
+      (enh-ruby-calculate-indent-1 (point) (line-beginning-position)))
 
      (t 0)
      ))))
 
-(defun ruby-string-start-pos (pos)
+(defun enh-ruby-string-start-pos (pos)
   (when (< 0 (or (setq pos (previous-single-property-change pos 'face)) 0))
     (previous-single-property-change pos 'face)))
 
-(defun ruby-show-errors-at (pos face)
+(defun enh-ruby-show-errors-at (pos face)
   (let ((overlays (overlays-at pos))
         overlay
         messages)
@@ -695,7 +696,7 @@ modifications to the buffer."
     messages))
 
 
-(defun ruby-find-error (&optional arg)
+(defun enh-ruby-find-error (&optional arg)
   "Search back, then forward for a syntax error/warning.
 Display contents in mini-buffer."
   (interactive "^P")
@@ -704,27 +705,27 @@ Display contents in mini-buffer."
         (face (if arg 'erm-syn-warnline 'erm-syn-errline))
         messages
         (pos (point)))
-    (unless (eq last-command 'ruby-find-error)
+    (unless (eq last-command 'enh-ruby-find-error)
       (while (and (not messages) (> pos (point-min)))
-        (setq messages (ruby-show-errors-at (setq pos (previous-overlay-change pos)) face))))
+        (setq messages (enh-ruby-show-errors-at (setq pos (previous-overlay-change pos)) face))))
 
     (unless messages
       (while (and (not messages) (< pos (point-max)))
-        (setq messages (ruby-show-errors-at (setq pos (next-overlay-change pos)) face))))
+        (setq messages (enh-ruby-show-errors-at (setq pos (next-overlay-change pos)) face))))
 
     (if messages
         (goto-char pos)
       (unless arg
-        (ruby-find-error t)))))
+        (enh-ruby-find-error t)))))
 
 
-(defun ruby-up-sexp (&optional arg)
+(defun enh-ruby-up-sexp (&optional arg)
   "Move up one balanced expression (sexp).
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
   (while (>= (setq arg (1- arg)) 0)
-    (let* ((pos (ruby-previous-indent-change (point)))
+    (let* ((pos (enh-ruby-previous-indent-change (point)))
            (prop (get-text-property pos 'indent))
            (count 1))
 
@@ -733,12 +734,12 @@ With ARG, do it that many times."
                          ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1- count))
                          ((or (eq prop 'r) (eq prop 'e)) (1+ count))
                          (t count))))
-        (setq prop (and (setq pos (ruby-previous-indent-change pos))
+        (setq prop (and (setq pos (enh-ruby-previous-indent-change pos))
                         (get-text-property pos 'indent))))
 
       (goto-char (if prop pos (point-min))))))
 
-(defun ruby-beginning-of-defun (&optional arg)
+(defun enh-ruby-beginning-of-defun (&optional arg)
   "Move backward across one balanced expression (sexp) looking for a definition begining.
 With ARG, do it that many times."
   (interactive "^p")
@@ -751,33 +752,33 @@ With ARG, do it that many times."
          (while (and
                  (> (point) (point-min))
                  (progn
-                  (ruby-backward-sexp 1)
+                  (enh-ruby-backward-sexp 1)
                   (setq prop (get-text-property (point) 'indent))
                   (not (and (eq prop 'b) (looking-at ruby-defun-beg-re)))))))
        (point)))))
 
-(defun ruby-mark-defun ()
+(defun enh-ruby-mark-defun ()
   "Put mark at end of this Ruby definition, point at beginning."
   (interactive)
   (push-mark (point))
-  (ruby-beginning-of-defun 1)
-  (ruby-forward-sexp 1)
+  (enh-ruby-beginning-of-defun 1)
+  (enh-ruby-forward-sexp 1)
   (forward-line 1)
   (push-mark (point) nil t)
-  (ruby-backward-sexp 1)
+  (enh-ruby-backward-sexp 1)
   (forward-line 0))
 
-(defun ruby-indent-exp (&optional shutup-p)
+(defun enh-ruby-indent-exp (&optional shutup-p)
   "Indent each line in the balanced expression following point syntactically.
 If optional SHUTUP-P is non-nil, no errors are signalled if no
 balanced expression is found."
   (interactive "*P")
   (erm-wait-for-parse)
-  (let ((end-pos (save-excursion (ruby-forward-sexp 1) (point))))
+  (let ((end-pos (save-excursion (enh-ruby-forward-sexp 1) (point))))
     (indent-region (point) end-pos)))
 
 
-(defun ruby-beginning-of-block (&optional arg)
+(defun enh-ruby-beginning-of-block (&optional arg)
   "Move backward across one balanced expression (sexp) looking for a block begining.
 With ARG, do it that many times."
   (interactive "^p")
@@ -788,13 +789,13 @@ With ARG, do it that many times."
      (save-excursion
        (while (>= (setq arg (1- arg)) 0)
          (while (progn
-                  (ruby-backward-sexp 1)
+                  (enh-ruby-backward-sexp 1)
                   (setq prop (get-text-property (point) 'indent))
                   (not (or (eq prop 'b) (eq prop 'd))))))
        (point)))))
 
 
-(defun ruby-end-of-defun (&optional arg)
+(defun enh-ruby-end-of-defun (&optional arg)
   "Move forwards across one balanced expression (sexp) looking for a definition end.
 With ARG, do it that many times."
   (interactive "^p")
@@ -805,16 +806,16 @@ With ARG, do it that many times."
          (while (and
                  (< (point) (point-max))
                  (progn
-                   (ruby-forward-sexp 1)
+                   (enh-ruby-forward-sexp 1)
                    (setq prop (get-text-property (point) 'indent))
                    (not (and (eq prop 'e)
                              (save-excursion
-                               (ruby-backward-sexp 1)
+                               (enh-ruby-backward-sexp 1)
                                (looking-at ruby-defun-beg-re))))))))
     (forward-word)
     (point)))
 
-(defun ruby-end-of-block (&optional arg)
+(defun enh-ruby-end-of-block (&optional arg)
   "Move forwards across one balanced expression (sexp) looking for a block end.
 With ARG, do it that many times."
   (interactive "^p")
@@ -825,12 +826,12 @@ With ARG, do it that many times."
      (save-excursion
        (while (>= (setq arg (1- arg)) 0)
          (while (progn
-                  (ruby-forward-sexp 1)
+                  (enh-ruby-forward-sexp 1)
                   (setq prop (get-text-property (point) 'indent))
                   (not (eq prop 'e)))))
        (point)))))
 
-(defun ruby-backward-sexp (&optional arg)
+(defun enh-ruby-backward-sexp (&optional arg)
   "Move backward across one balanced expression (sexp).
 With ARG, do it that many times."
   (interactive "^p")
@@ -842,7 +843,7 @@ With ARG, do it that many times."
            (count 0))
 
       (unless (or (eq prop 'r) (eq prop 'e))
-        (setq prop (and (setq pos (ruby-previous-indent-change pos))
+        (setq prop (and (setq pos (enh-ruby-previous-indent-change pos))
                         (get-text-property pos 'indent))))
 
 
@@ -854,12 +855,12 @@ With ARG, do it that many times."
                          ((eq prop 's) (if (= 0 count) 1 count))
                          (t 0))))
         (goto-char pos)
-        (setq prop (and (setq pos (ruby-previous-indent-change pos))
+        (setq prop (and (setq pos (enh-ruby-previous-indent-change pos))
                         (get-text-property pos 'indent))))
 
       (goto-char (if prop pos (point-min))))))
 
-(defun ruby-forward-sexp (&optional arg)
+(defun enh-ruby-forward-sexp (&optional arg)
   "Move backward across one balanced expression (sexp).
 With ARG, do it that many times."
   (interactive "^p")
@@ -870,7 +871,7 @@ With ARG, do it that many times."
            (count 0))
 
       (unless (or (eq prop 'l) (eq prop 'b) (eq prop 'd))
-        (setq prop (and (setq pos (ruby-next-indent-change pos))
+        (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
                         (get-text-property pos 'indent))))
 
 
@@ -882,12 +883,12 @@ With ARG, do it that many times."
                          ((eq prop 's) (if (= 0 count) 1 count))
                          (t 0))))
         (goto-char pos)
-        (setq prop (and (setq pos (ruby-next-indent-change pos))
+        (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
                         (get-text-property pos 'indent))))
 
       (goto-char (if prop pos (point-max))))))
 
-(defun ruby-insert-end ()
+(defun enh-ruby-insert-end ()
   (interactive)
   (let ((text (save-excursion
                 (forward-line 0)
@@ -897,19 +898,19 @@ With ARG, do it that many times."
                       "\n}"
                     "\nend")))))
     (insert text)
-    (ruby-indent-line t)
+    (enh-ruby-indent-line t)
     ))
 
-(defun ruby-previous-indent-change (pos)
+(defun enh-ruby-previous-indent-change (pos)
   (and pos (setq pos (1- pos))
        (>= pos (point-min))
        (or (and (get-text-property pos 'indent) pos)
            (and (> pos (point-min))
                 (get-text-property (1- pos) 'indent)
                 (1- pos))
-           (ruby-previous-indent-change (previous-single-property-change pos 'indent)))))
+           (enh-ruby-previous-indent-change (previous-single-property-change pos 'indent)))))
 
-(defun ruby-next-indent-change (pos)
+(defun enh-ruby-next-indent-change (pos)
   (and pos (setq pos (1+ pos))
        (<= pos (point-max))
        (or (and (get-text-property pos 'indent) pos)
@@ -918,16 +919,16 @@ With ARG, do it that many times."
                 (1+ pos))
            (next-single-property-change pos 'indent))))
 
-(defun ruby-indent-line (&optional flag)
+(defun enh-ruby-indent-line (&optional flag)
   "Correct indentation of the current ruby line."
   (erm-wait-for-parse)
   (unwind-protect
       (progn
         (setq erm-no-parse-needed-p t)
-        (ruby-indent-to (ruby-calculate-indent)))
+        (enh-ruby-indent-to (enh-ruby-calculate-indent)))
     (setq erm-no-parse-needed-p nil)))
 
-(defun ruby-indent-to (indent)
+(defun enh-ruby-indent-to (indent)
   "Indent the current line."
   (unless (= (current-indentation) indent)
     (save-excursion
@@ -941,7 +942,7 @@ With ARG, do it that many times."
   (if (< (current-column) (current-indentation))
       (back-to-indentation)))
 
-(defun ruby-add-faces (list)
+(defun enh-ruby-add-faces (list)
   (let* ((ipos (car list))
          (buf-size (car ipos))
          (istart (cadr ipos))
@@ -1071,18 +1072,18 @@ With ARG, do it that many times."
                     (catch 'interrupted
                       (if send-next-p
                           (erm-ready)
-                        (ruby-add-faces (car (read-from-string response))))
+                        (enh-ruby-add-faces (car (read-from-string response))))
                       nil)
                   (error t)))
           (if interrupted-p
               (setq erm-full-parse-p t)
 
             (if erm-full-parse-p
-                (ruby-fontify-buffer)
+                (enh-ruby-fontify-buffer)
               (if (car erm-reparse-list)
                   (with-current-buffer (car erm-reparse-list)
                     (setq erm-reparse-list (cdr erm-reparse-list))
-                    (ruby-fontify-buffer))
+                    (enh-ruby-fontify-buffer))
                 (erm-do-syntax-check)
                 ))))
 
