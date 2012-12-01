@@ -118,20 +118,20 @@ the value changes.
 
 (defconst enh-ruby-symbol-chars "a-zA-Z0-9_=?!")
 
-(defconst enh-ruby-symbol-re (concat "[" ruby-symbol-chars "]"))
+(defconst enh-ruby-symbol-re (concat "[" enh-ruby-symbol-chars "]"))
 
 (defconst enh-ruby-defun-beg-keywords
   '("class" "module" "def")
   "Keywords at the beginning of definitions.")
 
 (defconst enh-ruby-defun-beg-re
-  (regexp-opt ruby-defun-beg-keywords)
+  (regexp-opt enh-ruby-defun-beg-keywords)
   "Regexp to match the beginning of definitions.")
 
 (defconst enh-ruby-defun-and-name-re
-  (concat "\\(" ruby-defun-beg-re "\\)[ \t]+\\("
+  (concat "\\(" enh-ruby-defun-beg-re "\\)[ \t]+\\("
                                          ;; \\. and :: for class method
-                                         "\\([A-Za-z_]" ruby-symbol-re "*\\|\\.\\|::" "\\)"
+                                         "\\([A-Za-z_]" enh-ruby-symbol-re "*\\|\\.\\|::" "\\)"
                                          "+\\)")
   "Regexp to match definitions and their name")
 
@@ -185,8 +185,8 @@ the value changes.
         (setq coding-system
               (if coding-system
                   (symbol-name
-                   (or (and ruby-use-encoding-map
-                            (cdr (assq coding-system ruby-encoding-map)))
+                   (or (and enh-ruby-use-encoding-map
+                            (cdr (assq coding-system enh-ruby-encoding-map)))
                        coding-system))
                 "ascii-8bit"))
         (if (looking-at "^#!") (beginning-of-line 2))
@@ -292,7 +292,7 @@ the value changes.
       (process-send-string (erm-ruby-get-process)
                            (concat "x"
                                    (number-to-string erm-buff-num) ":"
-                                   (mapconcat 'identity ruby-extra-keywords " ")
+                                   (mapconcat 'identity enh-ruby-extra-keywords " ")
                                    ":\n\0\0\0\n"))
       (enh-ruby-fontify-buffer)
       t))
@@ -372,9 +372,9 @@ the value changes.
   (set (make-local-variable 'require-final-newline) t)
   (set (make-variable-buffer-local 'comment-start) "# ")
   (set (make-variable-buffer-local 'comment-end) "")
-  (set (make-variable-buffer-local 'comment-column) ruby-comment-column)
+  (set (make-variable-buffer-local 'comment-column) enh-ruby-comment-column)
   (set (make-variable-buffer-local 'comment-start-skip) "#+ *")
-  (setq indent-tabs-mode ruby-indent-tabs-mode)
+  (setq indent-tabs-mode enh-ruby-indent-tabs-mode)
   (set (make-local-variable 'need-syntax-check-p) nil)
   (set (make-local-variable 'erm-full-parse-p) nil)
   (set (make-local-variable 'erm-buff-num) nil)
@@ -444,7 +444,7 @@ the value changes.
     (setq end (or end (point-max)))
     (while (and pos (< pos end))
       (goto-char pos)
-      (when (and (eq prop 'b) (looking-at ruby-defun-and-name-re))
+      (when (and (eq prop 'b) (looking-at enh-ruby-defun-and-name-re))
         (push (cons (concat (match-string 1) " "(match-string 2)) pos) index-alist))
 
       (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
@@ -460,7 +460,7 @@ the value changes.
   (condition-case nil
       (save-excursion
         (enh-ruby-beginning-of-defun 1)
-        (when (looking-at ruby-defun-and-name-re)
+        (when (looking-at enh-ruby-defun-and-name-re)
           (concat (match-string 1) " "(match-string 2))))))
 
 ;; Stolen shamelessly from James Clark's nxml-mode.
@@ -494,7 +494,7 @@ modifications to the buffer."
   (setq erm-reparse-list (cons (current-buffer) erm-reparse-list)))
 
 (defun erm-req-parse (min max len)
-  (when (and ruby-check-syntax (not need-syntax-check-p))
+  (when (and enh-ruby-check-syntax (not need-syntax-check-p))
     (setq need-syntax-check-p t)
     (setq erm-syntax-check-list (cons (current-buffer) erm-syntax-check-list)))
   (let ((pc (if erm-parsing-p
@@ -543,7 +543,7 @@ modifications to the buffer."
     (setq erm-parsing-p t)
     (process-send-string (erm-ruby-get-process) (concat "g" (number-to-string erm-buff-num) ":\n\0\0\0\n"))))
 
-(setq ruby-font-names
+(setq enh-ruby-font-names
       '(nil
         font-lock-string-face
         font-lock-type-face
@@ -551,12 +551,12 @@ modifications to the buffer."
         font-lock-comment-face
         font-lock-constant-face
         font-lock-string-face
-        ruby-string-delimiter-face
-        ruby-regexp-delimiter-face
+        enh-ruby-string-delimiter-face
+        enh-ruby-regexp-delimiter-face
         font-lock-function-name-face
         font-lock-keyword-face
-        ruby-heredoc-delimiter-face
-        ruby-op-face
+        enh-ruby-heredoc-delimiter-face
+        enh-ruby-op-face
         ))
 
 (defun enh-ruby-calculate-indent (&optional start-point)
@@ -581,13 +581,13 @@ modifications to the buffer."
             (enh-ruby-calculate-indent-1 pos (line-beginning-position))))
 
          ((eq 'r prop)
-          (if ruby-deep-indent-paren
+          (if enh-ruby-deep-indent-paren
               (progn (enh-ruby-backward-sexp) (current-column))
             (forward-line -1)
             (enh-ruby-skip-non-indentable)
-            (- (enh-ruby-calculate-indent-1 pos (line-beginning-position)) ruby-indent-level)))
+            (- (enh-ruby-calculate-indent-1 pos (line-beginning-position)) enh-ruby-indent-level)))
 
-         ((or (memq face '(font-lock-string-face ruby-heredoc-delimiter-face))
+         ((or (memq face '(font-lock-string-face enh-ruby-heredoc-delimiter-face))
               (and (eq 'font-lock-variable-name-face face)
                    (looking-at "#")))
           (current-column))
@@ -602,10 +602,10 @@ modifications to the buffer."
   (skip-syntax-forward " " (line-end-position))
   (let ((face (get-text-property (point) 'face)))
     (or (= (point) (line-end-position))
-        (memq face '(font-lock-string-face font-lock-comment-face ruby-heredoc-delimiter-face))
+        (memq face '(font-lock-string-face font-lock-comment-face enh-ruby-heredoc-delimiter-face))
         (and (eq 'font-lock-variable-name-face face)
              (looking-at "#"))
-        (and (memq face '(enh-ruby-regexp-delimiter-face ruby-string-delimiter-face))
+        (and (memq face '(enh-ruby-regexp-delimiter-face enh-ruby-string-delimiter-face))
              (> (point) (point-min))
              (eq (get-text-property (1- (point)) 'face) 'font-lock-string-face)))))
 
@@ -620,7 +620,7 @@ modifications to the buffer."
   (goto-char pos)
   (let ((start-pos pos)
         col max
-        (indent (- (current-indentation) (if (eq 'c (get-text-property pos 'indent)) ruby-hanging-indent-level 0)))
+        (indent (- (current-indentation) (if (eq 'c (get-text-property pos 'indent)) enh-ruby-hanging-indent-level 0)))
         bc (nbc 0)
         pc (npc 0)
         (prop (get-text-property pos 'indent)))
@@ -632,7 +632,7 @@ modifications to the buffer."
           (setq prop (get-text-property pos 'indent))))
       (setq col (- pos start-pos -1))
       (cond
-       ((eq prop 'l) (setq pc (cons (if ruby-deep-indent-paren col (+ ruby-indent-level indent)) pc)))
+       ((eq prop 'l) (setq pc (cons (if enh-ruby-deep-indent-paren col (+ enh-ruby-indent-level indent)) pc)))
        ((eq prop 'r) (if pc (setq pc (cdr pc)) (setq npc col)))
        ((or (eq prop 'b) (eq prop 'd) (eq prop 's)) (setq bc (cons col bc)))
        ((eq prop 'e) (if bc (setq bc (cdr bc)) (setq nbc col))))
@@ -644,7 +644,7 @@ modifications to the buffer."
     (setq pc (or (car pc) 0))
     (setq bc (or (car bc) 0))
     (setq max (max pc bc nbc npc))
-    (+ (if (eq 'c (get-text-property limit 'indent)) ruby-hanging-indent-level 0)
+    (+ (if (eq 'c (get-text-property limit 'indent)) enh-ruby-hanging-indent-level 0)
      (cond
      ((= max 0)
       (if (not (or (eq (get-text-property start-pos 'face) 'enh-ruby-heredoc-delimiter-face)
@@ -653,12 +653,12 @@ modifications to the buffer."
         (goto-char (or (enh-ruby-string-start-pos start-pos) limit))
         (current-indentation)))
 
-     ((= max pc) (if (eq 'c (get-text-property limit 'indent)) (- pc ruby-hanging-indent-level) pc))
+     ((= max pc) (if (eq 'c (get-text-property limit 'indent)) (- pc enh-ruby-hanging-indent-level) pc))
 
      ((= max bc)
       (if (eq 'd (get-text-property (+ start-pos bc -1) 'indent))
-          (+ (enh-ruby-calculate-indent-1 (+ start-pos bc -1) start-pos) ruby-indent-level)
-        (+ bc ruby-indent-level -1)))
+          (+ (enh-ruby-calculate-indent-1 (+ start-pos bc -1) start-pos) enh-ruby-indent-level)
+        (+ bc enh-ruby-indent-level -1)))
 
      ((= max npc)
       (goto-char (+ start-pos npc))
@@ -748,7 +748,7 @@ With ARG, do it that many times."
                  (progn
                   (enh-ruby-backward-sexp 1)
                   (setq prop (get-text-property (point) 'indent))
-                  (not (and (eq prop 'b) (looking-at ruby-defun-beg-re)))))))
+                  (not (and (eq prop 'b) (looking-at enh-ruby-defun-beg-re)))))))
        (point)))))
 
 (defun enh-ruby-mark-defun ()
@@ -803,7 +803,7 @@ With ARG, do it that many times."
                    (not (and (eq prop 'e)
                              (save-excursion
                                (enh-ruby-backward-sexp 1)
-                               (looking-at ruby-defun-beg-re))))))))
+                               (looking-at enh-ruby-defun-beg-re))))))))
     (forward-word)
     (point)))
 
@@ -960,7 +960,7 @@ With ARG, do it that many times."
           ))
 
       (while (setq list (cdr list))
-        (let ((face (nth (caar list) ruby-font-names))
+        (let ((face (nth (caar list) enh-ruby-font-names))
               (pos (cdar list)))
           (while pos
             (put-text-property (car pos) (cadr pos) 'face face)
@@ -985,7 +985,7 @@ With ARG, do it that many times."
           (setq response (substring response (match-end 0)))
           (forward-line (- line-no last-line))
 
-          (when (or (eq face 'erm-syn-errline) (eq ruby-check-syntax 'errors-and-warnings))
+          (when (or (eq face 'erm-syn-errline) (eq enh-ruby-check-syntax 'errors-and-warnings))
             (if (and (not (eq ?: (string-to-char response)))
                      (string-match "\\`[^\n]*\n\\( *\\)^\n" response))
                 (progn
