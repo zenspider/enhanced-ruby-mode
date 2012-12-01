@@ -46,6 +46,9 @@
 ;;    (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
 ;;    (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 ;;
+
+;;; Variables:
+
 (defcustom enh-ruby-program "ruby"
   "The ruby program to parse the source."
   :group 'enh-ruby)
@@ -91,7 +94,6 @@ the value changes.
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-comment-column 'safe-local-variable 'integerp)
 
-
 (defcustom enh-ruby-deep-arglist nil
   "Ignored in enhanced ruby mode."
   :group 'enh-ruby)
@@ -106,7 +108,6 @@ the value changes.
   "Ignored in enhanced ruby mode."
   :options '(t nil space) :group 'enh-ruby)
 
-
 (defcustom enh-ruby-encoding-map '((shift_jis . cp932) (shift-jis . cp932))
   "Alist to map encoding name from emacs to ruby."
   :group 'enh-ruby)
@@ -116,6 +117,7 @@ the value changes.
   :type 'boolean :group 'enh-ruby)
 
 (defconst enh-ruby-symbol-chars "a-zA-Z0-9_=?!")
+
 (defconst enh-ruby-symbol-re (concat "[" ruby-symbol-chars "]"))
 
 (defconst enh-ruby-defun-beg-keywords
@@ -132,6 +134,8 @@ the value changes.
                                          "\\([A-Za-z_]" ruby-symbol-re "*\\|\\.\\|::" "\\)"
                                          "+\\)")
   "Regexp to match definitions and their name")
+
+;;; Faces:
 
 (defface enh-ruby-string-delimiter-face
   '((t :foreground "PeachPuff3"))
@@ -153,7 +157,6 @@ the value changes.
   "Face used to highlight operators like + and ||"
   :group 'enh-ruby)
 
-
 (defface erm-syn-errline
   '((t (:box (:line-width 1 :color "red"))))
   "Face used for marking error lines."
@@ -164,6 +167,7 @@ the value changes.
   "Face used for marking warning lines."
   :group 'enh-ruby)
 
+;;; Functions:
 
 (defun enh-ruby-mode-set-encoding ()
   (save-excursion
@@ -234,7 +238,6 @@ the value changes.
     (setq erm-source-dir (file-name-directory (find-lisp-object-file-name
                                                'erm-source-dir (symbol-function 'erm-source-dir))))))
 
-
 (defvar erm-ruby-process nil
   "The current erm process where emacs is interacting with")
 
@@ -294,7 +297,6 @@ the value changes.
       (enh-ruby-fontify-buffer)
       t))
 
-
 (defvar enh-ruby-mode-syntax-table nil
   "Syntax table in use in enh-ruby-mode buffers.")
 
@@ -328,7 +330,6 @@ the value changes.
   (modify-syntax-entry ?\[ "(]" enh-ruby-mode-syntax-table)
   (modify-syntax-entry ?\] ")[" enh-ruby-mode-syntax-table)
   )
-
 
 (defvar enh-ruby-mode-map nil "Keymap used in ruby mode.")
 
@@ -400,7 +401,6 @@ the value changes.
   ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
   ;; for characters inside regexp literals.
 
-
   (set (make-local-variable 'add-log-current-defun-function) 'enh-ruby-add-log-current-method)
 
   (add-hook
@@ -463,7 +463,6 @@ the value changes.
         (when (looking-at ruby-defun-and-name-re)
           (concat (match-string 1) " "(match-string 2))))))
 
-
 ;; Stolen shamelessly from James Clark's nxml-mode.
 (defmacro erm-with-unmodifying-text-property-changes (&rest body)
   "Evaluate BODY without any text property changes modifying the buffer.
@@ -471,18 +470,17 @@ Any text properties changes happen as usual but the changes are not treated as
 modifications to the buffer."
   (let ((modified (make-symbol "modified")))
     `(let ((,modified (buffer-modified-p))
-	   (inhibit-read-only t)
-	   (inhibit-modification-hooks t)
-	   (buffer-undo-list t)
-	   (deactivate-mark nil)
-	   ;; Apparently these avoid file locking problems.
-	   (buffer-file-name nil)
-	   (buffer-file-truename nil))
+           (inhibit-read-only t)
+           (inhibit-modification-hooks t)
+           (buffer-undo-list t)
+           (deactivate-mark nil)
+           ;; Apparently these avoid file locking problems.
+           (buffer-file-name nil)
+           (buffer-file-truename nil))
        (unwind-protect
            (progn ,@body)
          (unless ,modified
            (restore-buffer-modified-p nil))))))
-
 
 (defun enh-ruby-fontify-buffer ()
   "Fontify the current buffer. Useful if faces are out of sync"
@@ -494,7 +492,6 @@ modifications to the buffer."
 
 (defun erm-reparse-diff-buf ()
   (setq erm-reparse-list (cons (current-buffer) erm-reparse-list)))
-
 
 (defun erm-req-parse (min max len)
   (when (and ruby-check-syntax (not need-syntax-check-p))
@@ -612,7 +609,6 @@ modifications to the buffer."
              (> (point) (point-min))
              (eq (get-text-property (1- (point)) 'face) 'font-lock-string-face)))))
 
-
 (defun enh-ruby-skip-non-indentable ()
   (forward-line 0)
   (while (and (> (point) (point-min))
@@ -695,7 +691,6 @@ modifications to the buffer."
     (message "%s" (mapconcat 'identity messages "\n"))
     messages))
 
-
 (defun enh-ruby-find-error (&optional arg)
   "Search back, then forward for a syntax error/warning.
 Display contents in mini-buffer."
@@ -717,7 +712,6 @@ Display contents in mini-buffer."
         (goto-char pos)
       (unless arg
         (enh-ruby-find-error t)))))
-
 
 (defun enh-ruby-up-sexp (&optional arg)
   "Move up one balanced expression (sexp).
@@ -777,7 +771,6 @@ balanced expression is found."
   (let ((end-pos (save-excursion (enh-ruby-forward-sexp 1) (point))))
     (indent-region (point) end-pos)))
 
-
 (defun enh-ruby-beginning-of-block (&optional arg)
   "Move backward across one balanced expression (sexp) looking for a block begining.
 With ARG, do it that many times."
@@ -793,7 +786,6 @@ With ARG, do it that many times."
                   (setq prop (get-text-property (point) 'indent))
                   (not (or (eq prop 'b) (eq prop 'd))))))
        (point)))))
-
 
 (defun enh-ruby-end-of-defun (&optional arg)
   "Move forwards across one balanced expression (sexp) looking for a definition end.
@@ -846,7 +838,6 @@ With ARG, do it that many times."
         (setq prop (and (setq pos (enh-ruby-previous-indent-change pos))
                         (get-text-property pos 'indent))))
 
-
       (while (< 0 (setq count
                         (cond
                          ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1- count))
@@ -873,7 +864,6 @@ With ARG, do it that many times."
       (unless (or (eq prop 'l) (eq prop 'b) (eq prop 'd))
         (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
                         (get-text-property pos 'indent))))
-
 
       (while (< 0 (setq count
                         (cond
@@ -1025,7 +1015,6 @@ With ARG, do it that many times."
               (setq end (point))
               (back-to-indentation)
               (setq beg (point)))
-
 
             (if (eq face 'erm-syn-warnline)
                 (setq warn-count (1+ warn-count))
