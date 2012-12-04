@@ -129,7 +129,7 @@ class ErmBuffer
       alias_method "on_#{sym}", :on_backref
     end
 
-    [:CHAR, :__end__, :label, :tstring_content, :label, :regexp_beg,
+    [:CHAR, :__end__, :label, :tstring_content, :regexp_beg,
      :backtick, :tstring_beg, :tlambda,
      :embdoc_beg, :embdoc, :embdoc_end].each do |event|
       module_eval(<<-End, __FILE__, __LINE__ + 1)
@@ -480,6 +480,8 @@ class ErmBuffer
     }
 
   def initialize
+    @extra_keywords = nil
+    @first_count = nil
     @buffer=''
   end
 
