@@ -410,20 +410,6 @@ the value changes.
          ((boundp 'write-contents-hooks) 'write-contents-hooks))
    'enh-ruby-mode-set-encoding)
 
-  ;; We do our own syntax highlighting based on the parse tree.
-  ;; However, we want minor modes that add keywords to highlight properly
-  ;; (examples:  doxymacs, column-marker).  We do this by not letting
-  ;; font-lock unfontify anything, and telling it to fontify after we
-  ;; re-parse and re-highlight the buffer.  (We currently don't do any
-  ;; work with regions other than the whole buffer.)
-  (dolist (var '(font-lock-unfontify-buffer-function
-                 font-lock-unfontify-region-function))
-    (set (make-local-variable var) (lambda (&rest args) t)))
-
-  ;; Don't let font-lock do syntactic (string/comment) fontification.
-  (set (make-local-variable #'font-lock-syntactic-face-function)
-       (lambda (state) nil))
-
   (set (make-local-variable 'imenu-create-index-function)
        'enh-ruby-imenu-create-index)
 
