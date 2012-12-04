@@ -957,7 +957,7 @@ With ARG, do it that many times."
           )
 
         (while rpos
-          (remove-text-properties (car rpos) (cadr rpos) '(face nil))
+          (remove-text-properties (car rpos) (cadr rpos) '(font-lock-face nil))
           (setq rpos (cddr rpos))
           ))
 
@@ -965,7 +965,7 @@ With ARG, do it that many times."
         (let ((face (nth (caar list) enh-ruby-font-names))
               (pos (cdar list)))
           (while pos
-            (put-text-property (car pos) (cadr pos) 'face face)
+            (put-text-property (car pos) (cadr pos) 'font-lock-face face)
             (setq pos (cddr pos))))))))
 
 (defun erm-syntax-response (response)
