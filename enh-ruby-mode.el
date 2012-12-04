@@ -683,7 +683,8 @@ modifications to the buffer."
 
     (while overlays
       (setq overlay (car overlays))
-      (when (and (overlay-get overlay 'erm-syn-overlay) (eq (overlay-get overlay 'face) face))
+      (when (and (overlay-get overlay 'erm-syn-overlay)
+                 (eq (overlay-get overlay 'face) face))
         (setq messages (cons (overlay-get overlay 'help-echo) messages)))
       (setq overlays (cdr overlays)))
 
