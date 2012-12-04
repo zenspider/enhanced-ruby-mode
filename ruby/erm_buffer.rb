@@ -46,7 +46,9 @@ class ErmBuffer
 
     def realadd(sym,tok,len)
       if sym == :indent
-        @indent_stack << tok << @count+len if @count+len <= @point_max && @count+len >= @point_min
+        pos = @count + len
+        @indent_stack << tok << pos if pos.between? @point_min, @point_max
+
         return
       end
 
