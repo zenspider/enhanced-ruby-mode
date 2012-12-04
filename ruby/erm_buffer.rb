@@ -156,7 +156,7 @@ class ErmBuffer
       list.inject({}){|h,k| h[k]=true; h}
     end
 
-    INDENT_KW    = make_hash [:begin, :def, :for, :case, :module, :class, :do]
+    INDENT_KW    = make_hash [:begin, :def, :case, :module, :class, :do]
     BACKDENT_KW  = make_hash [:elsif, :else, :when, :rescue, :ensure]
     BEGINDENT_KW = make_hash [:if, :unless, :while, :until]
 
