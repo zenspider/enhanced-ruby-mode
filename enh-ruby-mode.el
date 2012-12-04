@@ -568,7 +568,7 @@ modifications to the buffer."
       (skip-syntax-forward " " (line-end-position))
       (let ((pos (line-beginning-position))
             (prop (get-text-property (point) 'indent))
-            (face (get-text-property (point) 'face)))
+            (face (get-text-property (point) 'font-lock-face)))
         (cond
          ((or (eq 'e prop) (eq 's prop))
           (when (eq 's prop) (forward-char))
@@ -599,14 +599,15 @@ modifications to the buffer."
 
 (defun erm-looking-at-not-indentable ()
   (skip-syntax-forward " " (line-end-position))
-  (let ((face (get-text-property (point) 'face)))
+  (let ((face (get-text-property (point) 'font-lock-face)))
     (or (= (point) (line-end-position))
         (memq face '(font-lock-string-face font-lock-comment-face enh-ruby-heredoc-delimiter-face))
         (and (eq 'font-lock-variable-name-face face)
              (looking-at "#"))
         (and (memq face '(enh-ruby-regexp-delimiter-face enh-ruby-string-delimiter-face))
              (> (point) (point-min))
-             (eq (get-text-property (1- (point)) 'face) 'font-lock-string-face)))))
+             (eq (get-text-property (1- (point)) 'font-lock-face)
+                 'font-lock-string-face)))))
 
 (defun enh-ruby-skip-non-indentable ()
   (forward-line 0)
@@ -646,8 +647,8 @@ modifications to the buffer."
     (+ (if (eq 'c (get-text-property limit 'indent)) enh-ruby-hanging-indent-level 0)
      (cond
      ((= max 0)
-      (if (not (or (eq (get-text-property start-pos 'face) 'enh-ruby-heredoc-delimiter-face)
-                   (eq (get-text-property start-pos 'face) 'font-lock-string-face)))
+      (if (not (or (eq (get-text-property start-pos 'font-lock-face) 'enh-ruby-heredoc-delimiter-face)
+                   (eq (get-text-property start-pos 'font-lock-face) 'font-lock-string-face)))
           indent
         (goto-char (or (enh-ruby-string-start-pos start-pos) limit))
         (current-indentation)))
@@ -673,8 +674,8 @@ modifications to the buffer."
      ))))
 
 (defun enh-ruby-string-start-pos (pos)
-  (when (< 0 (or (setq pos (previous-single-property-change pos 'face)) 0))
-    (previous-single-property-change pos 'face)))
+  (when (< 0 (or (setq pos (previous-single-property-change pos 'font-lock-face)) 0))
+    (previous-single-property-change pos 'font-lock-face)))
 
 (defun enh-ruby-show-errors-at (pos face)
   (let ((overlays (overlays-at pos))
@@ -684,7 +685,7 @@ modifications to the buffer."
     (while overlays
       (setq overlay (car overlays))
       (when (and (overlay-get overlay 'erm-syn-overlay)
-                 (eq (overlay-get overlay 'face) face))
+                 (eq (overlay-get overlay 'font-lock-face) face))
         (setq messages (cons (overlay-get overlay 'help-echo) messages)))
       (setq overlays (cdr overlays)))
 
@@ -1011,7 +1012,7 @@ With ARG, do it that many times."
 
               (move-end-of-line nil)
               (skip-chars-backward " \n\t\r\v\f")
-              (while (eq 'font-lock-comment-face (get-text-property (point) 'face))
+              (while (eq 'font-lock-comment-face (get-text-property (point) 'font-lock-face))
                 (backward-char))
               (skip-chars-backward " \n\t\r\v\f")
               (setq end (point))
@@ -1023,7 +1024,7 @@ With ARG, do it that many times."
               (setq error-count (1+ error-count)))
 
             (setq ov (make-overlay beg end nil t t))
-            (overlay-put ov 'face           face)
+            (overlay-put ov 'font-lock-face face)
             (overlay-put ov 'help-echo      msg)
             (overlay-put ov 'erm-syn-overlay  t)
             (overlay-put ov 'priority (if (eq 'erm-syn-warnline face) 99 100)))
