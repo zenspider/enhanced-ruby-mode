@@ -934,17 +934,18 @@ With ARG, do it that many times."
       (back-to-indentation)))
 
 (defun enh-ruby-add-faces (list)
-  (let* ((ipos (car list))
-         (buf-size (car ipos))
-         (istart (cadr ipos))
-         (iend (caddr ipos))
-         (rpos (cdr (cadr list))))
+  (let* ((ipos     (car   list))
+         (buf-size (car   ipos))
+         (istart   (cadr  ipos))
+         (iend     (caddr ipos))
+         (rpos     (cdr   (cadr list))))
 
     (unless (and (= (buffer-size) buf-size))
       (throw 'interrupted t))
 
     (if (or (/= (point-min) istart) (/= (point-max) iend))
         (setq erm-full-parse-p t)
+
       (when (> iend 0)
         (remove-text-properties istart iend '(indent nil))
 
