@@ -24,9 +24,10 @@ class ErmBuffer
 
       @first_token=ft
       @last_add=la
-      (parser.equal?(self) ||
-       lineno != parser.lineno() ? self : prev)
-      .realadd(sym,tok,len)
+
+      target = parser.equal?(self) || lineno != parser.lineno() ? self : prev
+      target.realadd(sym, tok, len)
+
       sym
     end
   end
@@ -56,6 +57,7 @@ class ErmBuffer
       if (start=@count) > @point_max
         throw :parse_complete
       end
+
       unless len
         len=2+@src.index("\n",start)-start
       end
@@ -124,8 +126,7 @@ class ErmBuffer
       add(:rem,tok)
     end
 
-    for sym in [:embexpr_end, :float, :int,
-                :qwords_beg, :words_beg, :words_sep]
+    for sym in [:embexpr_end, :float, :int, :qwords_beg, :words_beg, :words_sep]
       alias_method "on_#{sym}", :on_backref
     end
 
