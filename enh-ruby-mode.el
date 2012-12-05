@@ -137,23 +137,28 @@ the value changes.
 
 ;;; Faces:
 
+(require 'color)
+
+(defun erm-darken-color (name)
+  (color-darken-name (face-attribute name :foreground) 20))
+
 (defface enh-ruby-string-delimiter-face
-  '((t :foreground "PeachPuff3"))
+  `((t :foreground ,(erm-darken-color font-lock-string-face)))
   "Face used to highlight string delimiters like \" and %Q."
   :group 'enh-ruby)
 
 (defface enh-ruby-heredoc-delimiter-face
-  '((t :foreground "PeachPuff3"))
+  `((t :foreground ,(erm-darken-color font-lock-string-face)))
   "Face used to highlight string heredoc anchor strings like <<END and END"
   :group 'enh-ruby)
 
 (defface enh-ruby-regexp-delimiter-face
-  '((t :foreground "goldenrod"))
+  `((t :foreground ,(erm-darken-color font-lock-string-face)))
   "Face used to highlight regexp delimiters like / and %r."
   :group 'enh-ruby)
 
 (defface enh-ruby-op-face
-  '((t :foreground "dark violet" :bold t))
+  `((t :foreground ,(erm-darken-color font-lock-keyword-face)))
   "Face used to highlight operators like + and ||"
   :group 'enh-ruby)
 
