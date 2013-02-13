@@ -1082,3 +1082,5 @@ With ARG, do it that many times."
 (erm-reset)
 
 (provide 'enh-ruby-mode)
+
+;;; enh-ruby-mode.el ends here
