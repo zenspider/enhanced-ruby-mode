@@ -21,8 +21,10 @@ Syntax checking is also preformed.
 
 
 == Synopsis
-
-   ;; only needed for a manual install:
+   
+* Enhanced Ruby Mode is intallable via el-get, where its package name is enh-ruby-mode.    
+   
+* For manual installation, add the following file to your init file. 
 
    (add-to-list 'load-path "(path-to)/Enhanced-Ruby-Mode") ; must be added after any path containing old ruby-mode
    (autoload 'enh-ruby-mode "enh-ruby-mode" "Major mode for ruby files" t)
