@@ -108,6 +108,31 @@ the value changes.
   "Ignored in enhanced ruby mode."
   :options '(t nil space) :group 'enh-ruby)
 
+(defcustom enh-ruby-bounce-deep-indent nil
+  "Bounce between normal indentation and deep indentation when non-nil."
+  :group 'enh-ruby)
+(put 'enh-ruby-bounce-deep-indent 'safe-local-variable 'booleanp)
+
+(defcustom enh-ruby-hanging-paren-indent-level 2
+  "*Extra hanging indentation for continued ruby parenthesis."
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-hanging-paren-indent-level 'safe-local-variable 'integerp)
+
+(defcustom enh-ruby-hanging-brace-indent-level 2
+  "*Extra hanging indentation for continued ruby curly braces."
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-hanging-brace-indent-level 'safe-local-variable 'integerp)
+
+(defcustom enh-ruby-hanging-paren-deep-indent-level 0
+  "*Extra hanging deep indentation for continued ruby parenthesis."
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-hanging-paren-deep-indent-level 'safe-local-variable 'integerp)
+
+(defcustom enh-ruby-hanging-brace-deep-indent-level 0
+  "*Extra hanging deep indentation for continued ruby curly braces."
+  :type 'integer :group 'enh-ruby)
+(put 'enh-ruby-hanging-brace-deep-indent-level 'safe-local-variable 'integerp)
+
 (defcustom enh-ruby-encoding-map '((shift_jis . cp932) (shift-jis . cp932))
   "Alist to map encoding name from emacs to ruby."
   :group 'enh-ruby)
@@ -370,6 +395,8 @@ the value changes.
   "Abbrev table in use in enh-ruby-mode buffers.")
 
 (define-abbrev-table 'enh-ruby-mode-abbrev-table ())
+(define-abbrev enh-ruby-mode-abbrev-table "end" "end" 'indent-for-tab-command
+  :system t)
 
 (defun enh-ruby-mode-variables ()
   (make-variable-buffer-local      'enh-ruby-extra-keywords)
@@ -404,6 +431,7 @@ the value changes.
         comment-start "#"  ; used by comment-region; don't change it
         comment-end "")
   (enh-ruby-mode-variables)
+  (abbrev-mode)
 
   ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
   ;; for characters inside regexp literals.
@@ -574,11 +602,24 @@ modifications to the buffer."
             (enh-ruby-calculate-indent-1 pos (line-beginning-position))))
 
          ((eq 'r prop)
-          (if enh-ruby-deep-indent-paren
-              (progn (enh-ruby-backward-sexp) (current-column))
-            (forward-line -1)
-            (enh-ruby-skip-non-indentable)
-            (- (enh-ruby-calculate-indent-1 pos (line-beginning-position)) enh-ruby-indent-level)))
+          (let ((opening-col
+                 (save-excursion (enh-ruby-backward-sexp) (current-column))))
+            (if (and enh-ruby-deep-indent-paren
+                     (not enh-ruby-bounce-deep-indent))
+                opening-col
+              (forward-line -1)
+              (enh-ruby-skip-non-indentable)
+              (let ((opening-char
+                     (save-excursion (enh-ruby-backward-sexp) (char-after)))
+                    (proposed-col
+                     (enh-ruby-calculate-indent-1 pos
+                                                  (line-beginning-position))))
+                (if (< proposed-col opening-col)
+                    (- proposed-col
+                       (if (char-equal opening-char ?{)
+                           enh-ruby-hanging-brace-indent-level
+                         enh-ruby-hanging-paren-indent-level))
+                     opening-col)))))
 
          ((or (memq face '(font-lock-string-face enh-ruby-heredoc-delimiter-face))
               (and (eq 'font-lock-variable-name-face face)
@@ -610,6 +651,12 @@ modifications to the buffer."
     (skip-chars-backward " \n\t\r\v\f")
     (forward-line 0)))
 
+(defvar enh-ruby-last-bounce-line nil
+  "The last line that `erm-bounce-deep-indent-paren` was run against.")
+
+(defvar enh-ruby-last-bounce-deep nil
+  "The last result from `erm-bounce-deep-indent-paren`.")
+
 (defun enh-ruby-calculate-indent-1 (limit pos)
   (goto-char pos)
   (let ((start-pos pos)
@@ -619,6 +666,12 @@ modifications to the buffer."
         pc (npc 0)
         (prop (get-text-property pos 'indent)))
 
+    (setq enh-ruby-last-bounce-deep
+          (if (eq enh-ruby-last-bounce-line (line-number-at-pos))
+              (not enh-ruby-last-bounce-deep)
+            t))
+    (setq enh-ruby-last-bounce-line (line-number-at-pos))
+
     (while (< pos limit)
       (unless prop
         (setq pos (next-single-property-change pos 'indent (current-buffer) limit))
@@ -626,7 +679,18 @@ modifications to the buffer."
           (setq prop (get-text-property pos 'indent))))
       (setq col (- pos start-pos -1))
       (cond
-       ((eq prop 'l) (setq pc (cons (if enh-ruby-deep-indent-paren col (+ enh-ruby-indent-level indent)) pc)))
+       ((eq prop 'l)
+        (let ((shallow-indent
+               (if (char-equal (char-after pos) ?{)
+                   (+ enh-ruby-hanging-brace-indent-level indent)
+                 (+ enh-ruby-hanging-paren-indent-level indent)))
+              (deep-indent
+               (if (char-equal (char-after pos) ?{)
+                   (+ enh-ruby-hanging-brace-deep-indent-level col)
+                 (+ enh-ruby-hanging-paren-deep-indent-level col))))
+          (if enh-ruby-bounce-deep-indent
+              (setq pc (cons (if enh-ruby-last-bounce-deep shallow-indent deep-indent) pc))
+            (setq pc (cons (if enh-ruby-deep-indent-paren deep-indent shallow-indent) pc)))))
        ((eq prop 'r) (if pc (setq pc (cdr pc)) (setq npc col)))
        ((or (eq prop 'b) (eq prop 'd) (eq prop 's)) (setq bc (cons col bc)))
        ((eq prop 'e) (if bc (setq bc (cdr bc)) (setq nbc col))))
