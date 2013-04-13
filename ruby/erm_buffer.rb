@@ -160,6 +160,7 @@ class ErmBuffer
     INDENT_KW    = make_hash [:begin, :def, :case, :module, :class, :do]
     BACKDENT_KW  = make_hash [:elsif, :else, :when, :rescue, :ensure]
     BEGINDENT_KW = make_hash [:if, :unless, :while, :until]
+    POSTCOND_KW  = make_hash [:if, :unless, :or, :and]
 
     def on_op(tok)
       if @mode == :sym
@@ -381,6 +382,7 @@ class ErmBuffer
           r
         end
       else
+        last_add = nil
         if sym == :end
           indent(:e)
         elsif sym == :do
@@ -389,13 +391,19 @@ class ErmBuffer
           @block=:b4args
           return r
         elsif BEGINDENT_KW.include? sym
-          indent(:b) if @statment_start
+          if @statment_start
+            indent(:b)
+          elsif POSTCOND_KW.include? sym
+            last_add = :cont
+          end
+        elsif POSTCOND_KW.include? sym
+          last_add = :cont
         elsif INDENT_KW.include? sym
           indent(:b)
         elsif BACKDENT_KW.include? sym
           indent(:s) if @statment_start
         end
-        r=add(:kw,sym)
+        r=add(:kw,sym,sym.size,false,last_add)
         @mode= (sym==:def || sym==:alias) && :predef
         r
       end
