@@ -142,35 +142,38 @@ the value changes.
 (defun erm-darken-color (name)
   (color-darken-name (face-attribute name :foreground) 20))
 
-(defface enh-ruby-string-delimiter-face
-  `((t :foreground ,(erm-darken-color font-lock-string-face)))
-  "Face used to highlight string delimiters like \" and %Q."
-  :group 'enh-ruby)
+(defun erm-define-faces ()
+ (defface enh-ruby-string-delimiter-face
+   `((t :foreground ,(erm-darken-color font-lock-string-face)))
+   "Face used to highlight string delimiters like \" and %Q."
+   :group 'enh-ruby)
 
-(defface enh-ruby-heredoc-delimiter-face
-  `((t :foreground ,(erm-darken-color font-lock-string-face)))
-  "Face used to highlight string heredoc anchor strings like <<END and END"
-  :group 'enh-ruby)
+ (defface enh-ruby-heredoc-delimiter-face
+   `((t :foreground ,(erm-darken-color font-lock-string-face)))
+   "Face used to highlight string heredoc anchor strings like <<END and END"
+   :group 'enh-ruby)
 
-(defface enh-ruby-regexp-delimiter-face
-  `((t :foreground ,(erm-darken-color font-lock-string-face)))
-  "Face used to highlight regexp delimiters like / and %r."
-  :group 'enh-ruby)
+ (defface enh-ruby-regexp-delimiter-face
+   `((t :foreground ,(erm-darken-color font-lock-string-face)))
+   "Face used to highlight regexp delimiters like / and %r."
+   :group 'enh-ruby)
 
-(defface enh-ruby-op-face
-  `((t :foreground ,(erm-darken-color font-lock-keyword-face)))
-  "Face used to highlight operators like + and ||"
-  :group 'enh-ruby)
+ (defface enh-ruby-op-face
+   `((t :foreground ,(erm-darken-color font-lock-keyword-face)))
+   "Face used to highlight operators like + and ||"
+   :group 'enh-ruby)
 
-(defface erm-syn-errline
-  '((t (:box (:line-width 1 :color "red"))))
-  "Face used for marking error lines."
-  :group 'enh-ruby)
+ (defface erm-syn-errline
+   '((t (:box (:line-width 1 :color "red"))))
+   "Face used for marking error lines."
+   :group 'enh-ruby)
 
-(defface erm-syn-warnline
-  '((t (:box (:line-width 1 :color "orange"))))
-  "Face used for marking warning lines."
-  :group 'enh-ruby)
+ (defface erm-syn-warnline
+   '((t (:box (:line-width 1 :color "orange"))))
+   "Face used for marking warning lines."
+   :group 'enh-ruby))
+
+(add-hook 'enh-ruby-mode-hook 'erm-define-faces)
 
 ;;; Functions:
 
