@@ -84,7 +84,7 @@ the value changes.
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-indent-level 'safe-local-variable 'integerp)
 
-(defcustom enh-ruby-hanging-indent-level 1
+(defcustom enh-ruby-hanging-indent-level 2
   "*Extra hanging Indentation for continued ruby statements."
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-hanging-indent-level 'safe-local-variable 'integerp)
