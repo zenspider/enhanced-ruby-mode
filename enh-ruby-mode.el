@@ -42,9 +42,6 @@
 ;;
 ;;    (add-to-list 'load-path "(path-to)/Enhanced-Ruby-Mode") ; must be added after any path containing old ruby-mode
 ;;    (setq enh-ruby-program "(path-to-ruby1.9)/bin/ruby") ; so that still works if ruby points to ruby1.8
-;;    (autoload 'enh-ruby-mode "enh-ruby-mode" "Major mode for ruby files" t)
-;;    (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
-;;    (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 ;;
 
 ;;; Variables:
@@ -418,6 +415,7 @@ the value changes.
   (set (make-local-variable        'paragraph-separate) paragraph-start)
   (set (make-local-variable        'paragraph-ignore-fill-prefix) t))
 
+;;;###autoload
 (defun enh-ruby-mode ()
   "Enhanced Major mode for editing Ruby code.
 
@@ -1147,6 +1145,13 @@ With ARG, do it that many times."
       (error "%s" (substring response 1))))))
 
 (erm-reset)
+
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.rb\\'" . enh-ruby-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("Rakefile\\'" . enh-ruby-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.gemspec\\'" . enh-ruby-mode))
 
 (provide 'enh-ruby-mode)
 
