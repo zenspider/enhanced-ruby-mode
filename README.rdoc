@@ -11,7 +11,7 @@ Enhanced Ruby Mode replaces the emacs ruby mode that comes with ruby.
 
 It uses the Ripper class found in ruby 1.9.2 (and later) to parse and indent the source code.  As a consquence only ruby 1.9.2 (or later) syntax is parsed correctly.
 
-Syntax checking is also preformed.
+Syntax checking is also peformed.
 
 == TODO
 
