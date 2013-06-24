@@ -302,6 +302,7 @@ the value changes.
         (erm-reset-buffer)))))
 
 (defun erm-major-mode-changed ()
+  (remove-hook 'kill-buffer-hook 'erm-buffer-killed t)
   (erm-buffer-killed))
 
 (defun erm-buffer-killed ()
