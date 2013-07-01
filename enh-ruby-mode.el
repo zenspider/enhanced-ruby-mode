@@ -8,7 +8,7 @@
 ;; URL: http://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
 ;; Keywords: languages elisp, ruby
-;; Version: 1.0
+;; Version: 1.0.1
 
 ;; This file is not part of GNU Emacs.
 
