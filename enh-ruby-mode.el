@@ -5,7 +5,7 @@
 ;;   Geoff Jacobsen
 
 ;; Author: Geoff Jacobsen
-;; URL: http://http://github.com/zenspider/Enhanced-Ruby-Mode
+;; URL: http://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
 ;; Keywords: languages elisp, ruby
 ;; Version: 1.0
