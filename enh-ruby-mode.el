@@ -157,6 +157,10 @@ the value changes.
                                          "+\\)")
   "Regexp to match definitions and their name")
 
+
+(defconst erm-process-delimiter
+  "\n\0\0\0\n")
+
 ;;; Faces:
 
 (require 'color)
@@ -253,7 +257,8 @@ the value changes.
       (set-process-query-on-exit-flag erm-ruby-process nil)
       (process-send-string (erm-ruby-get-process) (concat "x0:"
                                                           (mapconcat 'identity (default-value 'enh-ruby-extra-keywords) " ")
-                                                          ":\n\0\0\0\n"))))
+                                                          ":"
+                                                          erm-process-delimiter))))
 
   erm-ruby-process)
 
@@ -305,8 +310,11 @@ the value changes.
   (remove-hook 'kill-buffer-hook 'erm-buffer-killed t)
   (erm-buffer-killed))
 
+(defun erm-proc-string (prefix)
+  (concat prefix (number-to-string erm-buff-num) ":" erm-process-delimiter))
+
 (defun erm-buffer-killed ()
-  (process-send-string (erm-ruby-get-process) (concat "k" (number-to-string erm-buff-num) ":\n\0\0\0\n")))
+  (process-send-string (erm-ruby-get-process) (erm-proc-string "k")))
 
 (defun erm-reset-buffer ()
   (setq erm-buff-num erm-next-buff-num)
@@ -324,7 +332,7 @@ the value changes.
                            (concat "x"
                                    (number-to-string erm-buff-num) ":"
                                    (mapconcat 'identity enh-ruby-extra-keywords " ")
-                                   ":\n\0\0\0\n"))
+                                   ":" erm-process-delimiter))
       (enh-ruby-fontify-buffer)
       t))
 
@@ -537,9 +545,15 @@ modifications to the buffer."
                 (erm-reparse-diff-buf)
               (setq erm-parse-buff (current-buffer))
               (process-send-string (erm-ruby-get-process)
-                                   (format "%s%d:%d:%d:%d:%d:" pc erm-buff-num (point-min) (point-max) min len))
+                                   (format "%s%d:%d:%d:%d:%d:"
+                                           pc
+                                           erm-buff-num
+                                           (point-min)
+                                           (point-max)
+                                           min
+                                           len))
               (process-send-region erm-ruby-process min max)
-              (process-send-string erm-ruby-process "\n\0\0\0\n"))
+              (process-send-string erm-ruby-process erm-process-delimiter))
             nil))
     (when interrupted-p
       (setq erm-full-parse-p t))))
@@ -550,7 +564,8 @@ modifications to the buffer."
 
 (defun erm-filter (proc response)
   (setq erm-response (concat erm-response response))
-  (when (and (> (length erm-response) 5) (string= "\n\0\0\0\n" (substring erm-response -5 nil)))
+  (when (and (> (length erm-response) 5)
+             (string= erm-process-delimiter (substring erm-response -5 nil)))
     (setq response (substring erm-response 0 -5))
     (setq erm-response "")
     (with-current-buffer erm-parse-buff
@@ -561,7 +576,7 @@ modifications to the buffer."
   (if erm-full-parse-p
       (enh-ruby-fontify-buffer)
     (setq erm-parsing-p t)
-    (process-send-string (erm-ruby-get-process) (concat "g" (number-to-string erm-buff-num) ":\n\0\0\0\n"))))
+    (process-send-string (erm-ruby-get-process) (erm-proc-string "g"))))
 
 (setq enh-ruby-font-names
       '(nil
@@ -1104,8 +1119,7 @@ With ARG, do it that many times."
             (when need-syntax-check-p
               (setq need-syntax-check-p nil)
               (setq erm-parsing-p t)
-              (process-send-string (erm-ruby-get-process) (concat "c" (number-to-string erm-buff-num)
-                                                                  ":\n\0\0\0\n"))))
+              (process-send-string (erm-ruby-get-process) (erm-proc-string "c"))))
         (if erm-syntax-check-list
             (erm-do-syntax-check))))))
 
