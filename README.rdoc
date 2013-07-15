@@ -35,6 +35,10 @@ Syntax checking is also preformed.
 
    (setq enh-ruby-program "(path-to-ruby1.9)/bin/ruby") ; so that still works if ruby points to ruby1.8
 
+* Enhances Ruby Mode defines its own specific faces with the hook <tt>erm-define-faces</tt>. If your theme is already defining that faces, to not overwrite them, just remove the hook with:
+
+   (remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
+
 == Requirements
 
 * ruby 1.9.2 (or later)
