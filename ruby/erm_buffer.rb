@@ -126,7 +126,7 @@ class ErmBuffer
       add(:rem,tok)
     end
 
-    for sym in [:embexpr_end, :float, :int, :qwords_beg, :words_beg, :words_sep]
+    for sym in [:float, :int, :qwords_beg, :words_beg, :words_sep]
       alias_method "on_#{sym}", :on_backref
     end
 
@@ -275,6 +275,12 @@ class ErmBuffer
       @brace_stack << :embexpr
       indent(:l,1)
       add(:ivar,tok,len)
+    end
+
+    def on_embexpr_end(tok)
+      @brace_stack.pop
+      indent(:r)
+      add(:ivar,tok,tok.size)
     end
 
     def on_tlambeg(tok)
