@@ -211,4 +211,9 @@ E
 }
                 )
   end
+
+  def test_interpolated_string
+    assert_equal "((6 1 6 l 3 r 5)(0 4 5)(3 2 4 5 6)(7 1 2))",
+      parse_text(%q{"#{1}"})
+  end
 end
