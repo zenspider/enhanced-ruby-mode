@@ -274,13 +274,13 @@ class ErmBuffer
       end
       @brace_stack << :embexpr
       indent(:d,1)
-      add(:ivar,tok,len)
+      add(:embexpr_beg,tok,len)
     end
 
     def on_embexpr_end(tok)
       @brace_stack.pop
       indent(:e)
-      add(:ivar,tok)
+      add(:embexpr_beg,tok)
     end
 
     def on_tlambeg(tok)
@@ -474,6 +474,8 @@ class ErmBuffer
     arglist:         3,
     cvar:            3,
     gvar:            3,
+    embexpr_beg:     3,
+    embexpr_end:     3,
     comment:         4,  # font-lock-comment-face
     embdoc:          4,
     label:           5,  # font-lock-constant-face
