@@ -273,13 +273,13 @@ class ErmBuffer
         len=2
       end
       @brace_stack << :embexpr
-      indent(:l,1)
+      indent(:d,1)
       add(:ivar,tok,len)
     end
 
     def on_embexpr_end(tok)
       @brace_stack.pop
-      indent(:r)
+      indent(:e)
       add(:ivar,tok)
     end
 
