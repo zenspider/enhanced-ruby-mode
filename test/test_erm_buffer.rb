@@ -215,5 +215,17 @@ E
   def test_interpolated_string
     assert_equal "((6 1 6 d 3 e 5)(0 4 5)(3 2 4 5 6)(7 1 2))",
       parse_text(%q{"#{1}"})
+
+    assert_equal "((75 1 75 d 9 l 13 r 21 d 27 l 30 r 32 d 42 e 58 e 63 e 67)(0 1 7 10 27 29 30 31 32 33 40 43 51 52 58 60 63 66 67 69 70)(3 8 10 30 31 32 33 41 43 58 59 67 68)(7 7 8 40 41 59 60 68 69)(10 27 29 63 66)(12 51 52))",
+      parse_text(%q{
+puts "#{
+  [1, 2, 3].map do |i|
+    p "#{
+      i*i
+    }"
+  end
+}"
+      }
+                )
   end
 end
