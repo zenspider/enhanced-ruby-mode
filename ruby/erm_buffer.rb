@@ -280,7 +280,7 @@ class ErmBuffer
     def on_embexpr_end(tok)
       @brace_stack.pop
       indent(:r)
-      add(:ivar,tok,tok.size)
+      add(:ivar,tok)
     end
 
     def on_tlambeg(tok)
