@@ -21,10 +21,10 @@ Syntax checking is also peformed.
 
 
 == Synopsis
-   
-* Enhanced Ruby Mode is intallable via el-get and Melpa, where its package name is enh-ruby-mode.    
-   
-* For manual installation, add the following file to your init file. 
+
+* Enhanced Ruby Mode is intallable via el-get and Melpa, where its package name is enh-ruby-mode.
+
+* For manual installation, add the following file to your init file.
 
    (add-to-list 'load-path "(path-to)/Enhanced-Ruby-Mode") ; must be added after any path containing old ruby-mode
    (autoload 'enh-ruby-mode "enh-ruby-mode" "Major mode for ruby files" t)
@@ -42,11 +42,11 @@ Syntax checking is also peformed.
 == Existing ruby-mode hooks
 
 You may have existing lines in your emacs config that add minor modes based on ruby mode, like this:
-    (add-hook 'ruby-mode-hook 'robe-mode)                                                                                                                                                                                                                                           
+    (add-hook 'ruby-mode-hook 'robe-mode)
     (add-hook 'ruby-mode-hook 'yard-mode)
 
 For these to work with enh-ruby-mode, you need to add hooks to the enh-ruby-mode minor mode:
-    (add-hook 'enh-ruby-mode-hook 'robe-mode)                                                                                                                                                                                                                                           
+    (add-hook 'enh-ruby-mode-hook 'robe-mode)
     (add-hook 'enh-ruby-mode-hook 'yard-mode)
 
 == Requirements
