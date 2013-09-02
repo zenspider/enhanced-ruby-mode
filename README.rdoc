@@ -59,7 +59,6 @@ For these to work with enh-ruby-mode, you need to add hooks to the enh-ruby-mode
 
 == Development
 
-Developing requires test-unit-full gem
 
 Testing parser:
 
