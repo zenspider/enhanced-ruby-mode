@@ -12,22 +12,17 @@
 
 (ert-deftest enh-ruby-backward-sexp-test ()
   :expected-result :failed
-  (with-temp-buffer
-    (insert-file "test/rubytest-file.rb")
-    (enh-ruby-mode)
-    (erm-wait-for-parse)
-    (goto-char (point-min))
-    (search-forward " word_")
-    (move-end-of-line nil)
-    (enh-ruby-backward-sexp 2)
-    (should (looking-at "%_string"))))
+  (with-temp-enh-rb-buffer
+   "test/rubytest-file.rb"
+   (search-forward " word_")
+   (move-end-of-line nil)
+   (enh-ruby-backward-sexp 2)
+   (should (looking-at "%_string"))))
 
 (ert-deftest enh-ruby-up-sexp-test ()
-  (with-temp-buffer
-    (insert-file "test/rubytest-file.rb")
-    (enh-ruby-mode)
-    (erm-wait-for-parse)
-    (goto-char (point-min))
-    (search-forward "test")
-    (enh-ruby-up-sexp)
-    (should (looking-at "def foo"))))
+  (with-temp-enh-rb-buffer
+   "test/rubytest-file.rb"
+   (goto-char (point-min))
+   (search-forward "test")
+   (enh-ruby-up-sexp)
+   (should (looking-at "def foo"))))

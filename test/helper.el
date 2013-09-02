@@ -1,5 +1,9 @@
 (require 'ert)
 
-;; disable VC-git to speed up
-(if (fboundp 'vc-find-file-hook)
-    (remove-hook 'find-file-hooks 'vc-find-file-hook))
+(defmacro with-temp-enh-rb-buffer (path &rest body)
+  `(with-temp-buffer
+     (insert-file-contents ,path)
+     (enh-ruby-mode)
+     (erm-wait-for-parse)
+     (goto-char (point-min))
+     (progn ,@body)))
