@@ -336,8 +336,8 @@ class ErmBuffer
     def on_rbrace(tok)
       add(case @brace_stack.pop
           when :embexpr
-            indent(:r)
-            :ivar
+            indent(:e)
+            :embexpr_beg
           when :block
             indent(:e)
             :block
