@@ -11,6 +11,3 @@ module Kernel
     messages[0]
   end
 end
-
-class Test::Unit::TestCase
-end

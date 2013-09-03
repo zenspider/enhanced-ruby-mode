@@ -59,13 +59,11 @@ For these to work with enh-ruby-mode, you need to add hooks to the enh-ruby-mode
 
 == Development
 
-Developing requires test-unit-full gem
+You can run tests via rake. Try:
 
-Testing parser:
+   rake -T
 
-ruby -I. test/test_erm_buffer.rb
-
-Sorry, no test suite for ruby-mode.el
+Tests for Emacs Lisp require ERT. It is built-in since Emacs 24.1.
 
 == Credits
 
