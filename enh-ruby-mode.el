@@ -165,7 +165,7 @@ the value changes.
 
 ;;; Faces:
 
-(require 'color)
+(require 'color nil t)
 
 (defun erm-darken-color (name)
   (color-darken-name (face-attribute name :foreground) 20))
