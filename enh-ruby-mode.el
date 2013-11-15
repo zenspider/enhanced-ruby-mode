@@ -396,7 +396,6 @@ the value changes.
   (define-key enh-ruby-mode-map "\e\C-q"   'enh-ruby-indent-exp)
   (define-key enh-ruby-mode-map "\C-c\C-e" 'enh-ruby-find-error)
   (define-key enh-ruby-mode-map "\C-c\C-f" 'enh-ruby-insert-end)
-  (define-key enh-ruby-mode-map "\C-m"     'newline)
   (define-key enh-ruby-mode-map "\C-c/"    'enh-ruby-insert-end))
 
 (defvar enh-ruby-mode-abbrev-table nil
