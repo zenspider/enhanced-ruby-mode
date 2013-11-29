@@ -126,7 +126,8 @@ class ErmBuffer
       add(:rem,tok)
     end
 
-    for sym in [:float, :int, :qwords_beg, :words_beg, :words_sep]
+    for sym in [:float, :int, :qwords_beg, :words_beg, :qsymbols_beg,
+                :symbols_beg, :words_sep]
       alias_method "on_#{sym}", :on_backref
     end
 
