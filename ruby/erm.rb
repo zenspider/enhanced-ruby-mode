@@ -25,10 +25,6 @@ end
 
 STDIN.set_encoding("UTF-8")
 
-# $fixme=File.open("/tmp/erm.out",'w')
-# $fixme.puts "\n\nstarting\n\n"
-# $fixme.flush
-
 require_relative 'erm_buffer'
 
 store=BufferStore.new
@@ -46,22 +42,16 @@ begin
       STDERR.puts "#{buf.check_syntax}\n\n\0\0\0"
     when :k
       store.rm(bn)
-      # $fixme.puts "Killed"
     else
       buf.add_content(cmd,*args) unless cmd == :g
       unless cmd == :a
         r=buf.parse
         # fixme r
-        STDERR.puts(r << "\n\0\0\0")
+        STDERR.puts r
+        STDERR.puts "\0\0\0"
       end
     end
-    # $fixme.puts buf.buffer
-    # $fixme.flush
   end
 rescue
-  # $fixme.puts c.inspect
-  # $fixme.puts $!.message
-  # $fixme.puts $!.backtrace
-  # $fixme.flush
   STDERR.puts "e#{$!.message}: #{$!.backtrace.join("\n")}\n\0\0\0\n"
 end
