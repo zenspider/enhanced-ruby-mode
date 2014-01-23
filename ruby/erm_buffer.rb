@@ -155,8 +155,8 @@ class ErmBuffer
       end
     end
 
-    def self.make_hash(list)
-      list.inject({}){|h,k| h[k]=true; h}
+    def self.make_hash list
+      Hash[list.map { |k| [k, true] }]
     end
 
     INDENT_KW    = make_hash [:begin, :def, :case, :module, :class, :do, :for]
