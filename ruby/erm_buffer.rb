@@ -458,8 +458,16 @@ class ErmBuffer
 
         realadd(:rem, '', @src_size-@count) if heredoc
       end
-      res=@res.map.with_index{|v,i| v ? "(#{i} #{v.join(' ')})" : nil}.flatten.join
-      "((#{@src_size} #{@point_min} #{@point_max} #{@indent_stack.join(' ')})#{res})"
+
+      res = @res.map.with_index { |v,i|
+        "(%d %s)" % [i, v.join(" ")] if v
+      }
+
+      "((%s %s %s %s)%s)" % [@src_size,
+                             @point_min,
+                             @point_max,
+                             @indent_stack.join(' '),
+                             res.join]
     end
   end
 
