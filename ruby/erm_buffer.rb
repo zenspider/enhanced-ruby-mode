@@ -66,19 +66,19 @@ class ErmBuffer
       start=@point_min if start < @point_min
       pos= @point_max if pos > @point_max
 
-      idx=FONT_LOCK_NAMES[sym]
-      if t=@res[idx]
+      idx = FONT_LOCK_NAMES[sym]
+
+      if t = @res[idx]
         if t.last == start
-          t[-1]=pos
+          t[-1] = pos
         else
           t << start << pos
         end
       else
-        @res[idx]= [start, pos]
+        @res[idx] = [start, pos]
       end
-      if pos == @point_max
-        throw :parse_complete
-      end
+
+      throw :parse_complete if pos == @point_max
     end
 
     class Heredoc
@@ -439,27 +439,24 @@ class ErmBuffer
     # Bugs in Ripper:
     # empty here doc fails to fire on_heredoc_end
     def parse
-      @count=1
-      @mode=nil
-      @brace_stack=[]
-      @heredoc=nil
-      @first_token=true
-      @last_add=nil
-      @res=[]
-      @ident=false
-      @ident_stack=[]
-      @block=false
-      @statment_start=true
-      @indent_stack=[]
-      @list_count=0
+      @count          = 1
+      @mode           = nil
+      @brace_stack    = []
+      @heredoc        = nil
+      @first_token    = true
+      @last_add       = nil
+      @res            = []
+      @ident          = false
+      @ident_stack    = []
+      @block          = false
+      @statment_start = true
+      @indent_stack   = []
+      @list_count     = 0
+
       catch :parse_complete do
         super
-        realadd(:rem,'',@src_size-@count) if heredoc
 
-        # @count+=1
-        # while heredoc
-        #   heredoc.restore
-        # end
+        realadd(:rem, '', @src_size-@count) if heredoc
       end
       res=@res.map.with_index{|v,i| v ? "(#{i} #{v.join(' ')})" : nil}.flatten.join
       "((#{@src_size} #{@point_min} #{@point_max} #{@indent_stack.join(' ')})#{res})"
@@ -496,7 +493,7 @@ class ErmBuffer
     heredoc_beg:     11,
     heredoc_end:     11,
     op:              12, # ruby-op-face
-    }
+  }
 
   def initialize
     @extra_keywords = nil

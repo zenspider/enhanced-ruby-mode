@@ -693,6 +693,7 @@ modifications to the buffer."
         (when (< pos limit)
           (setq prop (get-text-property pos 'indent))))
       (setq col (- pos start-pos -1))
+
       (cond
        ((eq prop 'l)
         (let ((shallow-indent
@@ -703,48 +704,61 @@ modifications to the buffer."
                (if (char-equal (char-after pos) ?{)
                    (+ enh-ruby-hanging-brace-deep-indent-level col)
                  (+ enh-ruby-hanging-paren-deep-indent-level col))))
+
           (if enh-ruby-bounce-deep-indent
               (setq pc (cons (if enh-ruby-last-bounce-deep shallow-indent deep-indent) pc))
             (setq pc (cons (if enh-ruby-deep-indent-paren deep-indent shallow-indent) pc)))))
-       ((eq prop 'r) (if pc (setq pc (cdr pc)) (setq npc col)))
-       ((or (eq prop 'b) (eq prop 'd) (eq prop 's)) (setq bc (cons col bc)))
-       ((eq prop 'e) (if bc (setq bc (cdr bc)) (setq nbc col))))
+
+       ((eq prop 'r)
+        (if pc (setq pc (cdr pc)) (setq npc col)))
+
+       ((memq prop '(b d s))
+        (setq bc (cons col bc)))
+
+       ((eq prop 'e)
+        (if bc
+            (setq bc (cdr bc))
+          (setq nbc col))))
+
       (when (< (setq pos (1+ pos)) limit)
-        (setq prop (get-text-property pos 'indent)))
-      )
+        (setq prop (get-text-property pos 'indent))))
 
     ;;(prin1 (list indent nbc bc npc pc))
     (setq pc (or (car pc) 0))
     (setq bc (or (car bc) 0))
     (setq max (max pc bc nbc npc))
-    (+ (if (eq 'c (get-text-property limit 'indent)) enh-ruby-hanging-indent-level 0)
+
+    (+
+     (if (eq 'c (get-text-property limit 'indent)) enh-ruby-hanging-indent-level 0)
      (cond
-     ((= max 0)
-      (if (not (or (eq (get-text-property start-pos 'font-lock-face) 'enh-ruby-heredoc-delimiter-face)
-                   (eq (get-text-property start-pos 'font-lock-face) 'font-lock-string-face)))
-          indent
-        (goto-char (or (enh-ruby-string-start-pos start-pos) limit))
-        (current-indentation)))
+      ((= max 0)
+       (if (not (memq (get-text-property start-pos 'font-lock-face)
+                      '(enh-ruby-heredoc-delimiter-face font-lock-string-face)))
+           indent
+         (goto-char (or (enh-ruby-string-start-pos start-pos) limit))
+         (current-indentation)))
 
-     ((= max pc) (if (eq 'c (get-text-property limit 'indent)) (- pc enh-ruby-hanging-indent-level) pc))
+      ((= max pc) (if (eq 'c (get-text-property limit 'indent))
+                      (- pc enh-ruby-hanging-indent-level)
+                    pc))
 
-     ((= max bc)
-      (if (eq 'd (get-text-property (+ start-pos bc -1) 'indent))
-          (+ (enh-ruby-calculate-indent-1 (+ start-pos bc -1) start-pos) enh-ruby-indent-level)
-        (+ bc enh-ruby-indent-level -1)))
+      ((= max bc)
+       (if (eq 'd (get-text-property (+ start-pos bc -1) 'indent))
+           (+ (enh-ruby-calculate-indent-1 (+ start-pos bc -1) start-pos)
+              enh-ruby-indent-level)
+         (+ bc enh-ruby-indent-level -1)))
 
-     ((= max npc)
-      (goto-char (+ start-pos npc))
-      (enh-ruby-backward-sexp)
-      (enh-ruby-calculate-indent-1 (point) (line-beginning-position)))
+      ((= max npc)
+       (goto-char (+ start-pos npc))
+       (enh-ruby-backward-sexp)
+       (enh-ruby-calculate-indent-1 (point) (line-beginning-position)))
 
-     ((= max nbc)
-      (goto-char (+ start-pos nbc -1))
-      (enh-ruby-backward-sexp)
-      (enh-ruby-calculate-indent-1 (point) (line-beginning-position)))
+      ((= max nbc)
+       (goto-char (+ start-pos nbc -1))
+       (enh-ruby-backward-sexp)
+       (enh-ruby-calculate-indent-1 (point) (line-beginning-position)))
 
-     (t 0)
-     ))))
+      (t 0)))))
 
 (defun enh-ruby-string-start-pos (pos)
   (when (< 0 (or (setq pos (previous-single-property-change pos 'font-lock-face)) 0))
