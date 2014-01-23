@@ -771,6 +771,11 @@ modifications to the buffer."
         overlay
         messages)
 
+    ;; TODO:
+    ;; (-map (lambda (o) (overlay-get o 'help-echo))
+    ;;       (-filter (lambda (o) (and (overlay-get o 'erm-syn-overlay)
+    ;;                                 (eq (overlay-get o 'font-lock-face) face)))))
+
     (while overlays
       (setq overlay (car overlays))
       (when (and (overlay-get overlay 'erm-syn-overlay)
