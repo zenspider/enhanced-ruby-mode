@@ -36,6 +36,7 @@ class ErmBuffer
     include Adder
 
     attr_accessor :heredoc, :mode
+    attr_accessor :indent_stack, :ident_stack, :brace_stack
 
     def parser
       self
