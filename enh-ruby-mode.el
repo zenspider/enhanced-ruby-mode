@@ -674,12 +674,14 @@ modifications to the buffer."
 
 (defun enh-ruby-calculate-indent-1 (limit pos)
   (goto-char pos)
-  (let ((start-pos pos)
-        col max
-        (indent (- (current-indentation) (if (eq 'c (get-text-property pos 'indent)) enh-ruby-hanging-indent-level 0)))
-        bc (nbc 0)
-        pc (npc 0)
-        (prop (get-text-property pos 'indent)))
+
+  (let* ((start-pos pos)
+         (prop (get-text-property pos 'indent))
+         (indent (- (current-indentation)
+                    (if (eq 'c prop) enh-ruby-hanging-indent-level 0)))
+         (nbc 0)
+         (npc 0)
+         col max bc pc)
 
     (setq enh-ruby-last-bounce-deep
           (if (eq enh-ruby-last-bounce-line (line-number-at-pos))
