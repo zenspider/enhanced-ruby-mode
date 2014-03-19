@@ -140,6 +140,10 @@ the value changes.
   "*Use `ruby-encoding-map' to set encoding magic comment if this is non-nil."
   :type 'boolean :group 'enh-ruby)
 
+(defcustom enh-ruby-use-ruby-mode-show-parens-config nil
+  "If not nil show-parens functionality from ruby-mode in 24.4 will be enabled"
+  :type 'boolean :group 'enh-ruby)
+
 (defconst enh-ruby-symbol-chars "a-zA-Z0-9_=?!")
 
 (defconst enh-ruby-symbol-re (concat "[" enh-ruby-symbol-chars "]"))
@@ -462,6 +466,12 @@ the value changes.
 
   (erm-reset-buffer)
 
+  (when enh-ruby-use-ruby-mode-show-parens-config
+    (require 'ruby-mode)
+    (smie-setup ruby-smie-grammar #'ruby-smie-rules
+                :forward-token  #'ruby-smie--forward-token
+                :backward-token #'ruby-smie--backward-token))
+  
   (if (fboundp 'run-mode-hooks)
       (run-mode-hooks 'enh-ruby-mode-hook)
     (run-hooks 'enh-ruby-mode-hook)))
