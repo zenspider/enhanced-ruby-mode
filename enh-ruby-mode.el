@@ -170,19 +170,12 @@ the value changes.
 ;;; Mode:
 
 ;;;###autoload
-(defun enh-ruby-mode ()
+(define-derived-mode enh-ruby-mode prog-mode "EnhRuby"
   "Enhanced Major mode for editing Ruby code.
 
 \\{enh-ruby-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map enh-ruby-mode-map)
   (set (make-local-variable 'erm-e-w-status) nil)
   (setq font-lock-defaults '(nil t))
-  (setq major-mode 'enh-ruby-mode
-        mode-name '("EnhRuby" erm-e-w-status)
-        comment-start "#"  ; used by comment-region; don't change it
-        comment-end "")
   (enh-ruby-mode-variables)
   (abbrev-mode)
 
@@ -212,10 +205,7 @@ the value changes.
     (smie-setup ruby-smie-grammar #'ruby-smie-rules
                 :forward-token  #'ruby-smie--forward-token
                 :backward-token #'ruby-smie--backward-token))
-
-  (if (fboundp 'run-mode-hooks)
-      (run-mode-hooks 'enh-ruby-mode-hook)
-    (run-hooks 'enh-ruby-mode-hook)))
+  )
 
 ;;; Faces:
 
