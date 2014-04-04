@@ -298,10 +298,12 @@ the value changes.
       (set-process-coding-system erm-ruby-process 'utf-8 'utf-8)
       (set-process-filter erm-ruby-process 'erm-filter)
       (set-process-query-on-exit-flag erm-ruby-process nil)
-      (process-send-string (erm-ruby-get-process) (concat "x0:"
-                                                          (mapconcat 'identity (default-value 'enh-ruby-extra-keywords) " ")
-                                                          ":"
-                                                          erm-process-delimiter))))
+      (process-send-string
+       (erm-ruby-get-process)
+       (concat "x0:"
+               (mapconcat 'identity (default-value 'enh-ruby-extra-keywords) " ")
+               ":"
+               erm-process-delimiter))))
 
   erm-ruby-process)
 
