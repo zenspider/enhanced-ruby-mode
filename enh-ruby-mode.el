@@ -438,6 +438,7 @@ the value changes.
   (kill-all-local-variables)
   (use-local-map enh-ruby-mode-map)
   (set (make-local-variable 'erm-e-w-status) nil)
+  (setq font-lock-defaults '(nil t))
   (setq major-mode 'enh-ruby-mode
         mode-name '("EnhRuby" erm-e-w-status)
         comment-start "#"  ; used by comment-region; don't change it
