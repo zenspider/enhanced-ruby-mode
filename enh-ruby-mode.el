@@ -174,35 +174,46 @@ the value changes.
   "Enhanced Major mode for editing Ruby code.
 
 \\{enh-ruby-mode-map}"
-  (set (make-local-variable 'erm-e-w-status) nil)
-  (setq font-lock-defaults '(nil t))
-  (enh-ruby-mode-variables)
-  (abbrev-mode)
 
-  (set (make-local-variable 'add-log-current-defun-function) 'enh-ruby-add-log-current-method)
+  (set (make-local-variable 'comment-column)               enh-ruby-comment-column)
+  (set (make-local-variable 'comment-end)                  "")
+  (set (make-local-variable 'comment-start)                "#")
+  (set (make-local-variable 'comment-start-skip)           "#+ *")
+  (set (make-local-variable 'erm-buff-num)                 nil)
+  (set (make-local-variable 'erm-e-w-status)               nil)
+  (set (make-local-variable 'erm-full-parse-p)             nil)
+  (set (make-local-variable 'indent-line-function)         'enh-ruby-indent-line)
+  (set (make-local-variable 'need-syntax-check-p)          nil)
+  (set (make-local-variable 'paragraph-ignore-fill-prefix) t)
+  (set (make-local-variable 'paragraph-separate)           paragraph-start)
+  (set (make-local-variable 'parse-sexp-ignore-comments)   t)
+  (set (make-local-variable 'parse-sexp-lookup-properties) t)
+  (set (make-local-variable 'require-final-newline)        t)
 
-  (add-hook
-   (cond ((boundp 'before-save-hook)
-          (make-local-variable 'before-save-hook)
-          'before-save-hook)
-         ((boundp 'write-contents-functions) 'write-contents-functions)
-         ((boundp 'write-contents-hooks) 'write-contents-hooks))
-   'enh-ruby-mode-set-encoding)
+  (set (make-local-variable 'paragraph-start)
+       (concat "$\\|" page-delimiter))
+  (set (make-local-variable 'add-log-current-defun-function)
+       'enh-ruby-add-log-current-method)
 
-  (set (make-local-variable 'imenu-create-index-function)
-       'enh-ruby-imenu-create-index)
+  (setq font-lock-defaults          '(nil t))
+  (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
+  (setq imenu-create-index-function 'enh-ruby-imenu-create-index)
 
-  (add-hook 'change-major-mode-hook 'erm-major-mode-changed nil t)
-  (add-hook 'kill-buffer-hook 'erm-buffer-killed nil t)
+  (add-hook 'before-save-hook       'enh-ruby-mode-set-encoding nil t)
+  (add-hook 'change-major-mode-hook 'erm-major-mode-changed     nil t)
+  (add-hook 'kill-buffer-hook       'erm-buffer-killed          nil t)
 
-  (erm-reset-buffer)
+  (define-abbrev enh-ruby-mode-abbrev-table "end" "end"
+    'indent-for-tab-command :system t)
 
   (when enh-ruby-use-ruby-mode-show-parens-config
     (require 'ruby-mode)
     (smie-setup ruby-smie-grammar #'ruby-smie-rules
                 :forward-token  #'ruby-smie--forward-token
                 :backward-token #'ruby-smie--backward-token))
-  )
+
+  (abbrev-mode)
+  (erm-reset-buffer))
 
 ;;; Faces:
 
@@ -440,33 +451,6 @@ the value changes.
   (define-key enh-ruby-mode-map "\C-c\C-e" 'enh-ruby-find-error)
   (define-key enh-ruby-mode-map "\C-c\C-f" 'enh-ruby-insert-end)
   (define-key enh-ruby-mode-map "\C-c/"    'enh-ruby-insert-end))
-
-(defvar enh-ruby-mode-abbrev-table nil
-  "Abbrev table in use in enh-ruby-mode buffers.")
-
-(define-abbrev-table 'enh-ruby-mode-abbrev-table ())
-(define-abbrev enh-ruby-mode-abbrev-table "end" "end" 'indent-for-tab-command
-  :system t)
-
-(defun enh-ruby-mode-variables ()
-  (make-variable-buffer-local      'enh-ruby-extra-keywords)
-  (set-syntax-table                 enh-ruby-mode-syntax-table)
-  (setq local-abbrev-table          enh-ruby-mode-abbrev-table)
-  (set (make-local-variable        'indent-line-function) 'enh-ruby-indent-line)
-  (set (make-local-variable        'require-final-newline) t)
-  (set (make-variable-buffer-local 'comment-start) "#")
-  (set (make-variable-buffer-local 'comment-end) "")
-  (set (make-variable-buffer-local 'comment-column) enh-ruby-comment-column)
-  (set (make-variable-buffer-local 'comment-start-skip) "#+ *")
-  (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
-  (set (make-local-variable        'need-syntax-check-p) nil)
-  (set (make-local-variable        'erm-full-parse-p) nil)
-  (set (make-local-variable        'erm-buff-num) nil)
-  (set (make-local-variable        'parse-sexp-ignore-comments) t)
-  (set (make-local-variable        'parse-sexp-lookup-properties) t)
-  (set (make-local-variable        'paragraph-start) (concat "$\\|" page-delimiter))
-  (set (make-local-variable        'paragraph-separate) paragraph-start)
-  (set (make-local-variable        'paragraph-ignore-fill-prefix) t))
 
 (defun enh-ruby-imenu-create-index-in-block (prefix beg end)
   (let* ((index-alist '())
