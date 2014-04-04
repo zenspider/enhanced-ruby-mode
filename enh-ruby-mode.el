@@ -465,7 +465,7 @@ the value changes.
   (setq local-abbrev-table          enh-ruby-mode-abbrev-table)
   (set (make-local-variable        'indent-line-function) 'enh-ruby-indent-line)
   (set (make-local-variable        'require-final-newline) t)
-  (set (make-variable-buffer-local 'comment-start) "# ")
+  (set (make-variable-buffer-local 'comment-start) "#")
   (set (make-variable-buffer-local 'comment-end) "")
   (set (make-variable-buffer-local 'comment-column) enh-ruby-comment-column)
   (set (make-variable-buffer-local 'comment-start-skip) "#+ *")
@@ -503,7 +503,7 @@ the value changes.
       (save-excursion
         (enh-ruby-beginning-of-defun 1)
         (when (looking-at enh-ruby-defun-and-name-re)
-          (concat (match-string 1) " "(match-string 2))))))
+          (concat (match-string 1) " " (match-string 2))))))
 
 ;; Stolen shamelessly from James Clark's nxml-mode.
 (defmacro erm-with-unmodifying-text-property-changes (&rest body)
