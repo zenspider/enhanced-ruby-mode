@@ -179,9 +179,6 @@ the value changes.
   (enh-ruby-mode-variables)
   (abbrev-mode)
 
-  ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
-  ;; for characters inside regexp literals.
-
   (set (make-local-variable 'add-log-current-defun-function) 'enh-ruby-add-log-current-method)
 
   (add-hook
@@ -489,6 +486,8 @@ the value changes.
 
 (defun enh-ruby-add-log-current-method ()
   "Return current method string."
+  ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
+  ;; for characters inside regexp literals.
   (condition-case nil
       (save-excursion
         (enh-ruby-beginning-of-defun 1)
