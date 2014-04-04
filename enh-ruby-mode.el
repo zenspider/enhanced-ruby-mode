@@ -167,6 +167,56 @@ the value changes.
 (defconst erm-process-delimiter
   "\n\0\0\0\n")
 
+;;; Mode:
+
+;;;###autoload
+(defun enh-ruby-mode ()
+  "Enhanced Major mode for editing Ruby code.
+
+\\{enh-ruby-mode-map}"
+  (interactive)
+  (kill-all-local-variables)
+  (use-local-map enh-ruby-mode-map)
+  (set (make-local-variable 'erm-e-w-status) nil)
+  (setq font-lock-defaults '(nil t))
+  (setq major-mode 'enh-ruby-mode
+        mode-name '("EnhRuby" erm-e-w-status)
+        comment-start "#"  ; used by comment-region; don't change it
+        comment-end "")
+  (enh-ruby-mode-variables)
+  (abbrev-mode)
+
+  ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
+  ;; for characters inside regexp literals.
+
+  (set (make-local-variable 'add-log-current-defun-function) 'enh-ruby-add-log-current-method)
+
+  (add-hook
+   (cond ((boundp 'before-save-hook)
+          (make-local-variable 'before-save-hook)
+          'before-save-hook)
+         ((boundp 'write-contents-functions) 'write-contents-functions)
+         ((boundp 'write-contents-hooks) 'write-contents-hooks))
+   'enh-ruby-mode-set-encoding)
+
+  (set (make-local-variable 'imenu-create-index-function)
+       'enh-ruby-imenu-create-index)
+
+  (add-hook 'change-major-mode-hook 'erm-major-mode-changed nil t)
+  (add-hook 'kill-buffer-hook 'erm-buffer-killed nil t)
+
+  (erm-reset-buffer)
+
+  (when enh-ruby-use-ruby-mode-show-parens-config
+    (require 'ruby-mode)
+    (smie-setup ruby-smie-grammar #'ruby-smie-rules
+                :forward-token  #'ruby-smie--forward-token
+                :backward-token #'ruby-smie--backward-token))
+
+  (if (fboundp 'run-mode-hooks)
+      (run-mode-hooks 'enh-ruby-mode-hook)
+    (run-hooks 'enh-ruby-mode-hook)))
+
 ;;; Faces:
 
 (require 'color nil t)
@@ -207,7 +257,7 @@ the value changes.
 
 (add-hook 'enh-ruby-mode-hook 'erm-define-faces)
 
-;;; Functions:
+;;; Support Functions:
 
 (defun enh-ruby-mode-set-encoding ()
   (save-excursion
@@ -428,54 +478,6 @@ the value changes.
   (set (make-local-variable        'paragraph-start) (concat "$\\|" page-delimiter))
   (set (make-local-variable        'paragraph-separate) paragraph-start)
   (set (make-local-variable        'paragraph-ignore-fill-prefix) t))
-
-;;;###autoload
-(defun enh-ruby-mode ()
-  "Enhanced Major mode for editing Ruby code.
-
-\\{enh-ruby-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map enh-ruby-mode-map)
-  (set (make-local-variable 'erm-e-w-status) nil)
-  (setq font-lock-defaults '(nil t))
-  (setq major-mode 'enh-ruby-mode
-        mode-name '("EnhRuby" erm-e-w-status)
-        comment-start "#"  ; used by comment-region; don't change it
-        comment-end "")
-  (enh-ruby-mode-variables)
-  (abbrev-mode)
-
-  ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
-  ;; for characters inside regexp literals.
-
-  (set (make-local-variable 'add-log-current-defun-function) 'enh-ruby-add-log-current-method)
-
-  (add-hook
-   (cond ((boundp 'before-save-hook)
-          (make-local-variable 'before-save-hook)
-          'before-save-hook)
-         ((boundp 'write-contents-functions) 'write-contents-functions)
-         ((boundp 'write-contents-hooks) 'write-contents-hooks))
-   'enh-ruby-mode-set-encoding)
-
-  (set (make-local-variable 'imenu-create-index-function)
-       'enh-ruby-imenu-create-index)
-
-  (add-hook 'change-major-mode-hook 'erm-major-mode-changed nil t)
-  (add-hook 'kill-buffer-hook 'erm-buffer-killed nil t)
-
-  (erm-reset-buffer)
-
-  (when enh-ruby-use-ruby-mode-show-parens-config
-    (require 'ruby-mode)
-    (smie-setup ruby-smie-grammar #'ruby-smie-rules
-                :forward-token  #'ruby-smie--forward-token
-                :backward-token #'ruby-smie--backward-token))
-  
-  (if (fboundp 'run-mode-hooks)
-      (run-mode-hooks 'enh-ruby-mode-hook)
-    (run-hooks 'enh-ruby-mode-hook)))
 
 (defun enh-ruby-imenu-create-index-in-block (prefix beg end)
   (let* ((index-alist '())
