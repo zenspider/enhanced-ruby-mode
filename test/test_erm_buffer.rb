@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
-require_relative 'helper'
+
+gem "minitest"
+require "minitest/autorun"
+
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..'))
+
 require 'ruby/erm_buffer.rb'
 
-class TestErmBuffer < Test::Unit::TestCase
+class TestErmBuffer < Minitest::Test
   def parse_text(text,buf=ErmBuffer.new)
     buf.add_content(:r,1,text.size,0,text.size,text)
     buf.parse
