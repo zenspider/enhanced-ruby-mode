@@ -155,15 +155,11 @@ class ErmBuffer
       end
     end
 
-    def self.make_hash list
-      Hash[list.map { |k| [k, true] }]
-    end
-
-    INDENT_KW          = make_hash [:begin, :def, :case, :module, :class, :do, :for]
-    BACKDENT_KW        = make_hash [:elsif, :else, :when, :rescue, :ensure]
-    BEGINDENT_KW       = make_hash [:if, :unless, :while, :until]
-    POSTCOND_KW        = make_hash [:if, :unless, :or, :and]
-    PRE_OPTIONAL_DO_KW = make_hash [:in, :while, :until]
+    INDENT_KW          = [:begin, :def, :case, :module, :class, :do, :for]
+    BACKDENT_KW        = [:elsif, :else, :when, :rescue, :ensure]
+    BEGINDENT_KW       = [:if, :unless, :while, :until]
+    POSTCOND_KW        = [:if, :unless, :or, :and]
+    PRE_OPTIONAL_DO_KW = [:in, :while, :until]
 
     def on_op(tok)
       if @mode == :sym
