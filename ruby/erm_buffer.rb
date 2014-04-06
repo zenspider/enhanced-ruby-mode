@@ -159,10 +159,11 @@ class ErmBuffer
       Hash[list.map { |k| [k, true] }]
     end
 
-    INDENT_KW    = make_hash [:begin, :def, :case, :module, :class, :do, :for]
-    BACKDENT_KW  = make_hash [:elsif, :else, :when, :rescue, :ensure]
-    BEGINDENT_KW = make_hash [:if, :unless, :while, :until]
-    POSTCOND_KW  = make_hash [:if, :unless, :or, :and]
+    INDENT_KW          = make_hash [:begin, :def, :case, :module, :class, :do, :for]
+    BACKDENT_KW        = make_hash [:elsif, :else, :when, :rescue, :ensure]
+    BEGINDENT_KW       = make_hash [:if, :unless, :while, :until]
+    POSTCOND_KW        = make_hash [:if, :unless, :or, :and]
+    PRE_OPTIONAL_DO_KW = make_hash [:in, :while, :until]
 
     def on_op(tok)
       if @mode == :sym
@@ -191,6 +192,7 @@ class ErmBuffer
 
     def on_period(tok)
       @mode||=:period
+      indent(:c,tok.size) if tok == "\n"
       add(:rem, tok, tok.size, false, :cont)
     end
 
@@ -202,6 +204,7 @@ class ErmBuffer
       if heredoc && heredoc.lineno == lineno()
         heredoc.restore
       end
+      @cond_stack.pop if @cond_stack.last
       @statment_start=true
       r
     end
@@ -217,6 +220,7 @@ class ErmBuffer
 
     def on_semicolon(tok)
       r=add(:kw,:semicolon,1,true)
+      @cond_stack.pop if @cond_stack.last
       @statment_start=true
       r
     end
@@ -275,12 +279,14 @@ class ErmBuffer
         len=2
       end
       @brace_stack << :embexpr
+      @cond_stack << false
       indent(:d,1)
       add(:embexpr_beg,tok,len)
     end
 
     def on_embexpr_end(tok)
       @brace_stack.pop
+      @cond_stack.pop
       indent(:e)
       add(:embexpr_beg,tok)
     end
@@ -292,6 +298,7 @@ class ErmBuffer
     end
 
     def on_lbrace(tok)
+      @cond_stack << false
       if @ident
         @brace_stack << :block
         indent(:d)
@@ -316,6 +323,7 @@ class ErmBuffer
                                else
                                  @mode
                                end]
+      @cond_stack << false
       indent(:l)
       @list_count+=1
       r=add(:rem,tok)
@@ -330,12 +338,14 @@ class ErmBuffer
       r=add(:rem,tok)
       @list_count-=1
       @ident,@mode=@ident_stack.pop
+      @cond_stack.pop
       r
     end
 
     alias on_rbracket on_rparen
 
     def on_rbrace(tok)
+      @cond_stack.pop
       add(case @brace_stack.pop
           when :embexpr
             indent(:e)
@@ -394,9 +404,24 @@ class ErmBuffer
         if sym == :end
           indent(:e)
         elsif sym == :do
-          indent(:d)
-          r=add(:kw,sym)
-          @block=:b4args
+          # `add` and `indent` must precede `@block=:b4args`.
+          # Otherwise @block is overwritten, and indentation is broken
+          # in the following code:
+          #  each do |a| # <- `|` for argument list is recognized as operator,
+          #      # <- which produces an extra indentation.
+          #  end
+
+          # `indent` precedes `add` for the compatibility of parsing result.
+
+          if @cond_stack.last
+            @cond_stack.pop
+            r = add(:kw, sym)
+          else
+            indent(:d)
+            r = add(:kw, sym)
+            @block=:b4args
+          end
+
           return r
         elsif BEGINDENT_KW.include? sym
           if @statment_start
@@ -411,6 +436,7 @@ class ErmBuffer
         elsif BACKDENT_KW.include? sym
           indent(:s) if @statment_start
         end
+        @cond_stack << true if PRE_OPTIONAL_DO_KW.include? sym
         r=add(:kw,sym,sym.size,false,last_add)
         @mode= (sym==:def || sym==:alias) && :predef
         r
@@ -452,6 +478,7 @@ class ErmBuffer
       @statment_start = true
       @indent_stack   = []
       @list_count     = 0
+      @cond_stack     = []
 
       catch :parse_complete do
         super

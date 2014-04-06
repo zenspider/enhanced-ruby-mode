@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
-require_relative 'helper'
+
+gem "minitest"
+require "minitest/autorun"
+
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..'))
+
 require 'ruby/erm_buffer.rb'
 
-class TestErmBuffer < Test::Unit::TestCase
+class TestErmBuffer < Minitest::Test
   def parse_text(text,buf=ErmBuffer.new)
     buf.add_content(:r,1,text.size,0,text.size,text)
     buf.parse
@@ -227,5 +232,28 @@ puts "#{
 }"
       }
                 )
+  end
+
+  def test_keyword_do_block
+    assert_equal "((13 1 13 d 7 e 10)(0 1 7 9 10)(10 7 9 10 13))",
+      parse_text(%q{
+each do
+end
+})
+  end
+
+  def test_keyword_do_cond
+    assert_equal "((20 1 20 b 2 e 17)(0 1 2 7 8 13 14 16 17)(10 2 7 8 13 14 16 17 20))",
+      parse_text(%q{
+while false do
+end
+})
+
+    assert_equal "((42 1 42 b 2 l 8 b 9 e 31 r 34 e 39)(0 1 2 7 9 14 15 20 21 23 31 34 36 38 39)(10 2 7 9 14 15 20 21 23 31 34 36 38 39 42))",
+      parse_text(%q{
+while (until false do
+       end) do
+end
+})
   end
 end
