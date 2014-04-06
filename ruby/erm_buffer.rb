@@ -191,6 +191,7 @@ class ErmBuffer
 
     def on_period(tok)
       @mode||=:period
+      indent(:c,tok.size) if tok == "\n"
       add(:rem, tok, tok.size, false, :cont)
     end
 
