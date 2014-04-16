@@ -170,42 +170,41 @@ the value changes.
 ;;; Mode:
 
 ;;;###autoload
-(defun enh-ruby-mode ()
+(define-derived-mode enh-ruby-mode prog-mode "EnhRuby"
   "Enhanced Major mode for editing Ruby code.
 
 \\{enh-ruby-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map enh-ruby-mode-map)
-  (set (make-local-variable 'erm-e-w-status) nil)
-  (setq font-lock-defaults '(nil t))
-  (setq major-mode 'enh-ruby-mode
-        mode-name '("EnhRuby" erm-e-w-status)
-        comment-start "#"  ; used by comment-region; don't change it
-        comment-end "")
-  (enh-ruby-mode-variables)
-  (abbrev-mode)
 
-  ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
-  ;; for characters inside regexp literals.
+  (set (make-local-variable 'comment-column)               enh-ruby-comment-column)
+  (set (make-local-variable 'comment-end)                  "")
+  (set (make-local-variable 'comment-start)                "#")
+  (set (make-local-variable 'comment-start-skip)           "#+ *")
+  (set (make-local-variable 'erm-buff-num)                 nil)
+  (set (make-local-variable 'erm-e-w-status)               nil)
+  (set (make-local-variable 'erm-full-parse-p)             nil)
+  (set (make-local-variable 'indent-line-function)         'enh-ruby-indent-line)
+  (set (make-local-variable 'need-syntax-check-p)          nil)
+  (set (make-local-variable 'paragraph-ignore-fill-prefix) t)
+  (set (make-local-variable 'paragraph-separate)           paragraph-start)
+  (set (make-local-variable 'parse-sexp-ignore-comments)   t)
+  (set (make-local-variable 'parse-sexp-lookup-properties) t)
+  (set (make-local-variable 'require-final-newline)        t)
 
-  (set (make-local-variable 'add-log-current-defun-function) 'enh-ruby-add-log-current-method)
+  (set (make-local-variable 'paragraph-start)
+       (concat "$\\|" page-delimiter))
+  (set (make-local-variable 'add-log-current-defun-function)
+       'enh-ruby-add-log-current-method)
 
-  (add-hook
-   (cond ((boundp 'before-save-hook)
-          (make-local-variable 'before-save-hook)
-          'before-save-hook)
-         ((boundp 'write-contents-functions) 'write-contents-functions)
-         ((boundp 'write-contents-hooks) 'write-contents-hooks))
-   'enh-ruby-mode-set-encoding)
+  (setq font-lock-defaults          '(nil t))
+  (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
+  (setq imenu-create-index-function 'enh-ruby-imenu-create-index)
 
-  (set (make-local-variable 'imenu-create-index-function)
-       'enh-ruby-imenu-create-index)
+  (add-hook 'before-save-hook       'enh-ruby-mode-set-encoding nil t)
+  (add-hook 'change-major-mode-hook 'erm-major-mode-changed     nil t)
+  (add-hook 'kill-buffer-hook       'erm-buffer-killed          nil t)
 
-  (add-hook 'change-major-mode-hook 'erm-major-mode-changed nil t)
-  (add-hook 'kill-buffer-hook 'erm-buffer-killed nil t)
-
-  (erm-reset-buffer)
+  (define-abbrev enh-ruby-mode-abbrev-table "end" "end"
+    'indent-for-tab-command :system t)
 
   (when enh-ruby-use-ruby-mode-show-parens-config
     (require 'ruby-mode)
@@ -213,9 +212,8 @@ the value changes.
                 :forward-token  #'ruby-smie--forward-token
                 :backward-token #'ruby-smie--backward-token))
 
-  (if (fboundp 'run-mode-hooks)
-      (run-mode-hooks 'enh-ruby-mode-hook)
-    (run-hooks 'enh-ruby-mode-hook)))
+  (abbrev-mode)
+  (erm-reset-buffer))
 
 ;;; Faces:
 
@@ -311,10 +309,12 @@ the value changes.
       (set-process-coding-system erm-ruby-process 'utf-8 'utf-8)
       (set-process-filter erm-ruby-process 'erm-filter)
       (set-process-query-on-exit-flag erm-ruby-process nil)
-      (process-send-string (erm-ruby-get-process) (concat "x0:"
-                                                          (mapconcat 'identity (default-value 'enh-ruby-extra-keywords) " ")
-                                                          ":"
-                                                          erm-process-delimiter))))
+      (process-send-string
+       (erm-ruby-get-process)
+       (concat "x0:"
+               (mapconcat 'identity (default-value 'enh-ruby-extra-keywords) " ")
+               ":"
+               erm-process-delimiter))))
 
   erm-ruby-process)
 
@@ -452,33 +452,6 @@ the value changes.
   (define-key enh-ruby-mode-map "\C-c\C-f" 'enh-ruby-insert-end)
   (define-key enh-ruby-mode-map "\C-c/"    'enh-ruby-insert-end))
 
-(defvar enh-ruby-mode-abbrev-table nil
-  "Abbrev table in use in enh-ruby-mode buffers.")
-
-(define-abbrev-table 'enh-ruby-mode-abbrev-table ())
-(define-abbrev enh-ruby-mode-abbrev-table "end" "end" 'indent-for-tab-command
-  :system t)
-
-(defun enh-ruby-mode-variables ()
-  (make-variable-buffer-local      'enh-ruby-extra-keywords)
-  (set-syntax-table                 enh-ruby-mode-syntax-table)
-  (setq local-abbrev-table          enh-ruby-mode-abbrev-table)
-  (set (make-local-variable        'indent-line-function) 'enh-ruby-indent-line)
-  (set (make-local-variable        'require-final-newline) t)
-  (set (make-variable-buffer-local 'comment-start) "#")
-  (set (make-variable-buffer-local 'comment-end) "")
-  (set (make-variable-buffer-local 'comment-column) enh-ruby-comment-column)
-  (set (make-variable-buffer-local 'comment-start-skip) "#+ *")
-  (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
-  (set (make-local-variable        'need-syntax-check-p) nil)
-  (set (make-local-variable        'erm-full-parse-p) nil)
-  (set (make-local-variable        'erm-buff-num) nil)
-  (set (make-local-variable        'parse-sexp-ignore-comments) t)
-  (set (make-local-variable        'parse-sexp-lookup-properties) t)
-  (set (make-local-variable        'paragraph-start) (concat "$\\|" page-delimiter))
-  (set (make-local-variable        'paragraph-separate) paragraph-start)
-  (set (make-local-variable        'paragraph-ignore-fill-prefix) t))
-
 (defun enh-ruby-imenu-create-index-in-block (prefix beg end)
   (let* ((index-alist '())
          (pos beg)
@@ -499,6 +472,8 @@ the value changes.
 
 (defun enh-ruby-add-log-current-method ()
   "Return current method string."
+  ;; We un-confuse `parse-partial-sexp' by setting syntax-table properties
+  ;; for characters inside regexp literals.
   (condition-case nil
       (save-excursion
         (enh-ruby-beginning-of-defun 1)
