@@ -190,6 +190,8 @@ the value changes.
   (set (make-local-variable 'parse-sexp-lookup-properties) t)
   (set (make-local-variable 'require-final-newline)        t)
 
+  (set (make-local-variable 'forward-sexp-function) 'enh-ruby-forward-sexp)
+
   (set (make-local-variable 'paragraph-start)
        (concat "$\\|" page-delimiter))
   (set (make-local-variable 'add-log-current-defun-function)
@@ -939,28 +941,30 @@ With ARG, do it that many times."
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
-  (while (>= (setq arg (1- arg)) 0)
-    (let* ((pos (point))
-           (prop (get-text-property pos 'indent))
-           (count 0))
+  (if (< arg 0)
+      (enh-ruby-backward-sexp (- arg))
+    (while (>= (setq arg (1- arg)) 0)
+      (let* ((pos (point))
+             (prop (get-text-property pos 'indent))
+             (count 0))
 
-      (unless (or (eq prop 'l) (eq prop 'b) (eq prop 'd))
-        (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
-                        (get-text-property pos 'indent))))
+        (unless (or (eq prop 'l) (eq prop 'b) (eq prop 'd))
+          (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
+                          (get-text-property pos 'indent))))
 
-      (while (< 0 (setq count
-                        (cond
-                         ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1+ count))
-                         ((or (eq prop 'r) (eq prop 'e)) (1- count))
-                         ((eq prop 'c) count)
-                         ((eq prop 's) (if (= 0 count) 1 count))
-                         (t 0))))
-        (goto-char pos)
-        (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
-                        (get-text-property pos 'indent))))
+        (while (< 0 (setq count
+                          (cond
+                           ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1+ count))
+                           ((or (eq prop 'r) (eq prop 'e)) (1- count))
+                           ((eq prop 'c) count)
+                           ((eq prop 's) (if (= 0 count) 1 count))
+                           (t 0))))
+          (goto-char pos)
+          (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
+                          (get-text-property pos 'indent))))
 
-      (goto-char (if prop pos (point-max)))
-      (skip-syntax-forward ")w"))))     ; move past trailing ), }, or end
+        (goto-char (if prop pos (point-max)))
+        (skip-syntax-forward ")w"))))) ; move past trailing ), }, or end
 
 (defun enh-ruby-insert-end ()
   (interactive)
