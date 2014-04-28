@@ -181,10 +181,8 @@ the value changes.
     (define-key map (kbd "M-C-e")   'enh-ruby-end-of-defun)
     (define-key map (kbd "M-C-b")   'enh-ruby-backward-sexp)
     (define-key map (kbd "M-C-f")   'enh-ruby-forward-sexp)
-
     (define-key map (kbd "M-C-p")   'enh-ruby-beginning-of-block)
     (define-key map (kbd "M-C-n")   'enh-ruby-end-of-block)
-
     (define-key map (kbd "M-C-h")   'enh-ruby-mark-defun)
     (define-key map (kbd "M-C-q")   'enh-ruby-indent-exp)
     (define-key map (kbd "C-c C-e") 'enh-ruby-find-error)
@@ -208,7 +206,7 @@ the value changes.
     (modify-syntax-entry ?$  "."  table)
     (modify-syntax-entry ??  "_"  table)
     (modify-syntax-entry ?_  "_"  table)
-    ;; TODO (modify-syntax-entry ?: "_" table)
+    (modify-syntax-entry ?:  "_"  table)
     (modify-syntax-entry ?<  "."  table)
     (modify-syntax-entry ?>  "."  table)
     (modify-syntax-entry ?&  "."  table)
