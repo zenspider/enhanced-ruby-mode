@@ -814,19 +814,19 @@ With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
   (while (>= (setq arg (1- arg)) 0)
-    (let* ((pos (enh-ruby-previous-indent-change (point)))
-           (prop (get-text-property pos 'indent))
-           (count 1))
-
-      (while (< 0 (setq count
-                        (cond
-                         ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1- count))
-                         ((or (eq prop 'r) (eq prop 'e)) (1+ count))
-                         (t count))))
-        (setq prop (and (setq pos (enh-ruby-previous-indent-change pos))
-                        (get-text-property pos 'indent))))
-
-      (goto-char (if prop pos (point-min))))))
+    (let* ((count 1)
+           prop)
+      (goto-char
+       (save-excursion
+         (while (and (not (= (point) (point-min)))
+                     (< 0 count))
+           (goto-char (enh-ruby-previous-indent-change (point)))
+           (setq prop (get-text-property (point) 'indent))
+           (setq count (cond
+                        ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1- count))
+                        ((or (eq prop 'r) (eq prop 'e)) (1+ count))
+                        (t count))))
+         (point))))))
 
 (defun enh-ruby-beginning-of-defun (&optional arg)
   "Move backward across one balanced expression (sexp) looking for a definition begining.
