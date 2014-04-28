@@ -975,8 +975,7 @@ With ARG, do it that many times."
           (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
                           (get-text-property pos 'indent))))
 
-        (goto-char (if prop pos (point-max)))
-        (skip-syntax-forward ")w"))))) ; move past trailing ), }, or end
+        (goto-char (if prop pos (point-max)))))))
 
 (defun enh-ruby-insert-end ()
   (interactive)
