@@ -167,6 +167,74 @@ the value changes.
 (defconst erm-process-delimiter
   "\n\0\0\0\n")
 
+(define-abbrev-table 'enh-ruby-mode-abbrev-table ()
+  "Abbrev table used by enhanced-ruby-mode.")
+
+(define-abbrev enh-ruby-mode-abbrev-table "end" "end"
+  'indent-for-tab-command :system t)
+
+(defvar enh-ruby-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "{"             'enh-ruby-electric-brace)
+    (define-key map "}"             'enh-ruby-electric-brace)
+    (define-key map (kbd "M-C-a")   'enh-ruby-beginning-of-defun)
+    (define-key map (kbd "M-C-e")   'enh-ruby-end-of-defun)
+    (define-key map (kbd "M-C-b")   'enh-ruby-backward-sexp)
+    (define-key map (kbd "M-C-f")   'enh-ruby-forward-sexp)
+
+    (define-key map (kbd "M-C-p")   'enh-ruby-beginning-of-block)
+    (define-key map (kbd "M-C-n")   'enh-ruby-end-of-block)
+
+    (define-key map (kbd "M-C-h")   'enh-ruby-mark-defun)
+    (define-key map (kbd "M-C-q")   'enh-ruby-indent-exp)
+    (define-key map (kbd "C-c C-e") 'enh-ruby-find-error)
+    (define-key map (kbd "C-c C-f") 'enh-ruby-insert-end)
+    (define-key map (kbd "C-c /")   'enh-ruby-insert-end)
+    (define-key map (kbd "M-C-u")   'enh-ruby-up-sexp)
+    (define-key map (kbd "C-j")     'reindent-then-newline-and-indent)
+    (define-key map (kbd "C-m")     'newline)
+    (define-key map (kbd "C-c C-c") 'comment-region)
+    map)
+  "Syntax table in use in enh-ruby-mode buffers.")
+
+(defvar enh-ruby-mode-syntax-table
+  (let ((table (make-syntax-table)))
+    (modify-syntax-entry ?\' "\"" table)
+    (modify-syntax-entry ?\" "\"" table)
+    (modify-syntax-entry ?\` "\"" table)
+    (modify-syntax-entry ?#  "<"  table)
+    (modify-syntax-entry ?\n ">"  table)
+    (modify-syntax-entry ?\\ "\\" table)
+    (modify-syntax-entry ?$  "."  table)
+    (modify-syntax-entry ??  "_"  table)
+    (modify-syntax-entry ?_  "_"  table)
+    ;; TODO (modify-syntax-entry ?: "_" table)
+    (modify-syntax-entry ?<  "."  table)
+    (modify-syntax-entry ?>  "."  table)
+    (modify-syntax-entry ?&  "."  table)
+    (modify-syntax-entry ?|  "."  table)
+    (modify-syntax-entry ?%  "."  table)
+    (modify-syntax-entry ?=  "."  table)
+    (modify-syntax-entry ?/  "."  table)
+    (modify-syntax-entry ?+  "."  table)
+    (modify-syntax-entry ?*  "."  table)
+    (modify-syntax-entry ?-  "."  table)
+    (modify-syntax-entry ?\; "."  table)
+    (modify-syntax-entry ?\( "()" table)
+    (modify-syntax-entry ?\) ")(" table)
+    (modify-syntax-entry ?\{ "(}" table)
+    (modify-syntax-entry ?\} "){" table)
+    (modify-syntax-entry ?\[ "(]" table)
+    (modify-syntax-entry ?\] ")[" table)
+    table)
+  "Syntax table used by enh-ruby-mode buffers.")
+
+
+
+
+
+
+
 ;;; Mode:
 
 ;;;###autoload
@@ -204,9 +272,6 @@ the value changes.
   (add-hook 'before-save-hook       'enh-ruby-mode-set-encoding nil t)
   (add-hook 'change-major-mode-hook 'erm-major-mode-changed     nil t)
   (add-hook 'kill-buffer-hook       'erm-buffer-killed          nil t)
-
-  (define-abbrev enh-ruby-mode-abbrev-table "end" "end"
-    'indent-for-tab-command :system t)
 
   (when enh-ruby-use-ruby-mode-show-parens-config
     (require 'ruby-mode)
@@ -394,65 +459,12 @@ the value changes.
       (enh-ruby-fontify-buffer)
       t))
 
-(defvar enh-ruby-mode-syntax-table nil
-  "Syntax table in use in enh-ruby-mode buffers.")
-
-(if enh-ruby-mode-syntax-table
-    ()
-  (setq enh-ruby-mode-syntax-table (make-syntax-table))
-  (modify-syntax-entry ?\' "\"" enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\" "\"" enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\` "\"" enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?#  "<"  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\n ">"  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\\ "\\" enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?$  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ??  "_"  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?_  "_"  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?<  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?>  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?&  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?|  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?%  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?=  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?/  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?+  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?*  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?-  "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\; "."  enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\( "()" enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\) ")(" enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\{ "(}" enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\} "){" enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\[ "(]" enh-ruby-mode-syntax-table)
-  (modify-syntax-entry ?\] ")[" enh-ruby-mode-syntax-table))
-
-(defvar enh-ruby-mode-map nil "Keymap used in ruby mode.")
-
 (defun enh-ruby-electric-brace (arg)
   (interactive "P")
   (insert-char last-command-event 1)
   (enh-ruby-indent-line t)
   (delete-char -1)
   (self-insert-command (prefix-numeric-value arg)))
-
-(if enh-ruby-mode-map
-    nil
-  (setq enh-ruby-mode-map (make-sparse-keymap))
-  (define-key enh-ruby-mode-map "{"        'enh-ruby-electric-brace)
-  (define-key enh-ruby-mode-map "}"        'enh-ruby-electric-brace)
-  (define-key enh-ruby-mode-map "\e\C-a"   'enh-ruby-beginning-of-defun)
-  (define-key enh-ruby-mode-map "\e\C-e"   'enh-ruby-end-of-defun)
-  (define-key enh-ruby-mode-map "\e\C-b"   'enh-ruby-backward-sexp)
-  (define-key enh-ruby-mode-map "\e\C-f"   'enh-ruby-forward-sexp)
-  (define-key enh-ruby-mode-map "\e\C-u"   'enh-ruby-up-sexp)
-  (define-key enh-ruby-mode-map "\e\C-p"   'enh-ruby-beginning-of-block)
-  (define-key enh-ruby-mode-map "\e\C-n"   'enh-ruby-end-of-block)
-  (define-key enh-ruby-mode-map "\e\C-h"   'enh-ruby-mark-defun)
-  (define-key enh-ruby-mode-map "\e\C-q"   'enh-ruby-indent-exp)
-  (define-key enh-ruby-mode-map "\C-c\C-e" 'enh-ruby-find-error)
-  (define-key enh-ruby-mode-map "\C-c\C-f" 'enh-ruby-insert-end)
-  (define-key enh-ruby-mode-map "\C-c/"    'enh-ruby-insert-end))
 
 (defun enh-ruby-imenu-create-index-in-block (prefix beg end)
   (let* ((index-alist '())
