@@ -190,7 +190,6 @@ the value changes.
     (define-key map (kbd "C-c /")   'enh-ruby-insert-end)
     (define-key map (kbd "M-C-u")   'enh-ruby-up-sexp)
     (define-key map (kbd "C-j")     'reindent-then-newline-and-indent)
-    (define-key map (kbd "C-m")     'newline)
     (define-key map (kbd "C-c C-c") 'comment-region)
     map)
   "Syntax table in use in enh-ruby-mode buffers.")
