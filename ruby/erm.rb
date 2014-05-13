@@ -1,57 +1,50 @@
 #!/usr/bin/env ruby
 
+require_relative "erm_buffer"
+
+STDIN.set_encoding "UTF-8"
+
 class BufferStore
   def initialize
-    @buffers={}
+    @buffers = {}
   end
 
-  def get_buffer(buf_num)
-    if buf_num > 0
-      @buffers[buf_num] || @buffers[buf_num]=ErmBuffer.new
-    end
+  def get_buffer buf_num
+    @buffers[buf_num] ||= ErmBuffer.new if buf_num > 0
   end
 
-  def rm(buf_num)
-    @buffers.delete(buf_num)
+  def rm buf_num
+    @buffers.delete buf_num
   end
 end
 
-# module Kernel
-#   def fixme(*args)
-#     $fixme.puts args.inspect
-#     $fixme.flush
-#   end
-# end
+store = BufferStore.new
 
-STDIN.set_encoding("UTF-8")
+EOT = "\n\0\0\0\n"
 
-require_relative 'erm_buffer'
-
-store=BufferStore.new
 begin
-  while c=STDIN.gets("\n\0\0\0\n")
-    # fixme c
-    cmd=c[0].to_sym
-    args=c[1..-6].split(':',6)
-    buf=store.get_buffer(bn=args.shift.to_i)
+  while c = STDIN.gets(EOT)
+    cmd  = c[0].to_sym
+    args = c[1..-6].split ":", 6
+    bn   = args.shift.to_i
+    buf  = store.get_buffer bn
+
     case cmd
-    when :x
-      (buf || ErmBuffer).set_extra_keywords(args.first.split(' '))
-    when :c
-      STDERR.print 'c'
-      STDERR.puts "#{buf.check_syntax}\n\n\0\0\0"
-    when :k
-      store.rm(bn)
+    when :x then
+      (buf || ErmBuffer).set_extra_keywords args.first.split " "
+    when :c then
+      STDERR.puts "c#{buf.check_syntax}\n\n\0\0\0"
+    when :k then
+      store.rm bn
     else
-      buf.add_content(cmd,*args) unless cmd == :g
+      buf.add_content(cmd, *args) unless cmd == :g
+
       unless cmd == :a
-        r=buf.parse
-        # fixme r
-        STDERR.puts r
+        STDERR.puts buf.parse
         STDERR.puts "\0\0\0"
       end
     end
   end
 rescue
-  STDERR.puts "e#{$!.message}: #{$!.backtrace.join("\n")}\n\0\0\0\n"
+  STDERR.puts "e#{$!.message}: #{$!.backtrace.join("\n")}#{EOT}"
 end

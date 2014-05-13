@@ -225,12 +225,6 @@ the value changes.
     table)
   "Syntax table used by enh-ruby-mode buffers.")
 
-
-
-
-
-
-
 ;;; Mode:
 
 ;;;###autoload
@@ -381,11 +375,10 @@ the value changes.
 
   erm-ruby-process)
 
-(defvar erm-response nil "Private variable.")
-(defvar erm-parsing-p nil "Private variable.")
+(defvar erm-response          nil "Private variable.")
+(defvar erm-parsing-p         nil "Private variable.")
 (defvar erm-no-parse-needed-p nil "Private variable.")
-
-(defvar erm-source-dir nil "Private variable.")
+(defvar erm-source-dir        nil "Private variable.")
 
 (defun erm-source-dir ()
   (or erm-source-dir
