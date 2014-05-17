@@ -6,6 +6,7 @@ require "minitest/autorun"
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..'))
 
 require 'ruby/erm_buffer.rb'
+require 'test/helper'
 
 class TestErmBuffer < Minitest::Test
   def parse_text(text,buf=ErmBuffer.new)
@@ -19,59 +20,51 @@ class TestErmBuffer < Minitest::Test
   end
 
   def test_continations
-    assert_equal "((11 1 11 c 5)(0 1 7))",
-    parse_text(%q{
+    assert_parse(%q{<0>
 a,
-b
-     })
+<@c>b})
   end
 
   def test_symbols
-    exp="((4 1 4 )(5 1 4))"
-    assert_equal(exp, parse_text(':aaa'))
-    assert_equal(exp, parse_text(':@aa'))
-    assert_equal(exp, parse_text(':@@a'))
-    assert_equal(exp, parse_text(':$aa'))
-    assert_equal(exp, parse_text(':<=>'))
-    exp="((3 1 3 )(5 1 3))"
-    assert_equal(exp, parse_text(':aa'))
-    assert_equal(exp, parse_text(':=='))
-    exp="((2 1 2 )(5 1 2))"
-    assert_equal(exp, parse_text(':a'))
-    assert_equal(exp, parse_text(':+'))
-    assert_equal(exp, parse_text(':='))
+    assert_parse('<5>:aaa')
+    assert_parse('<5>:@aa')
+    assert_parse('<5>:@@a')
+    assert_parse('<5>:$aa')
+    assert_parse('<5>:<=>')
+    assert_parse('<5>:aa')
+    assert_parse('<5>:==')
+    assert_parse('<5>:a')
+    assert_parse('<5>:+')
+    assert_parse('<5>:=')
   end
 
   def test_extra_keywords
     ErmBuffer.set_extra_keywords(%w[require])
-    assert_equal "((43 1 43 c 31)(0 1 2 9 10 15 31 38 39)(1 11 14)(7 10 11 14 15)(10 2 9 31 38))",
-    parse_text(%q{
-require 'abc'
+    assert_parse(%q{
+<10>require<0> <7>'<1>abc<7>'<0>
 x.require z
 x.
-require
-     })
+<@c><10>require
+})
   end
 
   def test_buffer_local_extra_keywords
     ErmBuffer.set_extra_keywords(%w[global])
     local_buf=ErmBuffer.new
     local_buf.set_extra_keywords %w[local]
-    assert_equal "((19 1 19 )(0 1 9 14 15)(10 9 14))",
-    parse_text(%q{
-global local
-     },local_buf)
+    assert_parse(%q{
+<0>global <10>local
+}, local_buf)
   end
 
   def test_reset_mode
-    assert_equal "((32 1 32 d 10 e 22)(0 1 2 8 9 11 14 16 17 19 22)(1 23 24)(3 9 11 22 23)(5 14 16)(11 3 8 24 28)(12 2 3 17 19))",
-     parse_text(%q{a=<<END
-#{
-  :x == d
-}
-END
-     }
-                )
+   assert_parse(%q{
+<0>a<12>=<11><<END<0>
+<3>#<@d>{<0>
+  <5>:x<0> <12>==<0> d
+<@e><3>}<1>
+<11>END
+})
   end
 
   def test_heredoc_multi
