@@ -1,3 +1,4 @@
+require 'strscan'
 require_relative '../ruby/erm_buffer'
 
 module Markup

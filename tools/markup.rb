@@ -1,4 +1,3 @@
-require 'strscan'
 require_relative '../test/markup'
 
 if $0 == __FILE__

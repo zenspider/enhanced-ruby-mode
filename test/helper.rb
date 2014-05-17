@@ -1,4 +1,3 @@
-require 'strscan'
 require_relative './markup'
 
 module ErmTestHelper
