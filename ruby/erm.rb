@@ -33,7 +33,8 @@ begin
     when :x then
       (buf || ErmBuffer).set_extra_keywords args.first.split " "
     when :c then
-      STDERR.puts "c#{buf.check_syntax}\n\n\0\0\0"
+      STDERR.puts "c"
+      STDERR.puts "#{buf.check_syntax}\n\n\0\0\0"
     when :k then
       store.rm bn
     else
