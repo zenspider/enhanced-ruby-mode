@@ -20,31 +20,31 @@ class TestErmBuffer < Minitest::Test
   end
 
   def test_continations
-    assert_parse(%q{<0>
+    assert_parse(%q{«0»
 a,
-<@c>b})
+«@c»b})
   end
 
   def test_symbols
-    assert_parse('<5>:aaa')
-    assert_parse('<5>:@aa')
-    assert_parse('<5>:@@a')
-    assert_parse('<5>:$aa')
-    assert_parse('<5>:<=>')
-    assert_parse('<5>:aa')
-    assert_parse('<5>:==')
-    assert_parse('<5>:a')
-    assert_parse('<5>:+')
-    assert_parse('<5>:=')
+    assert_parse('«5»:aaa')
+    assert_parse('«5»:@aa')
+    assert_parse('«5»:@@a')
+    assert_parse('«5»:$aa')
+    assert_parse('«5»:<=>')
+    assert_parse('«5»:aa')
+    assert_parse('«5»:==')
+    assert_parse('«5»:a')
+    assert_parse('«5»:+')
+    assert_parse('«5»:=')
   end
 
   def test_extra_keywords
     ErmBuffer.set_extra_keywords(%w[require])
     assert_parse(%q{
-<10>require<0> <7>'<1>abc<7>'<0>
+«10»require«0» «7»'«1»abc«7»'«0»
 x.require z
 x.
-<@c><10>require
+«@c»«10»require
 })
   end
 
@@ -53,17 +53,17 @@ x.
     local_buf=ErmBuffer.new
     local_buf.set_extra_keywords %w[local]
     assert_parse(%q{
-<0>global <10>local
+«0»global «10»local
 }, local_buf)
   end
 
   def test_reset_mode
    assert_parse(%q{
-<0>a<12>=<11><<END<0>
-<3>#<@d>{<0>
-  <5>:x<0> <12>==<0> d
-<@e><3>}<1>
-<11>END
+«0»a«12»=«11»<<END«0»
+«3»#«@d»{«0»
+  «5»:x«0» «12»==«0» d
+«@e»«3»}«1»
+«11»END
 })
   end
 

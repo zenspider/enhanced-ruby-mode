@@ -20,14 +20,14 @@ module Markup
     ss = StringScanner.new(str)
     loop do
       case
-      when ss.scan(/<@(.)>/)
+      when ss.scan(/«@(.)»/)
         indent_stack << ss[1] << code.size + 1
-      when ss.scan(/<(\w+)>/)
+      when ss.scan(/«(\w+)»/)
         last_tag << code.size + 1 if last_tag && last_tag.size.odd? # close last_tag
         last_tag = (result[ss[1]] << code.size + 1)
-      when ss.scan(%r|</\w*>|)
+      when ss.scan(%r|«/\w*»|)
         last_tag << code.size + 1
-      when ss.scan(/[^<]+/), ss.scan(/<[^@\w]/)
+      when ss.scan(/[^«]+/), ss.scan(/«[^@\w]/)
         code << ss[0]
       when ss.eos?
         last_tag << code.size + 1 if last_tag && last_tag.size.odd? # close last_tag
@@ -87,19 +87,19 @@ module Markup
     }.merge(options)
 
     indents, highlights = sexp[0][3..-1], sexp[1..-1]
-    tags = [] # [["<tag>", insert_position], ... ]
+    tags = [] # [["«tag»", insert_position], ... ]
 
     if options[:indent]
       indents.each_slice(2).each do |symbol, index|
-        tags << ["<@#{symbol}>", index.to_i]
+        tags << ["«@#{symbol}»", index.to_i]
       end
     end
 
     if options[:highlight]
       highlights.map do |(id, *ranges)|
         ranges.each_slice(2) do |open, close|
-          tags << ["<#{id}>", open.to_i]
-          tags << ["</#{id}>", close.to_i] if options[:close_tag]
+          tags << ["«#{id}»", open.to_i]
+          tags << ["«/#{id}»", close.to_i] if options[:close_tag]
         end
       end
     end
@@ -107,7 +107,7 @@ module Markup
     markup = code.dup
     offset = 0
     tags.sort_by { |(tag, index)|
-      # Sort tags like </close><@indent><open> for human-readability.
+      # Sort tags like «/close»«@indent»«open» for human-readability.
       type = case tag[1]
              when "/" # close tag
                0
