@@ -79,14 +79,14 @@ module Markup
     result
   end
 
-  def markup(code, sexp, options = {})
+  def markup(code, parsed_sexp, options = {})
     options = {
       :indent    => true,
       :highlight => true,
       :close_tag  => false,
     }.merge(options)
 
-    indents, highlights = sexp[0][3..-1], sexp[1..-1]
+    indents, highlights = parsed_sexp[0][3..-1], parsed_sexp[1..-1]
     tags = [] # [["«tag»", insert_position], ... ]
 
     if options[:indent]
