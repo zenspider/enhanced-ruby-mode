@@ -17,7 +17,7 @@ module Minitest::Assertions
   module_function
 
   def assert_parse(markedup_code, buf = ErmBuffer.new, msg = nil)
-    markedup_code.gsub!(/^\n|\n$/, "")
+    markedup_code.gsub!(/\A\n|\n\z/, "")
 
     expected_sexp, code = Markup.parse_markup(markedup_code)
     actual_sexp = Markup.parse_code(code, buf)
