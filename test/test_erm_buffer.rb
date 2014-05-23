@@ -20,9 +20,11 @@ class TestErmBuffer < Minitest::Test
   end
 
   def test_continations
-    assert_parse(%q{«0»
+    assert_parse(%q{
+«0»
 a,
-«@c»b})
+«@c»b
+})
   end
 
   def test_symbols
@@ -51,10 +53,8 @@ x.
   def test_buffer_local_extra_keywords
     ErmBuffer.set_extra_keywords(%w[global])
     local_buf=ErmBuffer.new
-    local_buf.set_extra_keywords %w[local]
-    assert_parse(%q{
-«0»global «10»local
-}, local_buf)
+    local_buf.set_extra_keywords(%w[local])
+    assert_parse(%q{«0»global «10»local}, local_buf)
   end
 
   def test_reset_mode
@@ -202,9 +202,7 @@ a«12»=«@l»«0»{«5»a:«0» fds,
   end
 
   def test_interpolated_string
-    assert_parse(%q{
-«7»"«3»#«@d»{«0»1«@e»«3»}«7»"
-})
+    assert_parse(%q{«7»"«3»#«@d»{«0»1«@e»«3»}«7»"})
 
     assert_parse(%q{
 «0»puts «7»"«3»#«@d»{«0»
