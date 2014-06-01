@@ -291,6 +291,7 @@ class ErmBuffer
       when :period then
         add :ident, tok
       else
+        indent :s if %w(private protected public).include? tok
         if @ermbuffer.extra_keywords.include? tok then
           add :kw, tok
         else
