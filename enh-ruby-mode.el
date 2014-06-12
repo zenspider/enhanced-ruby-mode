@@ -845,6 +845,8 @@ With ARG, do it that many times."
   (enh-ruby-forward-sexp 1)
   (forward-line 1)
   (push-mark (point) nil t)
+  (forward-line -1)
+  (end-of-line)
   (enh-ruby-backward-sexp 1)
   (forward-line 0))
 
