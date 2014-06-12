@@ -451,7 +451,8 @@ class ErmBuffer
       add type, tok
     end
 
-    def on_regexp_begin tok
+    def on_regexp_beg tok
+      tok.force_encoding @file_encoding if tok.encoding != @file_encoding
       @mode = :regexp
       add :regexp_beg, tok
     end
@@ -499,6 +500,7 @@ class ErmBuffer
     end
 
     def on_tstring_content tok
+      tok.force_encoding @file_encoding if tok.encoding != @file_encoding
       if @mode == :regexp
         add :regexp_string, tok
       else
