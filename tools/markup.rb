@@ -1,3 +1,5 @@
+#!/usr/bin/ruby -w
+
 require_relative '../test/markup'
 
 if ARGV.delete("--help")
