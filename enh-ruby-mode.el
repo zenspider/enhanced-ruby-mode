@@ -296,7 +296,7 @@ the value changes.
    :group 'enh-ruby)
 
  (defface enh-ruby-regexp-face
-   `((t :foreground ,(erm-darken-color font-lock-type-face)))
+   `((t :foreground ,(face-attribute font-lock-string-face :foreground)))
    "Face used to highlight the inside of regular expressions"
    :group 'enh-ruby)
 
