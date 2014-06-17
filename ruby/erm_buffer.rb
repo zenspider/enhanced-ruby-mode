@@ -175,8 +175,7 @@ class ErmBuffer
     # on_* handlers
 
     [:CHAR, :__end__, :backtick, :embdoc, :embdoc_beg, :embdoc_end,
-     :label, :regexp_beg, :tlambda, :tstring_beg, :tstring_content
-    ].each do |event|
+     :label, :tlambda, :tstring_beg].each do |event|
       define_method "on_#{event}" do |tok|
         tok.force_encoding @file_encoding if tok.encoding != @file_encoding
         add event, tok
@@ -452,7 +451,14 @@ class ErmBuffer
       add type, tok
     end
 
+    def on_regexp_beg tok
+      tok.force_encoding @file_encoding if tok.encoding != @file_encoding
+      @mode = :regexp
+      add :regexp_beg, tok
+    end
+
     def on_regexp_end tok
+      @mode = nil
       add :regexp_end, tok
     end
 
@@ -491,6 +497,15 @@ class ErmBuffer
       @brace_stack << :block
       indent :d
       add :block, tok
+    end
+
+    def on_tstring_content tok
+      tok.force_encoding @file_encoding if tok.encoding != @file_encoding
+      if @mode == :regexp
+        add :regexp_string, tok
+      else
+        add :tstring_content, tok
+      end
     end
 
     def on_tstring_end tok
@@ -536,6 +551,7 @@ class ErmBuffer
     heredoc_beg:     11,
     heredoc_end:     11,
     op:              12, # ruby-op-face
+    regexp_string:   13, # ruby-regexp-face
   }
 
   @@extra_keywords = {}

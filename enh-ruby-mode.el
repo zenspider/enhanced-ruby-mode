@@ -295,6 +295,11 @@ the value changes.
    "Face used to highlight regexp delimiters like / and %r."
    :group 'enh-ruby)
 
+ (defface enh-ruby-regexp-face
+   `((t :foreground ,(erm-darken-color font-lock-type-face)))
+   "Face used to highlight the inside of regular expressions"
+   :group 'enh-ruby)
+
  (defface enh-ruby-op-face
    `((t :foreground ,(erm-darken-color font-lock-keyword-face)))
    "Face used to highlight operators like + and ||"
@@ -584,6 +589,7 @@ modifications to the buffer."
         font-lock-keyword-face
         enh-ruby-heredoc-delimiter-face
         enh-ruby-op-face
+        enh-ruby-regexp-face
         ))
 
 (defun enh-ruby-calculate-indent (&optional start-point)
