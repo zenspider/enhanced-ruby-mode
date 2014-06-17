@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require_relative 'erm_buffer'
+require_relative '../ruby/erm_buffer'
 
 class ErmBuffer::Parser
   alias :old_realadd :realadd
