@@ -227,8 +227,11 @@ the value changes.
 
 ;;; Mode:
 
+(defalias 'enh-ruby-parent-mode
+  (if (fboundp 'prog-mode) 'prog-mode 'fundamental-mode))
+
 ;;;###autoload
-(define-derived-mode enh-ruby-mode prog-mode "EnhRuby"
+(define-derived-mode enh-ruby-mode enh-ruby-parent-mode "EnhRuby"
   "Enhanced Major mode for editing Ruby code.
 
 \\{enh-ruby-mode-map}"
