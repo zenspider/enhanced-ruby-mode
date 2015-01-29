@@ -234,4 +234,39 @@ a«12»=«@l»«0»{«5»a:«0» fds,
 «@e»«10»end
 })
   end
+
+  def test_percent_literals_w
+    assert_parse(%q{
+«@l»«0»[
+  «7»"«1»one«7»"«0»
+«@r»]
+«@l»[«7»"«1»one«7»"«@r»«0»]
+
+«@l»%w(
+  one
+«@r»)
+«@l»%W( one «3»#«@d»{«5»:two«@e»«3»}«0» «@r»)
+
+«@b»«10»begin«0»
+  a «12»=«0» «@l»[
+    «7»"«1»one«7»"«0»
+  «@r»]
+  a «12»=«0» «@l»%w[
+    one
+  «@r»]
+«@e»«10»end
+})
+  end
+
+  def test_percent_literals_i
+    # %i didn't exist before ruby 2.0
+    return if RUBY_VERSION.split(".").first.to_i < 2
+
+    assert_parse(%q{
+«@l»«0»%i[one «@r»]
+
+«@l»%I'a \#{a}«@r»'
+«@l»%I'a «3»#«@d»{«0»a«@e»«3»}«@r»«0»'
+})
+  end
 end
