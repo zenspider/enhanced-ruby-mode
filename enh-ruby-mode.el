@@ -1186,13 +1186,6 @@ With ARG, do it that many times."
 
 (erm-reset)
 
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.rb\\'" . enh-ruby-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("Rakefile\\'" . enh-ruby-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.gemspec\\'" . enh-ruby-mode))
-
 (provide 'enh-ruby-mode)
 
 ;;; enh-ruby-mode.el ends here
