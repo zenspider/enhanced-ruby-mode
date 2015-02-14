@@ -1,3 +1,5 @@
+task :default => "test:all"
+
 namespace :test do
   desc "Run tests for Ruby"
   task :ruby do
