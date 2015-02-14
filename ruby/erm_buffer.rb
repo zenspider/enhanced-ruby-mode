@@ -299,6 +299,12 @@ class ErmBuffer
       end
     end
 
+    def on_ignored_nl tok
+      unless tok.nil?
+        on_nl tok
+      end
+    end
+
     def on_kw sym # TODO: break up. 61 lines long
       sym = sym.to_sym
       case @mode
@@ -516,7 +522,6 @@ class ErmBuffer
       end
     end
 
-    alias on_ignored_nl on_nl
     alias on_lbracket   on_lparen
     alias on_rbracket   on_rparen
   end
