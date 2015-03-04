@@ -144,6 +144,11 @@ the value changes.
   "If not nil show-parens functionality from ruby-mode in 24.4 will be enabled"
   :type 'boolean :group 'enh-ruby)
 
+(defcustom enh-ruby-outdent-access-modifiers nil
+  "*Outdent public/protected/private modifiers if this is non-nil."
+  :type 'boolean :group 'enh-ruby)
+(put 'enh-ruby-outdent-access-modifiers 'safe-local-variable 'booleanp)
+
 (defconst enh-ruby-symbol-chars "a-zA-Z0-9_=?!")
 
 (defconst enh-ruby-symbol-re (concat "[" enh-ruby-symbol-chars "]"))
