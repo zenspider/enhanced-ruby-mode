@@ -132,6 +132,10 @@ the value changes.
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-hanging-brace-deep-indent-level 'safe-local-variable 'integerp)
 
+(defcustom enh-ruby-add-encoding-comment-on-save t
+  "Adds ruby magic encoding comment on save when non-nil."
+  :type 'boolean :group 'enh-ruby)
+
 (defcustom enh-ruby-encoding-map '((shift_jis . cp932) (shift-jis . cp932))
   "Alist to map encoding name from emacs to ruby."
   :group 'enh-ruby)
@@ -262,7 +266,9 @@ the value changes.
   (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
   (setq imenu-create-index-function 'enh-ruby-imenu-create-index)
 
-  (add-hook 'before-save-hook       'enh-ruby-mode-set-encoding nil t)
+  (if enh-ruby-add-encoding-comment-on-save
+    (add-hook 'before-save-hook 'enh-ruby-mode-set-encoding nil t))
+
   (add-hook 'change-major-mode-hook 'erm-major-mode-changed     nil t)
   (add-hook 'kill-buffer-hook       'erm-buffer-killed          nil t)
 
