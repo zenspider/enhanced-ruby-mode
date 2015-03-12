@@ -14,15 +14,26 @@
   :expected-result :failed
   (with-temp-enh-rb-buffer
    "test/rubytest-file.rb"
+   (goto-char (point-min))
    (search-forward " word_")
    (move-end-of-line nil)
    (enh-ruby-backward-sexp 2)
    (should (looking-at "%_string"))))
 
+(ert-deftest enh-ruby-forward-sexp-test ()
+  :expected-result :failed
+  (with-temp-enh-rb-buffer
+   "test/rubytest-file.rb"
+   (goto-char (point-min))
+   (search-forward "def foo")
+   (move-beginning-of-line nil)
+   (enh-ruby-forward-sexp 1)
+   (should (looking-at "\ndef backward_sexp"))))
+
 (ert-deftest enh-ruby-up-sexp-test ()
   (with-temp-enh-rb-buffer
    "test/rubytest-file.rb"
    (goto-char (point-min))
-   (search-forward "test")
+   (search-forward "test1_")
    (enh-ruby-up-sexp)
    (should (looking-at "def foo"))))
