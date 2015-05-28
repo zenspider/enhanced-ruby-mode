@@ -11,6 +11,15 @@
       "#000000")))
 
 (ert-deftest enh-ruby-backward-sexp-test ()
+  (with-temp-enh-rb-buffer
+   "test/rubytest-file.rb"
+   (goto-char (point-min))
+   (search-forward "def backward_sexp")
+   (move-beginning-of-line nil)
+   (enh-ruby-backward-sexp 1)
+   (should (looking-at "def foo"))))
+
+(ert-deftest enh-ruby-backward-sexp-test-inner ()
   :expected-result :failed
   (with-temp-enh-rb-buffer
    "test/rubytest-file.rb"
@@ -21,14 +30,13 @@
    (should (looking-at "%_string"))))
 
 (ert-deftest enh-ruby-forward-sexp-test ()
-  :expected-result :failed
   (with-temp-enh-rb-buffer
    "test/rubytest-file.rb"
    (goto-char (point-min))
    (search-forward "def foo")
    (move-beginning-of-line nil)
    (enh-ruby-forward-sexp 1)
-   (should (looking-at "\ndef backward_sexp"))))
+   (should (looking-at "\n\ndef backward_sexp"))))
 
 (ert-deftest enh-ruby-up-sexp-test ()
   (with-temp-enh-rb-buffer
