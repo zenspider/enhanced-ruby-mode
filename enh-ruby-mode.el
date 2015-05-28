@@ -959,29 +959,40 @@ With ARG, do it that many times."
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
-  (if (< arg 0)
-      (enh-ruby-backward-sexp (- arg))
-    (while (>= (setq arg (1- arg)) 0)
-      (let* ((pos (point))
-             (prop (get-text-property pos 'indent))
-             (count 0))
+  (let ((i (or arg 1)))
+    (cond
+     ((< i 0)
+      (enh-ruby-backward-sexp (- i)))
+     (t
+      (skip-syntax-forward " ")
+      (while (> i 0)
+        (let* ((pos (point))
+               (prop (get-text-property pos 'indent))
+               (count 0))
 
-        (unless (or (eq prop 'l) (eq prop 'b) (eq prop 'd))
-          (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
-                          (get-text-property pos 'indent))))
+          (unless (memq prop '(l b d))
+            (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
+                            (get-text-property pos 'indent))))
 
-        (while (< 0 (setq count
-                          (cond
-                           ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1+ count))
-                           ((or (eq prop 'r) (eq prop 'e)) (1- count))
-                           ((eq prop 'c) count)
-                           ((eq prop 's) (if (= 0 count) 1 count))
-                           (t 0))))
-          (goto-char pos)
-          (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
-                          (get-text-property pos 'indent))))
+          (while (< 0 (setq count
+                            (cond
+                             ((memq prop '(l b d)) (1+ count))
+                             ((memq prop '(r e))   (1- count))
+                             ((memq prop '(c))     count)
+                             ((memq prop '(s))     (if (= 0 count) 1 count))
+                             (t                    0))))
+            (goto-char pos)
+            (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
+                            (get-text-property pos 'indent))))
 
-        (goto-char (if prop pos (point-max)))))))
+          (goto-char (if prop pos (point-max)))
+
+          (cond ((looking-at "end")     ; move past end/}/]/)
+                 (forward-word 1))
+                ((looking-at "}\\|)\\|]")
+                 (forward-char 1))))
+
+        (setq i (1- i)))))))
 
 (defun enh-ruby-insert-end ()
   (interactive)
