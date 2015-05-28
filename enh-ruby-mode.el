@@ -254,8 +254,9 @@ the value changes.
   (setq-local parse-sexp-ignore-comments   t)
   (setq-local parse-sexp-lookup-properties t)
   (setq-local require-final-newline        t)
-
   (setq-local forward-sexp-function       'enh-ruby-forward-sexp)
+  (setq-local beginning-of-defun-function  'enh-ruby-beginning-of-defun)
+  (setq-local end-of-defun-function        'enh-ruby-end-of-defun)
 
   (set (make-local-variable 'paragraph-start)
        (concat "$\\|" page-delimiter))
