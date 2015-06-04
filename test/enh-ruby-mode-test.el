@@ -41,3 +41,17 @@
    (search-forward "test1_")
    (enh-ruby-up-sexp)
    (should (looking-at "def foo"))))
+
+(ert-deftest enh-ruby-indent-trailing-dots ()
+  (with-temp-enh-rb-buffer
+   "test/rubytest-indent.rb"
+   (indent-region (point-min) (point-max))
+   (search-forward "a.b.")
+   (should (looking-at "\n  c"))))
+
+(ert-deftest enh-ruby-indent-leading-dots ()
+  (with-temp-enh-rb-buffer
+   "test/rubytest-indent.rb"
+   (indent-region (point-min) (point-max))
+   (search-forward "d.e")
+   (should (looking-at "\n  .f"))))
