@@ -55,3 +55,17 @@
    (indent-region (point-min) (point-max))
    (search-forward "d.e")
    (should (looking-at "\n  .f"))))
+
+(ert-deftest enh-ruby-indent-pct-w-array ()
+  (with-temp-enh-rb-buffer
+   "test/rubytest-indent.rb"
+   (indent-region (point-min) (point-max))
+   (search-forward "words1 = %w[\n")
+   (should (looking-at "          moo\n         ]\n"))))
+
+(ert-deftest enh-ruby-indent-array-of-strings ()
+  (with-temp-enh-rb-buffer
+   "test/rubytest-indent.rb"
+   (indent-region (point-min) (point-max))
+   (search-forward "words2 = [\n")
+   (should (looking-at "          'moo'\n         ]\n"))))
