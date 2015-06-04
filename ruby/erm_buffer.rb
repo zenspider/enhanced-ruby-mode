@@ -74,6 +74,7 @@ class ErmBuffer
     BEGINDENT_KW       = [:if, :unless, :while, :until]
     POSTCOND_KW        = [:if, :unless, :or, :and]
     PRE_OPTIONAL_DO_KW = [:in, :while, :until]
+    DELIM_MAP          = { "(" => ")", "[" => "]", "{" => "}" }
 
     ESCAPE_LINE_END    = "\\\n"
 
@@ -116,6 +117,7 @@ class ErmBuffer
       @indent_stack   = []
       @list_count     = 0
       @cond_stack     = []
+      @plit_stack     = []
 
       catch :parse_complete do
         super
@@ -171,6 +173,20 @@ class ErmBuffer
       throw :parse_complete if pos == @point_max
     end
 
+    def maybe_plit_ending tok
+      if tok[-1] == @plit_stack.last
+        @plit_stack.pop
+
+        # Token can sometimes have preceding whitespace, which needs to be added
+        # as a separate token to work with indents.
+        if tok.length > 1
+          add :rem, tok[0..-2]
+        end
+        indent :r
+        add :rem, tok[-1]
+      end
+    end
+
     ############################################################
     # on_* handlers
 
@@ -182,8 +198,7 @@ class ErmBuffer
       end
     end
 
-    [:backref, :float, :int, :qsymbols_beg, :qwords_beg, :symbols_beg,
-     :words_beg, :words_sep].each do |event|
+    [:backref, :float, :int].each do |event|
       define_method "on_#{event}" do |tok|
         add :rem, tok
       end
@@ -233,6 +248,7 @@ class ErmBuffer
 
       @brace_stack << :embexpr
       @cond_stack << false
+      @plit_stack << false
 
       indent :d, 1
       add :embexpr_beg, tok, len
@@ -241,6 +257,7 @@ class ErmBuffer
     def on_embexpr_end tok
       @brace_stack.pop
       @cond_stack.pop
+      @plit_stack.pop
       indent :e
       add :embexpr_beg, tok
     end
@@ -442,6 +459,9 @@ class ErmBuffer
       type = case @brace_stack.pop
              when :embexpr then
                indent :e
+               if @plit_stack.last == false
+                 @plit_stack.pop
+               end
                :embexpr_beg
              when :block then
                indent :e
@@ -509,12 +529,16 @@ class ErmBuffer
       tok.force_encoding @file_encoding if tok.encoding != @file_encoding
       if @mode == :regexp
         add :regexp_string, tok
+      elsif @plit_stack.last # `tstring_content` is ignored by indent in emacs.
+        add :rem, tok
       else
         add :tstring_content, tok
       end
     end
 
     def on_tstring_end tok
+      return if maybe_plit_ending(tok)
+
       if @mode == :sym then
         add :label, tok
       else
@@ -522,8 +546,25 @@ class ErmBuffer
       end
     end
 
-    alias on_lbracket   on_lparen
-    alias on_rbracket   on_rparen
+    def on_words_beg tok
+      delimiter = tok.strip[-1]  # ie. "%w(\n" => "("
+      @plit_stack << (DELIM_MAP[delimiter] || delimiter)
+
+      indent :l
+      add :rem, tok
+    end
+
+    def on_words_sep tok
+      return if maybe_plit_ending(tok)
+
+      add :rem, tok
+    end
+
+    alias on_lbracket     on_lparen
+    alias on_qsymbols_beg on_words_beg
+    alias on_qwords_beg   on_words_beg
+    alias on_rbracket     on_rparen
+    alias on_symbols_beg  on_words_beg
   end
 
   FONT_LOCK_NAMES= {
