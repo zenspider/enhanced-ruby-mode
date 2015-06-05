@@ -8,12 +8,16 @@ namespace :test do
 
   desc "Run tests for Emacs Lisp"
   task :elisp do
-    sh(%q[emacs --batch -Q -l test/enh-ruby-mode-test.el -f ert-run-tests-batch-and-exit]){}
+    Dir.chdir "test" do
+      sh(%q[emacs --batch -Q -l enh-ruby-mode-test.el -f ert-run-tests-batch-and-exit]){}
+    end
   end
 
   desc "Run tests for Emacs Lisp interactively"
   task :elispi do
-    sh(%q[emacs -Q -l test/enh-ruby-mode-test.el -eval "(ert-run-tests-interactively 't)"]){}
+    Dir.chdir "test" do
+      sh(%q[emacs -Q -l enh-ruby-mode-test.el -eval "(ert-run-tests-interactively 't)"]){}
+    end
   end
 
   desc "Run test:ruby and test:elisp"
