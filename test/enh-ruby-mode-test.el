@@ -3,7 +3,7 @@
 
 ;; (ert-delete-all-tests)
 ;; (eval-buffer)
-;; (ert-run-tests-interactively )
+;; (ert-run-tests-interactively t)
 
 ;; In batch mode, face-attribute returns 'unspecified,
 ;; and it causes wrong-number-of-arguments errors.
@@ -20,7 +20,7 @@
    (search-forward "def backward_sexp")
    (move-beginning-of-line nil)
    (enh-ruby-backward-sexp 1)
-   (should (looking-at "def foo"))))
+   (line-should-equal "def foo")))
 
 (ert-deftest enh-ruby-backward-sexp-test-inner ()
   :expected-result :failed
@@ -29,7 +29,7 @@
    (search-forward " word_")
    (move-end-of-line nil)
    (enh-ruby-backward-sexp 2)
-   (should (looking-at "%_string"))))
+   (line-should-equal "%_string #{expr %_another_} word_")))
 
 (ert-deftest enh-ruby-forward-sexp-test ()
   (with-temp-enh-rb-buffer
@@ -37,26 +37,27 @@
    (search-forward "def foo")
    (move-beginning-of-line nil)
    (enh-ruby-forward-sexp 1)
-   (should (looking-at "\n\ndef backward_sexp"))))
+   (forward-char 2)
+   (line-should-equal "def backward_sexp")))
 
 (ert-deftest enh-ruby-up-sexp-test ()
   (with-temp-enh-rb-buffer
    "rubytest-file.rb"
    (search-forward "test1_")
    (enh-ruby-up-sexp)
-   (should (looking-at "def foo"))))
+   (line-should-equal "def foo")))
 
 (ert-deftest enh-ruby-indent-trailing-dots ()
   (with-temp-enh-rb-string
    "a.b.\nc\n"
    (indent-region (point-min) (point-max))
-   (should (looking-at "a.b.\n  c\n"))))
+   (buffer-should-equal "a.b.\n  c\n")))
 
 (ert-deftest enh-ruby-indent-leading-dots ()
   (with-temp-enh-rb-string
    "d.e\n.f\n"
    (indent-region (point-min) (point-max))
-   (should (looking-at "d.e\n  .f\n"))))
+   (buffer-should-equal "d.e\n  .f\n")))
 
 (ert-deftest enh-ruby-indent-pct-w-array ()
   (with-temp-enh-rb-string
