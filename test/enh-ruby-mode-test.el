@@ -2,6 +2,8 @@
 (load-file "../enh-ruby-mode.el")
 
 ;; (ert-delete-all-tests)
+;; (eval-buffer)
+;; (ert-run-tests-interactively )
 
 ;; In batch mode, face-attribute returns 'unspecified,
 ;; and it causes wrong-number-of-arguments errors.
@@ -45,29 +47,25 @@
    (should (looking-at "def foo"))))
 
 (ert-deftest enh-ruby-indent-trailing-dots ()
-  (with-temp-enh-rb-buffer
-   "rubytest-indent.rb"
+  (with-temp-enh-rb-string
+   "a.b.\nc\n"
    (indent-region (point-min) (point-max))
-   (search-forward "a.b.")
-   (should (looking-at "\n  c"))))
+   (should (looking-at "a.b.\n  c\n"))))
 
 (ert-deftest enh-ruby-indent-leading-dots ()
-  (with-temp-enh-rb-buffer
-   "rubytest-indent.rb"
+  (with-temp-enh-rb-string
+   "d.e\n.f\n"
    (indent-region (point-min) (point-max))
-   (search-forward "d.e")
-   (should (looking-at "\n  .f"))))
+   (should (looking-at "d.e\n  .f\n"))))
 
 (ert-deftest enh-ruby-indent-pct-w-array ()
-  (with-temp-enh-rb-buffer
-   "rubytest-indent.rb"
+  (with-temp-enh-rb-string
+   "words = %w[\nmoo\n]\n"
    (indent-region (point-min) (point-max))
-   (search-forward "words1 = %w[\n")
-   (should (looking-at "          moo\n         ]\n"))))
+   (buffer-should-equal "words = %w[\n         moo\n        ]\n")))
 
 (ert-deftest enh-ruby-indent-array-of-strings ()
-  (with-temp-enh-rb-buffer
-   "rubytest-indent.rb"
+  (with-temp-enh-rb-string
+   "words = [\n'moo'\n]\n"
    (indent-region (point-min) (point-max))
-   (search-forward "words2 = [\n")
-   (should (looking-at "          'moo'\n         ]\n"))))
+   (buffer-should-equal "words = [\n         'moo'\n        ]\n")))
