@@ -53,6 +53,20 @@
    (indent-region (point-min) (point-max))
    (buffer-should-equal "a.b.\n  c\n")))
 
+(ert-deftest enh-ruby-end-of-defun ()
+  (with-temp-enh-rb-string
+   "class Class\ndef method\n# blah\nend # method\nend # class"
+   (search-forward "blah")
+   (enh-ruby-end-of-defun)
+   (line-should-equal " # method")))
+
+(ert-deftest enh-ruby-end-of-block ()
+  (with-temp-enh-rb-string
+   "class Class\ndef method\n# blah\nend # method\nend # class"
+   (search-forward "blah")
+   (enh-ruby-end-of-block)
+   (line-should-equal " # method")))
+
 (ert-deftest enh-ruby-indent-leading-dots ()
   (with-temp-enh-rb-string
    "d.e\n.f\n"

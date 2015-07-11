@@ -902,12 +902,11 @@ With ARG, do it that many times."
                  (< (point) (point-max))
                  (progn
                    (enh-ruby-forward-sexp 1)
-                   (setq prop (get-text-property (point) 'indent))
+                   (setq prop (get-text-property (- (point) 3) 'indent))
                    (not (and (eq prop 'e)
                              (save-excursion
                                (enh-ruby-backward-sexp 1)
                                (looking-at enh-ruby-defun-beg-re))))))))
-    (forward-word)
     (point)))
 
 (defun enh-ruby-end-of-block (&optional arg)
@@ -922,7 +921,7 @@ With ARG, do it that many times."
        (while (>= (setq arg (1- arg)) 0)
          (while (progn
                   (enh-ruby-forward-sexp 1)
-                  (setq prop (get-text-property (point) 'indent))
+                  (setq prop (get-text-property (- (point) 3) 'indent))
                   (not (eq prop 'e)))))
        (point)))))
 
