@@ -84,3 +84,18 @@
    "words = [\n'moo'\n]\n"
    (indent-region (point-min) (point-max))
    (buffer-should-equal "words = [\n         'moo'\n        ]\n")))
+
+(ert-deftest enh-ruby-indent-hash ()
+  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
+  (with-temp-enh-rb-string
+   "{\na: a,\nb: b\n}\n"
+   (indent-region (point-min) (point-max))
+   (buffer-should-equal "{\n a: a,\n b: b\n}\n")))
+
+(ert-deftest enh-ruby-indent-hash-after-cmd ()
+  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
+  :expected-result :failed
+  (with-temp-enh-rb-string
+   "x\n{\na: a,\nb: b\n}"
+   (indent-region (point-min) (point-max))
+   (buffer-should-equal "x\n{\n a: a,\n b: b\n}")))
