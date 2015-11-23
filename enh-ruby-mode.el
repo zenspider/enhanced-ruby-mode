@@ -253,7 +253,7 @@ the value changes.
   (setq-local paragraph-separate           paragraph-start)
   (setq-local parse-sexp-ignore-comments   t)
   (setq-local parse-sexp-lookup-properties t)
-  (setq-local require-final-newline        t)
+  (setq-local require-final-newline        mode-require-final-newline)
   (setq-local beginning-of-defun-function  'enh-ruby-beginning-of-defun)
   (setq-local end-of-defun-function        'enh-ruby-end-of-defun)
 
