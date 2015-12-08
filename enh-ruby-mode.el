@@ -161,6 +161,13 @@ the value changes.
 
 (defconst enh-ruby-block-end-re "\\_<end\\_>")
 
+(defcustom enh-ruby-preserve-indent-in-heredocs nil
+  "Indent heredocs and multiline strings like text-mode.
+
+Warning: does not play well with electric-indent-mode.
+"
+  :type 'boolean :group 'enh-ruby)
+
 (defconst enh-ruby-symbol-chars "a-zA-Z0-9_=?!")
 
 (defconst enh-ruby-symbol-re (concat "[" enh-ruby-symbol-chars "]"))
@@ -758,6 +765,9 @@ modifications to the buffer."
          ((or (memq face '(font-lock-string-face enh-ruby-heredoc-delimiter-face))
               (and (eq 'font-lock-variable-name-face face)
                    (looking-at "#")))
+          (when enh-ruby-preserve-indent-in-heredocs
+            (forward-line -1)
+            (back-to-indentation))
           (current-column))
 
          (t
