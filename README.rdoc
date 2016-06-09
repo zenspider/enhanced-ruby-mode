@@ -49,6 +49,15 @@ For these to work with enh-ruby-mode, you need to add hooks to the enh-ruby-mode
     (add-hook 'enh-ruby-mode-hook 'robe-mode)
     (add-hook 'enh-ruby-mode-hook 'yard-mode)
 
+== Load enh-ruby-mode for Ruby files
+
+To use enh-ruby-mode for <tt>.rb</tt> add the following to your init file:
+    (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+
+To use enh-ruby-mode for all common Ruby files and the following to your init file:
+    (add-to-list 'auto-mode-alist
+                 '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
+
 == Requirements
 
 * ruby 1.9.2 (or later)
