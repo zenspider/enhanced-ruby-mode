@@ -1125,7 +1125,8 @@ With ARG, do it that many times."
 
               (move-end-of-line nil)
               (skip-chars-backward " \n\t\r\v\f")
-              (while (eq 'font-lock-comment-face (get-text-property (point) 'font-lock-face))
+              (while (and (> (point) (point-min))
+                          (eq 'font-lock-comment-face (get-text-property (point) 'font-lock-face)))
                 (backward-char))
               (skip-chars-backward " \n\t\r\v\f")
               (setq end (point))
