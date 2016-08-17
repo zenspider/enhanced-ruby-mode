@@ -477,7 +477,7 @@ the value changes.
     (while (and pos (< pos end))
       (goto-char pos)
       (when (and (eq prop 'b) (looking-at enh-ruby-defun-and-name-re))
-        (push (cons (concat (match-string 1) " "(match-string 2)) pos) index-alist))
+        (push (cons (concat (match-string 1) " " (match-string 2)) pos) index-alist))
 
       (setq prop (and (setq pos (enh-ruby-next-indent-change pos))
                       (get-text-property pos 'indent))))
