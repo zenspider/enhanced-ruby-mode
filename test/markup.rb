@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'strscan'
 require_relative '../ruby/erm_buffer'
 
