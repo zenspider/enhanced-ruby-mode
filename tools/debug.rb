@@ -16,7 +16,7 @@ end
 ARGV.each do |file|
   buf = ErmBuffer.new
   content = File.read file
-  point_min, point_max, pbeg, len = 0, content.size, 0, content.size
+  point_min, point_max, pbeg, len = 1, content.size+1, 0, content.size
 
   buf.add_content :x, point_min, point_max, pbeg, len, content
 
