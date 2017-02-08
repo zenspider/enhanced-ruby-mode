@@ -546,6 +546,11 @@ class ErmBuffer
       end
     end
 
+    def on_label_end tok
+      add :tstring_beg, tok[0]
+      add :label, tok[1]
+    end
+
     def on_words_beg tok
       delimiter = tok.strip[-1]  # ie. "%w(\n" => "("
       @plit_stack << (DELIM_MAP[delimiter] || delimiter)
