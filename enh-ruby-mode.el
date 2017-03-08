@@ -8,7 +8,8 @@
 ;; URL: http://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
 ;; Keywords: languages elisp, ruby
-;; Version: 1.0.1
+;; Package-Requires: ((emacs "24"))
+;; Version: 1.1.1
 
 ;; This file is not part of GNU Emacs.
 
@@ -229,13 +230,8 @@ the value changes.
     table)
   "Syntax table used by enh-ruby-mode buffers.")
 
-;;; Mode:
-
-(defalias 'enh-ruby-parent-mode
-  (if (fboundp 'prog-mode) 'prog-mode 'fundamental-mode))
-
 ;;;###autoload
-(define-derived-mode enh-ruby-mode enh-ruby-parent-mode "EnhRuby"
+(define-derived-mode enh-ruby-mode prog-mode "EnhRuby"
   "Enhanced Major mode for editing Ruby code.
 
 \\{enh-ruby-mode-map}"
