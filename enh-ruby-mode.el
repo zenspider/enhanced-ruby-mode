@@ -570,9 +570,12 @@ modifications to the buffer."
              (string= erm-process-delimiter (substring erm-response -5 nil)))
     (setq response (substring erm-response 0 -5))
     (setq erm-response "")
-    (with-current-buffer erm-parse-buff
-      (erm-with-unmodifying-text-property-changes
-       (erm-parse response)))))
+    (unless (buffer-live-p erm-parse-buff)
+      (erm-reset))
+    (when (buffer-live-p erm-parse-buff)
+      (with-current-buffer erm-parse-buff
+        (erm-with-unmodifying-text-property-changes
+         (erm-parse response))))))
 
 (defsubst erm-ready ()
   (if erm-full-parse-p

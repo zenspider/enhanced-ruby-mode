@@ -3,6 +3,7 @@
 require_relative "erm_buffer"
 
 STDIN.set_encoding "UTF-8"
+# STDIN.set_encoding "BINARY"
 
 class BufferStore
   def initialize
@@ -47,5 +48,5 @@ begin
     end
   end
 rescue
-  STDERR.puts "e#{$!.message}: #{$!.backtrace.join("\n")}#{EOT}"
+  STDERR.puts "e#{$!.class}: #{$!.message}: #{$!.backtrace.join("\n")}#{EOT}"
 end
