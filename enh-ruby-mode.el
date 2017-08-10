@@ -108,6 +108,11 @@ the value changes.
   "Ignored in enhanced ruby mode."
   :options '(t nil space) :group 'enh-ruby)
 
+(defcustom enh-ruby-deep-indent-construct t
+  "*Deep indent constructs such as if, def, class and module when non-nil."
+  :group 'enh-ruby)
+(put 'enh-ruby-deep-indent-construct 'safe-local-variable 'booleanp)
+
 (defcustom enh-ruby-bounce-deep-indent nil
   "Bounce between normal indentation and deep indentation when non-nil."
   :group 'enh-ruby)
@@ -630,12 +635,16 @@ modifications to the buffer."
          ((or (eq 'e prop) (eq 's prop))
           (when (eq 's prop) (forward-char))
           (enh-ruby-backward-sexp)
-          (if (not (eq 'd (get-text-property (point) 'indent)))
-              (current-column)
-            (setq pos (point))
-            (enh-ruby-skip-non-indentable)
-            (enh-ruby-calculate-indent-1 pos (line-beginning-position))))
-
+          (let ((bprop (get-text-property (point) 'indent)))
+            (cond ((eq 'd bprop)
+                   (setq pos (point))
+                   (enh-ruby-skip-non-indentable)
+                   (enh-ruby-calculate-indent-1 pos (line-beginning-position)))
+                  ((and (not enh-ruby-deep-indent-construct)
+                        (eq 'b bprop))
+                   (current-indentation))
+                  (t
+                   (current-column)))))
          ((eq 'r prop)
           (let ((opening-col
                  (save-excursion (enh-ruby-backward-sexp) (current-column))))
@@ -735,6 +744,13 @@ modifications to the buffer."
         (if pc (setq pc (cdr pc)) (setq npc col)))
 
        ((memq prop '(b d s))
+        (and (not enh-ruby-deep-indent-construct)
+             (eq prop 'b)
+             (setq col
+                   (- col (- (save-excursion
+                               (goto-char pos)
+                               (current-column))
+                             (current-indentation)))))
         (setq bc (cons col bc)))
 
        ((eq prop 'e)
