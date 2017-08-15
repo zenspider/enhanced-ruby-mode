@@ -250,6 +250,94 @@ Warning: does not play well with electric-indent-mode.
     table)
   "Syntax table used by enh-ruby-mode buffers.")
 
+(defconst enh-ruby-font-lock-keyword-beg-re "\\(?:^\\|[^.@$:]\\|\\.\\.\\)")
+
+(defconst enh-ruby-font-lock-keywords
+  `(;; Core methods that have required arguments.
+    (,(concat
+       enh-ruby-font-lock-keyword-beg-re
+       (regexp-opt
+        '( ;; built-in methods on Kernel
+          "at_exit"
+          "autoload"
+          "autoload?"
+          "callcc"
+          "catch"
+          "eval"
+          "exec"
+          "format"
+          "lambda"
+          "load"
+          "loop"
+          "open"
+          "p"
+          "print"
+          "printf"
+          "proc"
+          "putc"
+          "puts"
+          "require"
+          "require_relative"
+          "spawn"
+          "sprintf"
+          "syscall"
+          "system"
+          "throw"
+          "trace_var"
+          "trap"
+          "untrace_var"
+          "warn"
+          ;; keyword-like private methods on Module
+          "alias_method"
+          "attr"
+          "attr_accessor"
+          "attr_reader"
+          "attr_writer"
+          "define_method"
+          "extend"
+          "include"
+          "module_function"
+          "prepend"
+          "private_class_method"
+          "private_constant"
+          "public_class_method"
+          "public_constant"
+          "refine"
+          "using")
+        'symbols))
+     (1 (unless (looking-at " *\\(?:[]|,.)}=]\\|$\\)")
+          font-lock-builtin-face)))
+    ;; Kernel methods that have no required arguments.
+    (,(concat
+       enh-ruby-font-lock-keyword-beg-re
+       (regexp-opt
+        '("__callee__"
+          "__dir__"
+          "__method__"
+          "abort"
+          "binding"
+          "block_given?"
+          "caller"
+          "exit"
+          "exit!"
+          "fail"
+          "fork"
+          "global_variables"
+          "local_variables"
+          "private"
+          "protected"
+          "public"
+          "raise"
+          "rand"
+          "readline"
+          "readlines"
+          "sleep"
+          "srand")
+        'symbols))
+     (1 font-lock-builtin-face))
+    )
+  "Additional expressions to highlight in enh-ruby-mode.")
+
 ;;;###autoload
 (define-derived-mode enh-ruby-mode prog-mode "EnhRuby"
   "Enhanced Major mode for editing Ruby code.
@@ -278,7 +366,8 @@ Warning: does not play well with electric-indent-mode.
   (set (make-local-variable 'add-log-current-defun-function)
        'enh-ruby-add-log-current-method)
 
-  (setq font-lock-defaults          '(nil t))
+  (setq-local font-lock-keywords    enh-ruby-font-lock-keywords)
+  (setq font-lock-defaults          '((enh-ruby-font-lock-keywords) nil nil))
   (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
   (setq imenu-create-index-function 'enh-ruby-imenu-create-index)
 
