@@ -1,9 +1,14 @@
 (load-file "helper.el")
 (load-file "../enh-ruby-mode.el")
 
-;; (ert-delete-all-tests)
-;; (eval-buffer)
-;; (ert-run-tests-interactively t)
+(local-set-key (kbd "C-c C-r")
+               (lambda ()
+                 (interactive)
+                 (require 'ert)
+                 (ert-delete-all-tests)
+                 (load-file "../enh-ruby-mode.el")
+                 (eval-buffer)
+                 (ert-run-tests-interactively t)))
 
 ;; In batch mode, face-attribute returns 'unspecified,
 ;; and it causes wrong-number-of-arguments errors.
