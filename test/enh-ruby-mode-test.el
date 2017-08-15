@@ -107,13 +107,29 @@
    (indent-region (point-min) (point-max))
    (buffer-should-equal "x\n{\n a: a,\n b: b\n}")))
 
-(ert-deftest enh-ruby-toggle-block ()
+(defun toggle-to-do ()
+  (enh-ruby-toggle-block)
+  (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n"))
+
+(defun toggle-to-brace ()
+  (enh-ruby-toggle-block)
+  (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n"))
+
+(ert-deftest enh-ruby-toggle-block/both ()
   (with-temp-enh-rb-string
    "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
-   (enh-ruby-toggle-block)
-   (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
-   (enh-ruby-toggle-block)
-   (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
+   (toggle-to-do)
+   (toggle-to-brace)))
+
+(ert-deftest enh-ruby-toggle-block/brace ()
+  (with-temp-enh-rb-string
+   "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
+   (toggle-to-do)))
+
+(ert-deftest enh-ruby-toggle-block/do ()
+  (with-temp-enh-rb-string
+   "7.times do |i|\n  puts \"number #{i+1}\"\nend\n"
+   (toggle-to-brace)))
 
 (ert-deftest enh-ruby-indent-heredocs-test/unset ()
   (with-temp-enh-rb-string
