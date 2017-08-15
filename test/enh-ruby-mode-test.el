@@ -140,3 +140,31 @@
    (let ((enh-ruby-preserve-indent-in-heredocs nil))
      (indent-for-tab-command)           ; hitting TAB char
      (buffer-should-equal "meth <<-DONE\n  a b c\nd e f\nDONE\n"))))
+
+(ert-deftest enh-ruby-deep-indent-def-after-private ()
+  (with-temp-enh-rb-string
+   "class Foo\nprivate def foo\nx\nend\nend\n"
+   (let ((enh-ruby-deep-indent-construct t))
+     (indent-region (point-min) (point-max))
+     (buffer-should-equal "class Foo\n  private def foo\n            x\n          end\nend\n"))))
+
+(ert-deftest enh-ruby-indent-def-after-private ()
+  (with-temp-enh-rb-string
+   "class Foo\nprivate def foo\nx\nend\nend\n"
+   (let ((enh-ruby-deep-indent-construct nil))
+     (indent-region (point-min) (point-max))
+     (buffer-should-equal "class Foo\n  private def foo\n    x\n  end\nend\n"))))
+
+(ert-deftest enh-ruby-deep-indent-if-in-assignment ()
+  (with-temp-enh-rb-string
+   "foo = if bar\nx\nelse\ny\nend\n"
+   (let ((enh-ruby-deep-indent-construct t))
+     (indent-region (point-min) (point-max))
+     (buffer-should-equal "foo = if bar\n        x\n      else\n        y\n      end\n"))))
+
+(ert-deftest enh-ruby-indent-if-in-assignment ()
+  (with-temp-enh-rb-string
+   "foo = if bar\nx\nelse\ny\nend\n"
+   (let ((enh-ruby-deep-indent-construct nil))
+     (indent-region (point-min) (point-max))
+     (buffer-should-equal "foo = if bar\n  x\nelse\n  y\nend\n"))))
