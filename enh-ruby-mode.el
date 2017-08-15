@@ -142,7 +142,12 @@ the value changes.
   "Adds ruby magic encoding comment on save when non-nil."
   :type 'boolean :group 'enh-ruby)
 
-(defcustom enh-ruby-encoding-map '((shift_jis . cp932) (shift-jis . cp932))
+(defcustom enh-ruby-encoding-map
+  '((us-ascii       . nil)       ;; Do not put coding: us-ascii
+    (utf-8          . nil)       ;; Do not put coding: utf-8
+    (shift-jis      . cp932)     ;; Emacs charset name of Shift_JIS
+    (shift_jis      . cp932)     ;; MIME charset name of Shift_JIS
+    (japanese-cp932 . cp932))    ;; Emacs charset name of CP932
   "Alist to map encoding name from emacs to ruby."
   :group 'enh-ruby)
 
