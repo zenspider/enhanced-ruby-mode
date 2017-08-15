@@ -109,3 +109,29 @@
    (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
    (enh-ruby-toggle-block)
    (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
+
+(ert-deftest enh-ruby-indent-heredocs-test/unset ()
+  (with-temp-enh-rb-string
+   "meth <<-DONE\n  a b c\nd e f\nDONE\n"
+   (search-forward "d e f")
+   (move-beginning-of-line nil)
+   (indent-for-tab-command)             ; hitting TAB char
+   (buffer-should-equal "meth <<-DONE\n  a b c\nd e f\nDONE\n")))
+
+(ert-deftest enh-ruby-indent-heredocs-test/on ()
+  (with-temp-enh-rb-string
+   "meth <<-DONE\n  a b c\nd e f\nDONE\n"
+   (search-forward "d e f")
+   (move-beginning-of-line nil)
+   (let ((enh-ruby-preserve-indent-in-heredocs t))
+     (indent-for-tab-command)           ; hitting TAB char
+     (buffer-should-equal "meth <<-DONE\n  a b c\n  d e f\nDONE\n"))))
+
+(ert-deftest enh-ruby-indent-heredocs-test/off ()
+  (with-temp-enh-rb-string
+   "meth <<-DONE\n  a b c\nd e f\nDONE\n"
+   (search-forward "d e f")
+   (move-beginning-of-line nil)
+   (let ((enh-ruby-preserve-indent-in-heredocs nil))
+     (indent-for-tab-command)           ; hitting TAB char
+     (buffer-should-equal "meth <<-DONE\n  a b c\nd e f\nDONE\n"))))
