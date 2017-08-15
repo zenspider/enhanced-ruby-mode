@@ -99,3 +99,11 @@
    "x\n{\na: a,\nb: b\n}"
    (indent-region (point-min) (point-max))
    (buffer-should-equal "x\n{\n a: a,\n b: b\n}")))
+
+(ert-deftest enh-ruby-toggle-block ()
+  (with-temp-enh-rb-string
+   "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
+   (enh-ruby-toggle-block)
+   (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
+   (enh-ruby-toggle-block)
+   (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
