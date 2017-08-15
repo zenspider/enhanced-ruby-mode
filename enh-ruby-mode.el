@@ -346,10 +346,10 @@ the value changes.
   (setq-local beginning-of-defun-function  'enh-ruby-beginning-of-defun)
   (setq-local end-of-defun-function        'enh-ruby-end-of-defun)
 
-  (set (make-local-variable 'paragraph-start)
-       (concat "$\\|" page-delimiter))
-  (set (make-local-variable 'add-log-current-defun-function)
-       'enh-ruby-add-log-current-method)
+  (setq-local paragraph-start
+              (concat "$\\|" page-delimiter))
+  (setq-local add-log-current-defun-function
+              'enh-ruby-add-log-current-method)
 
   (setq-local font-lock-keywords    enh-ruby-font-lock-keywords)
   (setq font-lock-defaults          '((enh-ruby-font-lock-keywords) nil nil))
