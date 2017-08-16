@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: zenspider/emacs-ruby:latest
+      - image: zenspider/emacs-ruby:2.4.1
     working_directory: ~/erm
     steps:
       - checkout
