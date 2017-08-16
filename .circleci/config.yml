@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: zenspider/emacs-ruby:latest
+    working_directory: ~/erm
+    steps:
+      - checkout
+      - run: cd test && emacs --batch -Q -l enh-ruby-mode-test.el -f ert-run-tests-batch-and-exit

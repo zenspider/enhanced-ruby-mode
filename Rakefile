@@ -23,3 +23,15 @@ namespace :test do
   desc "Run test:ruby and test:elisp"
   task :all => [:ruby, :elisp]
 end
+
+task :circleci do
+  sh "circleci build"
+end
+
+task :docker do
+  sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test silex/emacs -Q --batch -l enh-ruby-mode-test.el -f ert-run-tests-batch-and-exit)
+end
+
+task :dockeri do
+  sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test silex/emacs -Q -l enh-ruby-mode-test.el -eval "(ert-run-tests-interactively)")
+end
