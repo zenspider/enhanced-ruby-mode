@@ -118,6 +118,7 @@ class ErmBuffer
       @list_count     = 0
       @cond_stack     = []
       @plit_stack     = []
+      @line_so_far    = []
 
       catch :parse_complete do
         super
@@ -168,6 +169,12 @@ class ErmBuffer
         end
       else
         @res[idx] = [start, pos]
+      end
+
+      if sym == :sp && tok == "\n"
+        @line_so_far = []
+      else
+        @line_so_far << [sym, tok, len]
       end
 
       throw :parse_complete if pos == @point_max
@@ -450,7 +457,16 @@ class ErmBuffer
 
     def on_period tok
       @mode ||= :period
+
       indent :c, tok.size if tok == "\n"
+
+      if @ident
+        line_so_far_str = @line_so_far.map {|(_, t, _)| t }.join
+        if line_so_far_str.strip == ""
+          indent :c, (line_so_far_str.length * -1)
+        end
+      end
+
       add :rem, tok, tok.size, false, :cont
     end
 

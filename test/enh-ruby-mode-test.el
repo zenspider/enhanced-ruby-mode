@@ -74,8 +74,6 @@
    (line-should-equal " # method")))
 
 (ert-deftest enh-ruby-indent-leading-dots ()
-  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/83
-  :expected-result :failed
   (with-temp-enh-rb-string
    "d.e\n.f\n"
    (indent-region (point-min) (point-max))

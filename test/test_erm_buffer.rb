@@ -269,4 +269,19 @@ a«12»=«@l»«0»{«5»a:«0» fds,
 «@l»%I'a «3»#«@d»{«0»a«@e»«3»}«@r»«0»'
 })
   end
+
+  def test_dot_indent
+    assert_parse(%q{
+«0»a.b
+
+c.
+«@c»  d
+
+g
+«@c»  .h
+
+i.j
+«@c»  .h
+})
+  end
 end
