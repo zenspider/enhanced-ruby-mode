@@ -1226,13 +1226,16 @@ With ARG, do it that many times."
     ))
 
 (defun enh-ruby-previous-indent-change (pos)
-  (and pos (setq pos (1- pos))
+  (and pos
+       (setq pos (1- pos))
        (>= pos (point-min))
-       (or (and (get-text-property pos 'indent) pos)
+       (or (and (get-text-property pos 'indent)
+                pos)
            (and (> pos (point-min))
                 (get-text-property (1- pos) 'indent)
                 (1- pos))
-           (enh-ruby-previous-indent-change (previous-single-property-change pos 'indent)))))
+           (enh-ruby-previous-indent-change (previous-single-property-change pos 'indent))
+           )))
 
 (defun enh-ruby-next-indent-change (pos)
   (and pos (setq pos (1+ pos))
