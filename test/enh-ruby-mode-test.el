@@ -48,7 +48,6 @@
 (ert-deftest enh-ruby-up-sexp-test ()
   (with-temp-enh-rb-buffer
    "rubytest-file.rb"
-   (sleep-for 0 50)                     ; TODO: fix... why is this needed?
    (search-forward "test1_")
    (enh-ruby-up-sexp)
    (line-should-equal "def foo")))

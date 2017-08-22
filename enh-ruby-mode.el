@@ -1235,6 +1235,7 @@ With ARG, do it that many times."
                 (get-text-property (1- pos) 'indent)
                 (1- pos))
            (enh-ruby-previous-indent-change (previous-single-property-change pos 'indent))
+           (point-min)
            )))
 
 (defun enh-ruby-next-indent-change (pos)
