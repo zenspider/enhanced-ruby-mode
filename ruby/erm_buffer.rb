@@ -172,7 +172,7 @@ class ErmBuffer
       end
 
       if sym == :sp && tok == "\n"
-        @line_so_far = []
+        @line_so_far.clear
       else
         @line_so_far << [sym, tok, len]
       end
@@ -461,7 +461,7 @@ class ErmBuffer
       indent :c, tok.size if tok == "\n"
 
       if @ident
-        line_so_far_str = @line_so_far.map {|(_, t, _)| t }.join
+        line_so_far_str = @line_so_far.map {|a| a[1] }.join
         if line_so_far_str.strip == ""
           indent :c, (line_so_far_str.length * -1)
         end
