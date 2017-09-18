@@ -22,7 +22,7 @@ Syntax checking is also performed.
 
 == Synopsis
 
-* Enhanced Ruby Mode is installable via el-get and Melpa, where its package name is enh-ruby-mode.
+* Enhanced Ruby Mode is installable via el-get and Melpa, where its package name is +enh-ruby-mode+.
 
 * For manual installation, add the following file to your init file.
 
