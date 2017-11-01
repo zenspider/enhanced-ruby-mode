@@ -20,5 +20,5 @@
 (defun rest-of-line ()
   (save-excursion
    (let ((start (point)))
-     (move-end-of-line nil)
+     (end-of-line)
      (buffer-substring-no-properties start (point)))))
