@@ -367,7 +367,7 @@ Warning: does not play well with electric-indent-mode.
               'enh-ruby-add-log-current-method)
 
   (setq-local font-lock-keywords    enh-ruby-font-lock-keywords)
-  (setq font-lock-defaults          '((enh-ruby-font-lock-keywords) nil nil))
+  (setq font-lock-defaults          '((enh-ruby-font-lock-keywords) t))
   (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
   (setq imenu-create-index-function 'enh-ruby-imenu-create-index)
 
