@@ -7,7 +7,7 @@
 ;; Author: Geoff Jacobsen
 ;; URL: http://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
-;; Keywords: languages elisp, ruby
+;; Keywords: languages, elisp, ruby
 ;; Package-Requires: ((emacs "24"))
 ;; Version: 1.1.1
 
