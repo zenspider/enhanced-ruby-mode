@@ -17,7 +17,7 @@ class ErmBuffer
         @block = false     if @block == :b4args
 
         case sym
-        when :ident, :const then
+        when :ident, :const, :ivar, :gvar, :cvar then
           @ident = true
         else
           @ident = false
@@ -196,6 +196,7 @@ class ErmBuffer
 
     ############################################################
     # on_* handlers
+    # TODO: I don't like these generated methods. Harder to trace/debug.
 
     [:CHAR, :__end__, :backtick, :embdoc, :embdoc_beg, :embdoc_end,
      :label, :tlambda, :tstring_beg].each do |event|

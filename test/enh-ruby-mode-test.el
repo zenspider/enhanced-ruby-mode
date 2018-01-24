@@ -84,6 +84,34 @@
    (indent-region (point-min) (point-max))
    (buffer-should-equal "d.e\n  .f\n")))
 
+(ert-deftest enh-ruby-indent-leading-dots-ident ()
+  (with-temp-enh-rb-string
+   "b\n.c\n.d\n"
+
+   (indent-region (point-min) (point-max))
+   (buffer-should-equal "b\n  .c\n  .d\n")))
+
+(ert-deftest enh-ruby-indent-leading-dots-ivar ()
+  (with-temp-enh-rb-string
+   "@b\n.c\n.d\n"
+
+   (indent-region (point-min) (point-max))
+   (buffer-should-equal "@b\n  .c\n  .d\n")))
+
+(ert-deftest enh-ruby-indent-leading-dots-gvar ()
+  (with-temp-enh-rb-string
+   "$b\n.c\n.d\n"
+
+   (indent-region (point-min) (point-max))
+   (buffer-should-equal "$b\n  .c\n  .d\n")))
+
+(ert-deftest enh-ruby-indent-leading-dots-cvar ()
+  (with-temp-enh-rb-string
+   "@@b\n.c\n.d\n"
+
+   (indent-region (point-min) (point-max))
+   (buffer-should-equal "@@b\n  .c\n  .d\n")))
+
 (ert-deftest enh-ruby-indent-pct-w-array ()
   (with-temp-enh-rb-string
    "words = %w[\nmoo\n]\n"
