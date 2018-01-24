@@ -11,7 +11,7 @@ class ErmBuffer
           parser.mode = nil
         end
       else
-        @statment_start = false
+        @statement_start = false
 
         parser.mode = :def if parser.mode == :predef
         @block = false     if @block == :b4args
@@ -113,7 +113,7 @@ class ErmBuffer
       @ident          = false
       @ident_stack    = []
       @block          = false
-      @statment_start = true
+      @statement_start = true
       @indent_stack   = []
       @list_count     = 0
       @cond_stack     = []
@@ -225,7 +225,7 @@ class ErmBuffer
     def on_comma tok
       @mode = nil
       r = add :rem, tok, tok.size, false, @list_count <= 0
-      @statment_start = true
+      @statement_start = true
       r
     end
 
@@ -290,7 +290,7 @@ class ErmBuffer
       end
 
       @cond_stack.pop if @cond_stack.last
-      @statment_start = true
+      @statement_start = true
 
       r
     end
@@ -370,7 +370,7 @@ class ErmBuffer
 
           return r
         when *BEGINDENT_KW then
-          if @statment_start then
+          if @statement_start then
             indent :b
           elsif POSTCOND_KW.include? sym then
             last_add = :cont
@@ -380,7 +380,7 @@ class ErmBuffer
         when *INDENT_KW then
           indent :b
         when *BACKDENT_KW then
-          indent :s if @statment_start
+          indent :s if @statement_start
         end
 
         @cond_stack << true if PRE_OPTIONAL_DO_KW.include? sym
@@ -424,7 +424,7 @@ class ErmBuffer
       indent :l
       @list_count += 1
       r = add :rem, tok
-      @statment_start = true
+      @statement_start = true
       r
     end
 
@@ -452,7 +452,7 @@ class ErmBuffer
           else
             add :op, tok, tok.size, false, :cont
           end
-        @statment_start = true
+        @statement_start = true
         r
       end
     end
@@ -522,7 +522,7 @@ class ErmBuffer
     def on_semicolon tok
       r = add :kw, :semicolon, 1, true
       @cond_stack.pop if @cond_stack.last
-      @statment_start = true
+      @statement_start = true
       r
     end
 
