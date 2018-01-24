@@ -28,12 +28,16 @@ task :circleci do
   sh "circleci build"
 end
 
+def docker cmd
+  sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test zenspider/emacs-ruby #{cmd})
+end
+
 task :docker do
-  sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test zenspider/emacs-ruby emacs -Q --batch -l enh-ruby-mode-test.el -f ert-run-tests-batch-and-exit)
+  docker "rake test:all"
 end
 
 task :dockeri do
-  sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test zenspider/emacs-ruby emacs -Q -l enh-ruby-mode-test.el -eval "(ert-run-tests-interactively t)")
+  docker "rake test:elispi"
 end
 
 task :debug do
