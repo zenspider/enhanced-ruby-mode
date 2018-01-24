@@ -2,7 +2,7 @@
 
 require_relative '../ruby/erm_buffer'
 
-trace = !ARGV.delete("--trace"),
+trace = ARGV.delete("--trace")
 
 class ErmBuffer::Parser
   alias :old_realadd :realadd
