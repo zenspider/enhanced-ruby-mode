@@ -29,9 +29,9 @@ task :circleci do
 end
 
 task :docker do
-  sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test silex/emacs -Q --batch -l enh-ruby-mode-test.el -f ert-run-tests-batch-and-exit)
+  sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test zenspider/emacs-ruby emacs -Q --batch -l enh-ruby-mode-test.el -f ert-run-tests-batch-and-exit)
 end
 
 task :dockeri do
-  sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test silex/emacs -Q -l enh-ruby-mode-test.el -eval "(ert-run-tests-interactively)")
+  sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test zenspider/emacs-ruby emacs -Q -l enh-ruby-mode-test.el -eval "(ert-run-tests-interactively)")
 end
