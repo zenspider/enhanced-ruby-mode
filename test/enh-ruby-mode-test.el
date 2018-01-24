@@ -131,6 +131,7 @@
    (toggle-to-brace)))
 
 (ert-deftest enh-ruby-toggle-block/brace ()
+  :expected-result t ; https://github.com/zenspider/enhanced-ruby-mode/issues/132
   (with-temp-enh-rb-string
    "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
 
