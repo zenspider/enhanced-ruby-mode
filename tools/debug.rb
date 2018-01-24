@@ -2,6 +2,8 @@
 
 require_relative '../ruby/erm_buffer'
 
+trace = !ARGV.delete("--trace"),
+
 class ErmBuffer::Parser
   alias :old_realadd :realadd
   def realadd(sym,tok,len)
@@ -11,7 +13,10 @@ class ErmBuffer::Parser
   end
 end
 
-# require "tracer"; Tracer.on
+if trace then
+  require "tracer"
+  Tracer.on
+end
 
 ARGV.each do |file|
   buf = ErmBuffer.new

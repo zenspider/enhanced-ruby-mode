@@ -35,3 +35,12 @@ end
 task :dockeri do
   sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test zenspider/emacs-ruby emacs -Q -l enh-ruby-mode-test.el -eval "(ert-run-tests-interactively t)")
 end
+
+task :debug do
+  f = ENV["F"]
+  system "ruby tools/debug.rb #{f}"
+  puts
+  system "ruby tools/lexer.rb #{f}"
+  puts
+  system "ruby tools/markup.rb #{f}"
+end
