@@ -292,4 +292,12 @@ i.j
 «@c»  .c
 })
   end
+
+  def test_dot_indent_with_comment
+    assert_parse(%q{
+«0»a
+«@c»  .b «4»# comment
+«@c»«0»  .c
+})
+  end
 end

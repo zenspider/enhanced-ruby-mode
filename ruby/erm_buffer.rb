@@ -171,7 +171,7 @@ class ErmBuffer
         @res[idx] = [start, pos]
       end
 
-      if sym == :sp && tok == "\n"
+      if (sym == :sp && tok == "\n") || (sym == :comment && tok.end_with?("\n"))
         @line_so_far.clear
       else
         @line_so_far << [sym, tok, len]
