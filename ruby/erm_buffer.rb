@@ -393,6 +393,7 @@ class ErmBuffer
 
     def on_lbrace tok
       @cond_stack << false
+      @ident_stack << [@ident, mode]
       if @ident then
         @brace_stack << :block
         indent :d
@@ -491,7 +492,9 @@ class ErmBuffer
                :rem
              end
 
-      add type, tok
+      add(type, tok).tap do
+        @ident, @mode = @ident_stack.pop
+      end
     end
 
     def on_regexp_beg tok

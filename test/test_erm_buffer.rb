@@ -284,4 +284,12 @@ i.j
 «@c»  .h
 })
   end
+
+  def test_dot_indent_with_block
+    assert_parse(%q{
+«0»a
+«@c»  .b «@d»«10»{«0» «@e»«10»}«0»
+«@c»  .c
+})
+  end
 end
