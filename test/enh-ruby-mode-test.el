@@ -112,6 +112,13 @@
    (indent-region (point-min) (point-max))
    (buffer-should-equal "@@b\n  .c\n  .d\n")))
 
+(ert-deftest enh-ruby-indent-leading-dots-with-block ()
+  (with-temp-enh-rb-string
+   "a\n.b {}\n.c\n"
+
+   (indent-region (point-min) (point-max))
+   (buffer-should-equal "a\n  .b {}\n  .c\n")))
+
 (ert-deftest enh-ruby-indent-pct-w-array ()
   (with-temp-enh-rb-string
    "words = %w[\nmoo\n]\n"
