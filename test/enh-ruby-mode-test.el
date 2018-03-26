@@ -109,7 +109,6 @@
 
 (ert-deftest enh-ruby-indent-hash-after-cmd ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
-  :expected-result :failed
   (with-deep-indent nil
     (string-should-indent "x\n{\na: a,\nb: b\n}"
                           "x\n{\n  a: a,\n  b: b\n}")))
@@ -118,14 +117,12 @@
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   ;; TODO: this output doesn't make sense!
   ;; either it should match non-deep or it should be *deeper*, not shallower.
-  :expected-result :failed
   (with-deep-indent t
     (string-should-indent "x\n{\na: a,\nb: b\n}"
                           "x\n{\n a: a,\n b: b\n}")))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd/ruby ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
-  :expected-result :failed
   (string-should-indent-like-ruby "x\n{\na: a,\nb: b\n}"))
 
 (ert-deftest enh-ruby-indent-if-in-assignment ()

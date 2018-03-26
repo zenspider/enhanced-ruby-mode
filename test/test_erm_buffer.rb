@@ -300,4 +300,13 @@ i.j
 «@c»«0»  .c
 })
   end
+
+  def test_brace_after_identifer
+    assert_parse(%q[
+«0»a
+«@l»{
+«5»:b«0» «12»=>«0» c,
+«@r»}
+])
+  end
 end
