@@ -832,10 +832,16 @@ modifications to the buffer."
                   (t
                    (current-column)))))
          ((eq 'r prop)
-          (let ((opening-col
-                 (save-excursion (enh-ruby-backward-sexp) (current-column))))
+          (let (opening-col opening-is-last-thing-on-line)
+            (save-excursion
+              (enh-ruby-backward-sexp)
+              (setq opening-col (current-column))
+              (forward-char 1)
+              (skip-syntax-forward " " (line-end-position))
+              (setq opening-is-last-thing-on-line (eolp)))
             (if (and enh-ruby-deep-indent-paren
-                     (not enh-ruby-bounce-deep-indent))
+                     (not enh-ruby-bounce-deep-indent)
+                     (not opening-is-last-thing-on-line))
                 opening-col
               (forward-line -1)
               (enh-ruby-skip-non-indentable)
@@ -923,14 +929,17 @@ modifications to the buffer."
               (deep-indent
                (if (char-equal (char-after pos) ?{)
                    (+ enh-ruby-hanging-brace-deep-indent-level col)
-                 (+ enh-ruby-hanging-paren-deep-indent-level col))))
-
+                 (+ enh-ruby-hanging-paren-deep-indent-level col)))
+              (at-eol (save-excursion
+                        (goto-char (1+ pos))
+                        (skip-syntax-forward " " (line-end-position))
+                        (eolp))))
           (if enh-ruby-bounce-deep-indent
               (setq pc (cons (if enh-ruby-last-bounce-deep
                                  shallow-indent
                                deep-indent)
                              pc))
-            (setq pc (cons (if enh-ruby-deep-indent-paren
+            (setq pc (cons (if (and (not at-eol) enh-ruby-deep-indent-paren)
                                deep-indent
                              shallow-indent)
                            pc)))))
