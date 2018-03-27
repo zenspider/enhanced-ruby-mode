@@ -325,7 +325,7 @@ class ErmBuffer
     end
 
     def on_ignored_nl tok
-      unless tok.nil?
+      if tok then
         on_nl tok
       end
     end
@@ -465,7 +465,7 @@ class ErmBuffer
       if @ident
         line_so_far_str = @line_so_far.map {|a| a[1] }.join
         if line_so_far_str.strip == ""
-          indent :c, (line_so_far_str.length * -1)
+          indent :c, -line_so_far_str.length
         end
       end
 
