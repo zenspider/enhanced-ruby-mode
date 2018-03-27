@@ -79,8 +79,8 @@
 
 (ert-deftest enh-ruby-indent-array-of-strings/deep ()
   (with-deep-indent t
-    (string-should-indent "words = [\n'moo'\n]\n"
-                          "words = [\n         'moo'\n        ]\n")))
+    (string-should-indent "words = ['cow',\n'moo'\n]\n"
+                          "words = ['cow',\n         'moo'\n        ]\n")))
 
 (ert-deftest enh-ruby-indent-array-of-strings/ruby ()
   (string-should-indent-like-ruby "words = [\n'moo'\n]\n"))
@@ -104,8 +104,8 @@
 (ert-deftest enh-ruby-indent-hash/deep ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   (with-deep-indent t
-    (string-should-indent "c = {\na: a,\nb: b\n}\n"
-                          "c = {\n     a: a,\n     b: b\n    }\n")))
+    (string-should-indent "c = {a: a,\nb: b,\n c: c}\n"
+                          "c = {a: a,\n     b: b,\n     c: c}\n")))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
@@ -188,7 +188,6 @@
   (string-should-indent-like-ruby "d.e\n.f\n"))
 
 (ert-deftest enh-ruby-indent-not-on-eol-opening/deep ()
-  :expected-result :failed
   (with-deep-indent t
    (string-should-indent "\nfoo(:bar,\n:baz)\nfoo(\n:bar,\n:baz,\n)\n[:foo,\n:bar]\n[\n:foo,\n:bar\n]"
                          "\nfoo(:bar,\n    :baz)\nfoo(\n  :bar,\n  :baz,\n)\n[:foo,\n :bar]\n[\n  :foo,\n  :bar\n]")))
