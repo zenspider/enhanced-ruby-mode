@@ -40,6 +40,10 @@ task :dockeri do
   docker "rake test:elispi"
 end
 
+task :sh do
+  docker "/bin/sh"
+end
+
 task :debug do
   f = ENV["F"]
   system "ruby tools/debug.rb #{f}"
