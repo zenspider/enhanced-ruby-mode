@@ -23,7 +23,7 @@
   (with-temp-enh-rb-string
    "def foo\n  xxx\nend\n"
 
-   (end-of-buffer)
+   (goto-char (point-max))
    (enh-ruby-backward-sexp 1)
    (line-should-equal "def foo")))
 
@@ -41,7 +41,6 @@
   (with-temp-enh-rb-string
    "def foo\n  xxx\n end\n\ndef backward_sexp\n  xxx\nend\n"
 
-   (beginning-of-buffer)
    (enh-ruby-forward-sexp 1)
    (forward-char 2)
    (line-should-equal "def backward_sexp")))
