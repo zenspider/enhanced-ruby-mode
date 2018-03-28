@@ -1,4 +1,5 @@
 (require 'ert)
+(require 'ert-x)
 
 ;; I hate this so much... Shuts up "Indenting region..." output
 (defun make-progress-reporter (&rest ignored) nil)
@@ -8,11 +9,18 @@
      (insert ,str)
      (enh-ruby-mode)
      (erm-wait-for-parse)
+     (font-lock-fontify-buffer)
      (goto-char (point-min))
      (progn ,@body)))
 
 (defun buffer-string-plain ()
   (buffer-substring-no-properties (point-min) (point-max)))
+
+(defun string-should-indent (ruby exp)
+  (with-temp-enh-rb-string
+   ruby
+
+   (should (equal exp (ert-buffer-string-reindented)))))
 
 (defun buffer-should-equal (exp)
   (should (equal exp (buffer-string-plain))))
