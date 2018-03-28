@@ -1,5 +1,8 @@
 (require 'ert)
 
+;; I hate this so much... Shuts up "Indenting region..." output
+(defun make-progress-reporter (&rest ignored) nil)
+
 (defmacro with-temp-enh-rb-string (str &rest body)
   `(with-temp-buffer
      (insert ,str)
