@@ -54,11 +54,8 @@
    (line-should-equal "def foo")))      ; maybe this should be %_bosexp?
 
 (ert-deftest enh-ruby-indent-trailing-dots ()
-  (with-temp-enh-rb-string
-   "a.b.\nc\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "a.b.\n  c\n")))
+  (string-should-indent "a.b.\nc\n"
+                        "a.b.\n  c\n"))
 
 (ert-deftest enh-ruby-end-of-defun ()
   (with-temp-enh-rb-string
@@ -77,84 +74,51 @@
    (line-should-equal " # method")))
 
 (ert-deftest enh-ruby-indent-leading-dots ()
-  (with-temp-enh-rb-string
-   "d.e\n.f\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "d.e\n  .f\n")))
+  (string-should-indent "d.e\n.f\n"
+                        "d.e\n  .f\n"))
 
 (ert-deftest enh-ruby-indent-leading-dots-ident ()
-  (with-temp-enh-rb-string
-   "b\n.c\n.d\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "b\n  .c\n  .d\n")))
+  (string-should-indent "b\n.c\n.d\n"
+                        "b\n  .c\n  .d\n"))
 
 (ert-deftest enh-ruby-indent-leading-dots-ivar ()
-  (with-temp-enh-rb-string
-   "@b\n.c\n.d\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "@b\n  .c\n  .d\n")))
+  (string-should-indent "@b\n.c\n.d\n"
+                        "@b\n  .c\n  .d\n"))
 
 (ert-deftest enh-ruby-indent-leading-dots-gvar ()
-  (with-temp-enh-rb-string
-   "$b\n.c\n.d\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "$b\n  .c\n  .d\n")))
+  (string-should-indent "$b\n.c\n.d\n"
+                        "$b\n  .c\n  .d\n"))
 
 (ert-deftest enh-ruby-indent-leading-dots-cvar ()
-  (with-temp-enh-rb-string
-   "@@b\n.c\n.d\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "@@b\n  .c\n  .d\n")))
+  (string-should-indent "@@b\n.c\n.d\n"
+                        "@@b\n  .c\n  .d\n"))
 
 (ert-deftest enh-ruby-indent-leading-dots-with-block ()
-  (with-temp-enh-rb-string
-   "a\n.b {}\n.c\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "a\n  .b {}\n  .c\n")))
+  (string-should-indent "a\n.b {}\n.c\n"
+                        "a\n  .b {}\n  .c\n"))
 
 (ert-deftest enh-ruby-indent-leading-dots-with-comment ()
-  (with-temp-enh-rb-string
-   "a\n.b # comment\n.c\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "a\n  .b # comment\n  .c\n")))
+  (string-should-indent "a\n.b # comment\n.c\n"
+                        "a\n  .b # comment\n  .c\n"))
 
 (ert-deftest enh-ruby-indent-pct-w-array ()
-  (with-temp-enh-rb-string
-   "words = %w[\nmoo\n]\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "words = %w[\n         moo\n        ]\n")))
+  (string-should-indent "words = %w[\nmoo\n]\n"
+                        "words = %w[\n         moo\n        ]\n"))
 
 (ert-deftest enh-ruby-indent-array-of-strings ()
-  (with-temp-enh-rb-string
-   "words = [\n'moo'\n]\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "words = [\n         'moo'\n        ]\n")))
+  (string-should-indent "words = [\n'moo'\n]\n"
+                        "words = [\n         'moo'\n        ]\n"))
 
 (ert-deftest enh-ruby-indent-hash ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
-  (with-temp-enh-rb-string
-   "{\na: a,\nb: b\n}\n"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "{\n a: a,\n b: b\n}\n")))
+  (string-should-indent "{\na: a,\nb: b\n}\n"
+                        "{\n a: a,\n b: b\n}\n"))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   :expected-result :failed
-  (with-temp-enh-rb-string
-   "x\n{\na: a,\nb: b\n}"
-
-   (indent-region (point-min) (point-max))
-   (buffer-should-equal "x\n{\n a: a,\n b: b\n}")))
+  (string-should-indent "x\n{\na: a,\nb: b\n}"
+                        "x\n{\n a: a,\n b: b\n}"))
 
 (defun toggle-to-do ()
   (enh-ruby-toggle-block)
