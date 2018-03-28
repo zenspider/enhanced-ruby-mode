@@ -53,10 +53,6 @@
    (enh-ruby-up-sexp)
    (line-should-equal "def foo")))      ; maybe this should be %_bosexp?
 
-(ert-deftest enh-ruby-indent-trailing-dots ()
-  (string-should-indent "a.b.\nc\n"
-                        "a.b.\n  c\n"))
-
 (ert-deftest enh-ruby-end-of-defun ()
   (with-temp-enh-rb-string
    "class Class\ndef method\n# blah\nend # method\nend # class"
@@ -73,38 +69,6 @@
    (enh-ruby-end-of-block)
    (line-should-equal " # method")))
 
-(ert-deftest enh-ruby-indent-leading-dots ()
-  (string-should-indent "d.e\n.f\n"
-                        "d.e\n  .f\n"))
-
-(ert-deftest enh-ruby-indent-leading-dots-ident ()
-  (string-should-indent "b\n.c\n.d\n"
-                        "b\n  .c\n  .d\n"))
-
-(ert-deftest enh-ruby-indent-leading-dots-ivar ()
-  (string-should-indent "@b\n.c\n.d\n"
-                        "@b\n  .c\n  .d\n"))
-
-(ert-deftest enh-ruby-indent-leading-dots-gvar ()
-  (string-should-indent "$b\n.c\n.d\n"
-                        "$b\n  .c\n  .d\n"))
-
-(ert-deftest enh-ruby-indent-leading-dots-cvar ()
-  (string-should-indent "@@b\n.c\n.d\n"
-                        "@@b\n  .c\n  .d\n"))
-
-(ert-deftest enh-ruby-indent-leading-dots-with-block ()
-  (string-should-indent "a\n.b {}\n.c\n"
-                        "a\n  .b {}\n  .c\n"))
-
-(ert-deftest enh-ruby-indent-leading-dots-with-comment ()
-  (string-should-indent "a\n.b # comment\n.c\n"
-                        "a\n  .b # comment\n  .c\n"))
-
-(ert-deftest enh-ruby-indent-pct-w-array ()
-  (string-should-indent "words = %w[\nmoo\n]\n"
-                        "words = %w[\n         moo\n        ]\n"))
-
 (ert-deftest enh-ruby-indent-array-of-strings ()
   (string-should-indent "words = [\n'moo'\n]\n"
                         "words = [\n         'moo'\n        ]\n"))
@@ -119,6 +83,42 @@
   :expected-result :failed
   (string-should-indent "x\n{\na: a,\nb: b\n}"
                         "x\n{\n a: a,\n b: b\n}"))
+
+(ert-deftest enh-ruby-indent-leading-dots ()
+  (string-should-indent "d.e\n.f\n"
+                        "d.e\n  .f\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots-cvar ()
+  (string-should-indent "@@b\n.c\n.d\n"
+                        "@@b\n  .c\n  .d\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots-gvar ()
+  (string-should-indent "$b\n.c\n.d\n"
+                        "$b\n  .c\n  .d\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots-ident ()
+  (string-should-indent "b\n.c\n.d\n"
+                        "b\n  .c\n  .d\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots-ivar ()
+  (string-should-indent "@b\n.c\n.d\n"
+                        "@b\n  .c\n  .d\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots-with-block ()
+  (string-should-indent "a\n.b {}\n.c\n"
+                        "a\n  .b {}\n  .c\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots-with-comment ()
+  (string-should-indent "a\n.b # comment\n.c\n"
+                        "a\n  .b # comment\n  .c\n"))
+
+(ert-deftest enh-ruby-indent-pct-w-array ()
+  (string-should-indent "words = %w[\nmoo\n]\n"
+                        "words = %w[\n         moo\n        ]\n"))
+
+(ert-deftest enh-ruby-indent-trailing-dots ()
+  (string-should-indent "a.b.\nc\n"
+                        "a.b.\n  c\n"))
 
 (defun toggle-to-do ()
   (enh-ruby-toggle-block)
