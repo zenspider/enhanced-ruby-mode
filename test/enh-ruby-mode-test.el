@@ -187,9 +187,9 @@
 (ert-deftest enh-ruby-indent-leading-dots/ruby ()
   (string-should-indent-like-ruby "d.e\n.f\n"))
 
-(ert-deftest enh-ruby-indent-not-on-eol-opening ()
+(ert-deftest enh-ruby-indent-not-on-eol-opening/deep ()
   :expected-result :failed
-  (with-deep-indent nil
+  (with-deep-indent t
    (string-should-indent "\nfoo(:bar,\n:baz)\nfoo(\n:bar,\n:baz,\n)\n[:foo,\n:bar]\n[\n:foo,\n:bar\n]"
                          "\nfoo(:bar,\n    :baz)\nfoo(\n  :bar,\n  :baz,\n)\n[:foo,\n :bar]\n[\n  :foo,\n  :bar\n]")))
 
