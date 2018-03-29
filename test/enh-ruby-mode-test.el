@@ -215,7 +215,7 @@
 
    (toggle-to-brace)))
 
-(ert-deftest enh-ruby-indent-heredocs-test/unset ()
+(ert-deftest enh-ruby-indent-for-tab-heredocs/unset ()
   (with-temp-enh-rb-string
    "meth <<-DONE\n  a b c\nd e f\nDONE\n"
 
@@ -224,7 +224,7 @@
    (indent-for-tab-command)             ; hitting TAB char
    (buffer-should-equal "meth <<-DONE\n  a b c\nd e f\nDONE\n")))
 
-(ert-deftest enh-ruby-indent-heredocs-test/on ()
+(ert-deftest enh-ruby-indent--for-tab-heredocs/on ()
   (with-temp-enh-rb-string
    "meth <<-DONE\n  a b c\nd e f\nDONE\n"
 
@@ -234,7 +234,7 @@
      (indent-for-tab-command)           ; hitting TAB char
      (buffer-should-equal "meth <<-DONE\n  a b c\n  d e f\nDONE\n"))))
 
-(ert-deftest enh-ruby-indent-heredocs-test/off ()
+(ert-deftest enh-ruby-indent-for-tab-heredocs/off ()
   (with-temp-enh-rb-string
    "meth <<-DONE\n  a b c\nd e f\nDONE\n"
 
@@ -244,7 +244,7 @@
      (indent-for-tab-command)           ; hitting TAB char
      (buffer-should-equal "meth <<-DONE\n  a b c\nd e f\nDONE\n"))))
 
-(ert-deftest enh-ruby-deep-indent-def-after-private ()
+(ert-deftest enh-ruby-indent-def-after-private/deep ()
   (with-temp-enh-rb-string
    "class Foo\nprivate def foo\nx\nend\nend\n"
 
@@ -260,7 +260,7 @@
      (indent-region (point-min) (point-max))
      (buffer-should-equal "class Foo\n  private def foo\n    x\n  end\nend\n"))))
 
-(ert-deftest enh-ruby-deep-indent-if-in-assignment ()
+(ert-deftest enh-ruby-indent-if-in-assignment/deep ()
   (with-temp-enh-rb-string
    "foo = if bar\nx\nelse\ny\nend\n"
 
@@ -276,7 +276,7 @@
      (indent-region (point-min) (point-max))
      (buffer-should-equal "foo = if bar\n  x\nelse\n  y\nend\n"))))
 
-(ert-deftest enh-ruby-dont-deep-indent-eol-opening ()
+(ert-deftest enh-ruby-indent-not-on-eol-opening/deep ()
   :expected-result :failed
   (with-temp-enh-rb-string
    "\nfoo(:bar,\n:baz)\nfoo(\n:bar,\n:baz,\n)\n[:foo,\n:bar]\n[\n:foo,\n:bar\n]"
