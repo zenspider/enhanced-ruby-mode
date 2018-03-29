@@ -87,18 +87,14 @@
     (string-should-indent-like-ruby "words = [\n'moo'\n]\n")))
 
 (ert-deftest enh-ruby-indent-def-after-private ()
-  (with-temp-enh-rb-string
-   "class Foo\nprivate def foo\nx\nend\nend\n"
-   (let ((enh-ruby-deep-indent-construct nil))
-     (indent-region (point-min) (point-max))
-     (buffer-should-equal "class Foo\n  private def foo\n    x\n  end\nend\n"))))
+  (with-deep-indent nil
+   (string-should-indent "class Foo\nprivate def foo\nx\nend\nend\n"
+                         "class Foo\n  private def foo\n    x\n  end\nend\n")))
 
 (ert-deftest enh-ruby-indent-def-after-private/deep ()
-  (with-temp-enh-rb-string
-   "class Foo\nprivate def foo\nx\nend\nend\n"
-   (let ((enh-ruby-deep-indent-construct t))
-     (indent-region (point-min) (point-max))
-     (buffer-should-equal "class Foo\n  private def foo\n            x\n          end\nend\n"))))
+  (with-deep-indent t
+   (string-should-indent "class Foo\nprivate def foo\nx\nend\nend\n"
+                         "class Foo\n  private def foo\n            x\n          end\nend\n")))
 
 (ert-deftest enh-ruby-indent-hash ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
@@ -133,18 +129,14 @@
                           "c = {\n     a: a,\n     b: b\n    }\n")))
 
 (ert-deftest enh-ruby-indent-if-in-assignment ()
-  (with-temp-enh-rb-string
-   "foo = if bar\nx\nelse\ny\nend\n"
-   (let ((enh-ruby-deep-indent-construct nil))
-     (indent-region (point-min) (point-max))
-     (buffer-should-equal "foo = if bar\n  x\nelse\n  y\nend\n"))))
+  (with-deep-indent nil
+    (string-should-indent "foo = if bar\nx\nelse\ny\nend\n"
+                          "foo = if bar\n  x\nelse\n  y\nend\n")))
 
 (ert-deftest enh-ruby-indent-if-in-assignment/deep ()
-  (with-temp-enh-rb-string
-   "foo = if bar\nx\nelse\ny\nend\n"
-   (let ((enh-ruby-deep-indent-construct t))
-     (indent-region (point-min) (point-max))
-     (buffer-should-equal "foo = if bar\n        x\n      else\n        y\n      end\n"))))
+  (with-deep-indent t
+    (string-should-indent "foo = if bar\nx\nelse\ny\nend\n"
+                          "foo = if bar\n        x\n      else\n        y\n      end\n")))
 
 (ert-deftest enh-ruby-indent-leading-dots ()
   (string-should-indent "d.e\n.f\n"
@@ -195,14 +187,11 @@
 (ert-deftest enh-ruby-indent-leading-dots/ruby ()
   (string-should-indent-like-ruby "d.e\n.f\n"))
 
-(ert-deftest enh-ruby-indent-not-on-eol-opening/deep ()
+(ert-deftest enh-ruby-indent-not-on-eol-opening ()
   :expected-result :failed
-  (with-temp-enh-rb-string
-   "\nfoo(:bar,\n:baz)\nfoo(\n:bar,\n:baz,\n)\n[:foo,\n:bar]\n[\n:foo,\n:bar\n]"
-   (let ((enh-ruby-deep-indent-paren t))
-     (indent-region (point-min) (point-max))
-     (buffer-should-equal
-      "\nfoo(:bar,\n    :baz)\nfoo(\n  :bar,\n  :baz,\n)\n[:foo,\n :bar]\n[\n  :foo,\n  :bar\n]"))))
+  (with-deep-indent nil
+   (string-should-indent "\nfoo(:bar,\n:baz)\nfoo(\n:bar,\n:baz,\n)\n[:foo,\n:bar]\n[\n:foo,\n:bar\n]"
+                         "\nfoo(:bar,\n    :baz)\nfoo(\n  :bar,\n  :baz,\n)\n[:foo,\n :bar]\n[\n  :foo,\n  :bar\n]")))
 
 (ert-deftest enh-ruby-indent-pct-w-array ()
   (with-deep-indent nil
