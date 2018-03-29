@@ -21,6 +21,12 @@
      (goto-char (point-min))
      (progn ,@body)))
 
+(defmacro with-deep-indent (deep? &rest body)
+  `(let ((enh-ruby-deep-indent-construct ,deep?)
+        (enh-ruby-deep-indent-paren ,deep?))
+     ,@body))
+(put 'with-deep-indent 'lisp-indent-function 1)
+
 (defun buffer-string-plain ()
   (buffer-substring-no-properties (point-min) (point-max)))
 

@@ -70,24 +70,51 @@
    (line-should-equal " # method")))
 
 (ert-deftest enh-ruby-indent-array-of-strings ()
-  (string-should-indent "words = [\n'moo'\n]\n"
-                        "words = [\n         'moo'\n        ]\n"))
+  ;; TODO: this should NOT be indented this way
+  (with-deep-indent nil
+    (string-should-indent "words = [\n'moo'\n]\n"
+                          "words = [\n  'moo'\n]\n")))
+
+(ert-deftest enh-ruby-indent-array-of-strings/deep ()
+  (with-deep-indent t
+    (string-should-indent "words = [\n'moo'\n]\n"
+                          "words = [\n         'moo'\n        ]\n")))
+
+(ert-deftest enh-ruby-indent-array-of-strings/ruby ()
+  (with-deep-indent nil
+    (string-should-indent-like-ruby "words = [\n'moo'\n]\n")))
 
 (ert-deftest enh-ruby-indent-hash ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
-  (string-should-indent "{\na: a,\nb: b\n}\n"
-                        "{\n a: a,\n b: b\n}\n"))
+  (with-deep-indent nil
+    (string-should-indent "c = {\na: a,\nb: b\n}\n"
+                          "c = {\n  a: a,\n  b: b\n}\n")))
+
+(ert-deftest enh-ruby-indent-hash/deep ()
+  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
+  (with-deep-indent t
+    (string-should-indent "c = {\na: a,\nb: b\n}\n"
+                          "c = {\n     a: a,\n     b: b\n    }\n")))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   :expected-result :failed
-  (string-should-indent "x\n{\na: a,\nb: b\n}"
-                        "x\n{\n a: a,\n b: b\n}"))
+  (with-deep-indent nil
+    (string-should-indent "x\n{\na: a,\nb: b\n}"
+                          "x\n{\n a: a,\n b: b\n}")))
+
+(ert-deftest enh-ruby-indent-hash-after-cmd/deep ()
+  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
+  :expected-result :failed
+  (with-deep-indent t
+    (string-should-indent "x\n{\na: a,\nb: b\n}"
+                          "x\n{\n a: a,\n b: b\n}")))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd/ruby ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   :expected-result :failed
-  (string-should-indent-like-ruby "x\n{\na: a,\nb: b\n}"))
+  (with-deep-indent nil
+   (string-should-indent-like-ruby "x\n{\na: a,\nb: b\n}")))
 
 (ert-deftest enh-ruby-indent-leading-dots ()
   (string-should-indent "d.e\n.f\n"
@@ -139,12 +166,19 @@
   (string-should-indent-like-ruby "a\n.b # comment\n.c\n"))
 
 (ert-deftest enh-ruby-indent-pct-w-array ()
-  (string-should-indent "words = %w[\nmoo\n]\n"
-                        "words = %w[\n         moo\n        ]\n"))
+  (with-deep-indent nil
+    (string-should-indent "words = %w[\nmoo\n]\n"
+                          "words = %w[\n  moo\n]\n")))
+
+(ert-deftest enh-ruby-indent-pct-w-array/deep ()
+  (with-deep-indent t
+    (string-should-indent "words = %w[\nmoo\n]\n"
+                          "words = %w[\n         moo\n        ]\n")))
 
 (ert-deftest enh-ruby-indent-pct-w-array/ruby ()
   :expected-result :failed              ; I think ruby-mode is wrong here
-  (string-should-indent-like-ruby "words = %w[\nmoo\n]\n"))
+  (with-deep-indent nil
+    (string-should-indent-like-ruby "words = %w[\nmoo\n]\n")))
 
 (ert-deftest enh-ruby-indent-trailing-dots ()
   (string-should-indent "a.b.\nc\n"
@@ -241,3 +275,13 @@
    (let ((enh-ruby-deep-indent-construct nil))
      (indent-region (point-min) (point-max))
      (buffer-should-equal "foo = if bar\n  x\nelse\n  y\nend\n"))))
+
+(ert-deftest enh-ruby-dont-deep-indent-eol-opening ()
+  :expected-result :failed
+  (with-temp-enh-rb-string
+   "\nfoo(:bar,\n:baz)\nfoo(\n:bar,\n:baz,\n)\n[:foo,\n:bar]\n[\n:foo,\n:bar\n]"
+
+   (let ((enh-ruby-deep-indent-paren t))
+     (indent-region (point-min) (point-max))
+     (buffer-should-equal
+      "\nfoo(:bar,\n    :baz)\nfoo(\n  :bar,\n  :baz,\n)\n[:foo,\n :bar]\n[\n  :foo,\n  :bar\n]"))))
