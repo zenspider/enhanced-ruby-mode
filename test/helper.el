@@ -13,14 +13,28 @@
      (goto-char (point-min))
      (progn ,@body)))
 
+(defmacro with-temp-ruby-string (str &rest body)
+  `(with-temp-buffer
+     (insert ,str)
+     (ruby-mode)
+     (font-lock-fontify-buffer)
+     (goto-char (point-min))
+     (progn ,@body)))
+
 (defun buffer-string-plain ()
   (buffer-substring-no-properties (point-min) (point-max)))
 
-(defun string-should-indent (ruby exp)
-  (with-temp-enh-rb-string
-   ruby
+(defun string-plain (s)
+  (substring-no-properties s))
 
-   (should (equal exp (ert-buffer-string-reindented)))))
+(defun string-should-indent (ruby exp)
+  (let ((act (with-temp-enh-rb-string ruby (ert-buffer-string-reindented))))
+   (should (equal exp (string-plain act)))))
+
+(defun string-should-indent-like-ruby (ruby)
+  (let ((exp (with-temp-ruby-string   ruby (ert-buffer-string-reindented)))
+        (act (with-temp-enh-rb-string ruby (ert-buffer-string-reindented))))
+    (should (equal (string-plain exp) (string-plain act)))))
 
 (defun buffer-should-equal (exp)
   (should (equal exp (buffer-string-plain))))

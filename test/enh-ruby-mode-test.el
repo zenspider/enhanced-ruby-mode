@@ -84,41 +84,74 @@
   (string-should-indent "x\n{\na: a,\nb: b\n}"
                         "x\n{\n a: a,\n b: b\n}"))
 
+(ert-deftest enh-ruby-indent-hash-after-cmd/ruby ()
+  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
+  :expected-result :failed
+  (string-should-indent-like-ruby "x\n{\na: a,\nb: b\n}"))
+
 (ert-deftest enh-ruby-indent-leading-dots ()
   (string-should-indent "d.e\n.f\n"
                         "d.e\n  .f\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots/ruby ()
+  (string-should-indent-like-ruby "d.e\n.f\n"))
 
 (ert-deftest enh-ruby-indent-leading-dots-cvar ()
   (string-should-indent "@@b\n.c\n.d\n"
                         "@@b\n  .c\n  .d\n"))
 
+(ert-deftest enh-ruby-indent-leading-dots-cvar/ruby ()
+  (string-should-indent-like-ruby "@@b\n.c\n.d\n"))
+
 (ert-deftest enh-ruby-indent-leading-dots-gvar ()
   (string-should-indent "$b\n.c\n.d\n"
                         "$b\n  .c\n  .d\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots-gvar/ruby ()
+  (string-should-indent-like-ruby "$b\n.c\n.d\n"))
 
 (ert-deftest enh-ruby-indent-leading-dots-ident ()
   (string-should-indent "b\n.c\n.d\n"
                         "b\n  .c\n  .d\n"))
 
+(ert-deftest enh-ruby-indent-leading-dots-ident/ruby ()
+  (string-should-indent-like-ruby "b\n.c\n.d\n"))
+
 (ert-deftest enh-ruby-indent-leading-dots-ivar ()
   (string-should-indent "@b\n.c\n.d\n"
                         "@b\n  .c\n  .d\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots-ivar/ruby ()
+  (string-should-indent-like-ruby "@b\n.c\n.d\n"))
 
 (ert-deftest enh-ruby-indent-leading-dots-with-block ()
   (string-should-indent "a\n.b {}\n.c\n"
                         "a\n  .b {}\n  .c\n"))
 
+(ert-deftest enh-ruby-indent-leading-dots-with-block/ruby ()
+  (string-should-indent-like-ruby "a\n.b {}\n.c\n"))
+
 (ert-deftest enh-ruby-indent-leading-dots-with-comment ()
   (string-should-indent "a\n.b # comment\n.c\n"
                         "a\n  .b # comment\n  .c\n"))
+
+(ert-deftest enh-ruby-indent-leading-dots-with-comment/ruby ()
+  (string-should-indent-like-ruby "a\n.b # comment\n.c\n"))
 
 (ert-deftest enh-ruby-indent-pct-w-array ()
   (string-should-indent "words = %w[\nmoo\n]\n"
                         "words = %w[\n         moo\n        ]\n"))
 
+(ert-deftest enh-ruby-indent-pct-w-array/ruby ()
+  :expected-result :failed              ; I think ruby-mode is wrong here
+  (string-should-indent-like-ruby "words = %w[\nmoo\n]\n"))
+
 (ert-deftest enh-ruby-indent-trailing-dots ()
   (string-should-indent "a.b.\nc\n"
                         "a.b.\n  c\n"))
+
+(ert-deftest enh-ruby-indent-trailing-dots/ruby ()
+  (string-should-indent-like-ruby "a.b.\nc\n"))
 
 (defun toggle-to-do ()
   (enh-ruby-toggle-block)
