@@ -123,7 +123,7 @@ class ErmBuffer
       catch :parse_complete do
         super
 
-        realadd :rem, '', @src_size-@count if heredoc
+        realadd :rem_heredoc, '', @src_size-@count if heredoc
       end
 
       res = @res.map.with_index { |v, i|
@@ -159,6 +159,7 @@ class ErmBuffer
       start = @point_min if start < @point_min
       pos = @point_max   if pos   > @point_max
 
+      sym = :rem if sym =~ /^rem_/
       idx = FONT_LOCK_NAMES[sym]
 
       if t = @res[idx] then
@@ -187,10 +188,10 @@ class ErmBuffer
         # Token can sometimes have preceding whitespace, which needs to be added
         # as a separate token to work with indents.
         if tok.length > 1
-          add :rem, tok[0..-2]
+          add :rem_end_ws, tok[0..-2]
         end
         indent :r
-        add :rem, tok[-1]
+        add :rem_end_plit, tok[-1]
       end
     end
 
@@ -208,7 +209,7 @@ class ErmBuffer
 
     [:backref, :float, :int].each do |event|
       define_method "on_#{event}" do |tok|
-        add :rem, tok
+        add :"rem_#{event}", tok
       end
     end
 
@@ -224,7 +225,7 @@ class ErmBuffer
 
     def on_comma tok
       @mode = nil
-      r = add :rem, tok, tok.size, false, @list_count <= 0
+      r = add :rem_comma, tok, tok.size, false, @list_count <= 0
       @statement_start = true
       r
     end
@@ -406,7 +407,7 @@ class ErmBuffer
         @brace_stack << :brace
         @list_count += 1
         indent :l
-        add :rem, tok
+        add :rem_lbrace, tok
       end
     end
 
@@ -425,7 +426,7 @@ class ErmBuffer
       @cond_stack << false
       indent :l
       @list_count += 1
-      r = add :rem, tok
+      r = add :rem_lparen, tok
       @statement_start = true
       r
     end
@@ -471,7 +472,7 @@ class ErmBuffer
         end
       end
 
-      add :rem, tok, tok.size, false, :cont
+      add :rem_period, tok, tok.size, false, :cont
     end
 
     def on_rbrace tok
@@ -489,9 +490,9 @@ class ErmBuffer
              when :brace then
                indent :r
                @list_count -= 1
-               :rem
+               :rem_brace
              else
-               :rem
+               :rem_other
              end
 
       add(type, tok).tap do
@@ -512,7 +513,7 @@ class ErmBuffer
 
     def on_rparen tok
       indent :r
-      r = add :rem, tok
+      r = add :rem_rparen, tok
 
       @list_count -= 1
       @ident, @mode = @ident_stack.pop
@@ -552,7 +553,7 @@ class ErmBuffer
       if @mode == :regexp
         add :regexp_string, tok
       elsif @plit_stack.last # `tstring_content` is ignored by indent in emacs.
-        add :rem, tok
+        add :rem_tstring_content, tok
       else
         add :tstring_content, tok
       end
@@ -564,7 +565,7 @@ class ErmBuffer
       if @mode == :sym then
         add :label, tok
       else
-        add :tstring_beg, tok
+        add :tstring_end, tok # TODO: fix this to be :tstring_end
       end
     end
 
@@ -578,13 +579,13 @@ class ErmBuffer
       @plit_stack << (DELIM_MAP[delimiter] || delimiter)
 
       indent :l
-      add :rem, tok
+      add :rem_words_beg, tok
     end
 
     def on_words_sep tok
       return if maybe_plit_ending(tok)
 
-      add :rem, tok
+      add :rem_words_sep, tok
     end
 
     alias on_lbracket     on_lparen
@@ -595,7 +596,7 @@ class ErmBuffer
   end
 
   FONT_LOCK_NAMES= {
-    rem:             0,  # 'remove' TODO: make this more debuggable
+    rem:             0,  # remove/ignore
     sp:              0,
     ident:           0,
     tstring_content: 1,  # font-lock-string-face
@@ -615,6 +616,7 @@ class ErmBuffer
     embdoc_beg:      7,
     embdoc_end:      7,
     tstring_beg:     7,
+    tstring_end:     7,
     regexp_beg:      8,  # ruby-regexp-delimiter-face
     regexp_end:      8,
     tlambda:         9,  # font-lock-function-name-face
