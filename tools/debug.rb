@@ -8,7 +8,9 @@ class ErmBuffer::Parser
   alias :old_realadd :realadd
   def realadd(sym,tok,len)
     x = old_realadd(sym, tok, len)
-    p [sym, tok, len]
+    k = sym =~ /^rem_/ ? :rem : sym
+    v = ErmBuffer::FONT_LOCK_NAMES[k] || -1
+    puts "%2d %-20p %3d %p" % [v, sym, len, tok]
     x
   end
 end
