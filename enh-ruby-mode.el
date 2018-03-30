@@ -128,12 +128,12 @@ the value changes.
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-hanging-brace-indent-level 'safe-local-variable 'integerp)
 
-(defcustom enh-ruby-hanging-paren-deep-indent-level 0
+(defcustom enh-ruby-hanging-paren-deep-indent-level 0 ; TODO: enh-ruby-hanging-brace-indent-level
   "*Extra hanging deep indentation for continued ruby parenthesis."
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-hanging-paren-deep-indent-level 'safe-local-variable 'integerp)
 
-(defcustom enh-ruby-hanging-brace-deep-indent-level 0
+(defcustom enh-ruby-hanging-brace-deep-indent-level 0 ; TODO: enh-ruby-hanging-brace-indent-level
   "*Extra hanging deep indentation for continued ruby curly braces."
   :type 'integer :group 'enh-ruby)
 (put 'enh-ruby-hanging-brace-deep-indent-level 'safe-local-variable 'integerp)
@@ -915,7 +915,7 @@ modifications to the buffer."
       (setq col (- pos start-pos -1))
 
       (cond
-       ((eq prop 'l)
+       ((eq prop 'l)                    ; TODO: comment wtf these mean
         (let ((shallow-indent
                (if (char-equal (char-after pos) ?{)
                    (+ enh-ruby-hanging-brace-indent-level indent)
@@ -926,8 +926,14 @@ modifications to the buffer."
                  (+ enh-ruby-hanging-paren-deep-indent-level col))))
 
           (if enh-ruby-bounce-deep-indent
-              (setq pc (cons (if enh-ruby-last-bounce-deep shallow-indent deep-indent) pc))
-            (setq pc (cons (if enh-ruby-deep-indent-paren deep-indent shallow-indent) pc)))))
+              (setq pc (cons (if enh-ruby-last-bounce-deep
+                                 shallow-indent
+                               deep-indent)
+                             pc))
+            (setq pc (cons (if enh-ruby-deep-indent-paren
+                               deep-indent
+                             shallow-indent)
+                           pc)))))
 
        ((eq prop 'r)
         (if pc (setq pc (cdr pc)) (setq npc col)))

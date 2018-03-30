@@ -195,18 +195,18 @@
 
 (ert-deftest enh-ruby-indent-pct-w-array ()
   (with-deep-indent nil
-    (string-should-indent "words = %w[\nmoo\n]\n"
-                          "words = %w[\n  moo\n]\n")))
+    (string-should-indent "words = %w[\na\nb\n]\n"
+                          "words = %w[\n  a\n  b\n]\n")))
 
 (ert-deftest enh-ruby-indent-pct-w-array/deep ()
   (with-deep-indent t
-    (string-should-indent "words = %w[\nmoo\n]\n"
-                          "words = %w[\n         moo\n        ]\n")))
+    (string-should-indent "words = %w[\na\nb\n]\n"
+                          "words = %w[\n         a\n         b\n        ]\n")))
 
 (ert-deftest enh-ruby-indent-pct-w-array/ruby ()
   :expected-result :failed              ; I think ruby-mode is wrong here
   (with-deep-indent nil
-    (string-should-indent-like-ruby "words = %w[\nmoo\n]\n")))
+    (string-should-indent-like-ruby "words = %w[\na\nb\n]\n")))
 
 (ert-deftest enh-ruby-indent-trailing-dots ()
   (string-should-indent "a.b.\nc\n"

@@ -22,8 +22,8 @@
      (progn ,@body)))
 
 (defmacro with-deep-indent (deep? &rest body)
-  `(let ((enh-ruby-deep-indent-construct ,deep?)
-        (enh-ruby-deep-indent-paren ,deep?))
+  `(let ((enh-ruby-deep-indent-construct ,deep?) ; def / if
+         (enh-ruby-deep-indent-paren ,deep?))    ; arrays / hashes
      ,@body))
 (put 'with-deep-indent 'lisp-indent-function 1)
 
