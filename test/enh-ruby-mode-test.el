@@ -121,25 +121,19 @@
                           "c = {a: a,\n     b: b,\n     c: c}\n")))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd ()
-  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   (with-deep-indent nil
     (string-should-indent "x\n{\na: a,\nb: b\n}"
                           "x\n{\n  a: a,\n  b: b\n}")))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd/deep ()
-  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
-  ;; TODO: this output doesn't make sense!
-  ;; either it should match non-deep or it should be *deeper*, not shallower.
   (with-deep-indent t
     (string-should-indent "x\n{\na: a,\nb: b\n}"
-                          "x\n{\n a: a,\n b: b\n}")))
+                          "x\n{\n  a: a,\n  b: b\n}")))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd/ruby ()
-  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   (string-should-indent-like-ruby "x\n{\na: a,\nb: b\n}"))
 
 (ert-deftest enh-ruby-indent-hash/deep ()
-  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   (with-deep-indent t
     (string-should-indent "c = {a: a\nb: b,\nc: c}\n"
                           "c = {a: a\n     b: b,\n     c: c}\n")))
