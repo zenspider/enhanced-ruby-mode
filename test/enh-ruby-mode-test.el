@@ -102,7 +102,7 @@
                           "c = {\n  a: a,\n  b: b\n}\n")))
 
 (ert-deftest enh-ruby-indent-hash/deep ()
-  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
+  ;; TODO: "c = {\n      a: a,\n      b: b\n    }\n"
   (with-deep-indent t
     (string-should-indent "c = {a: a,\nb: b,\n c: c}\n"
                           "c = {a: a,\n     b: b,\n     c: c}\n")))
