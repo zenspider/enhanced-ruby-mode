@@ -72,18 +72,31 @@
 ;;; indent-region
 
 (ert-deftest enh-ruby-indent-array-of-strings ()
-  ;; TODO: this should NOT be indented this way
   (with-deep-indent nil
     (string-should-indent "words = [\n'moo'\n]\n"
                           "words = [\n  'moo'\n]\n")))
+
+(ert-deftest enh-ruby-indent-array-of-strings-incl-first ()
+  (with-deep-indent nil
+    (string-should-indent "words = ['cow',\n'moo'\n]\n"
+                          "words = ['cow',\n  'moo'\n]\n")))
 
 (ert-deftest enh-ruby-indent-array-of-strings/deep ()
   (with-deep-indent t
     (string-should-indent "words = ['cow',\n'moo'\n]\n"
                           "words = ['cow',\n         'moo'\n        ]\n")))
 
+(ert-deftest enh-ruby-indent-array-of-strings-incl-first/deep ()
+  (with-deep-indent t
+    (string-should-indent "words = ['cow',\n'moo'\n]\n"
+                          "words = ['cow',\n         'moo'\n        ]\n")))
+
 (ert-deftest enh-ruby-indent-array-of-strings/ruby ()
   (string-should-indent-like-ruby "words = [\n'moo'\n]\n"))
+
+(ert-deftest enh-ruby-indent-array-of-strings-incl-first/ruby ()
+  (string-should-indent-like-ruby "words = ['cow',\n'moo'\n]\n"
+                                  'deep))
 
 (ert-deftest enh-ruby-indent-def-after-private ()
   (with-deep-indent nil
@@ -124,6 +137,12 @@
 (ert-deftest enh-ruby-indent-hash-after-cmd/ruby ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   (string-should-indent-like-ruby "x\n{\na: a,\nb: b\n}"))
+
+(ert-deftest enh-ruby-indent-hash/deep ()
+  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
+  (with-deep-indent t
+    (string-should-indent "c = {a: a\nb: b,\nc: c}\n"
+                          "c = {a: a\n     b: b,\n     c: c}\n")))
 
 (ert-deftest enh-ruby-indent-if-in-assignment ()
   (with-deep-indent nil
@@ -202,7 +221,7 @@
                           "words = %w[ a\n         b\n         c\n        ]\n")))
 
 (ert-deftest enh-ruby-indent-pct-w-array/ruby ()
-  :expected-result :failed              ; I think ruby-mode is wrong here
+  (ert-skip 'ruby-mode-is-wrong)
   (string-should-indent-like-ruby "words = %w[ a\nb\nc\n]\n"))
 
 (ert-deftest enh-ruby-indent-trailing-dots ()

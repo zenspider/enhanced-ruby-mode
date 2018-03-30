@@ -37,8 +37,8 @@
   (let ((act (with-temp-enh-rb-string ruby (ert-buffer-string-reindented))))
    (should (equal exp (string-plain act)))))
 
-(defun string-should-indent-like-ruby (ruby)
-  (with-deep-indent nil
+(defun string-should-indent-like-ruby (ruby &optional deep?)
+  (with-deep-indent deep?
     (let ((exp (with-temp-ruby-string   ruby (ert-buffer-string-reindented)))
           (act (with-temp-enh-rb-string ruby (ert-buffer-string-reindented))))
       (should (equal (string-plain exp) (string-plain act))))))
