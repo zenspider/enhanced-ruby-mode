@@ -101,6 +101,12 @@
     (string-should-indent "c = {\na: a,\nb: b\n}\n"
                           "c = {\n  a: a,\n  b: b\n}\n")))
 
+(ert-deftest enh-ruby-indent-hash/deep ()
+  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
+  (with-deep-indent t
+    (string-should-indent "c = {\na: a,\nb: b\n}\n"
+                          "c = {\n     a: a,\n     b: b\n    }\n")))
+
 (ert-deftest enh-ruby-indent-hash-after-cmd ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   :expected-result :failed
@@ -121,12 +127,6 @@
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   :expected-result :failed
   (string-should-indent-like-ruby "x\n{\na: a,\nb: b\n}"))
-
-(ert-deftest enh-ruby-indent-hash/deep ()
-  ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
-  (with-deep-indent t
-    (string-should-indent "c = {\na: a,\nb: b\n}\n"
-                          "c = {\n     a: a,\n     b: b\n    }\n")))
 
 (ert-deftest enh-ruby-indent-if-in-assignment ()
   (with-deep-indent nil
