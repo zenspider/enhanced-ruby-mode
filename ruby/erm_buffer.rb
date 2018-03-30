@@ -104,6 +104,19 @@ class ErmBuffer
   class Parser < ::Ripper   #:nodoc: internal use only
     include Adder
 
+    # TODO: add @prev_line and copy it when we clear @line_so_far
+    # TODO: use this to calculate hanging indent for parenless args
+
+    # Indents:
+    #
+    # l - [, (, {, %w/%i open  or | goalpost open
+    # r - ], ), }, %w/%i close or | goalpost close
+    # b - begin/def/case/if
+    # e - end / embexpr (interpolation) end / close block }
+    # d - do / {
+    # s - statement start on BACKDENT_KW else/when/rescue etc
+    # c - continue - period followed by return (or other way around?)
+
     INDENT_KW          = [:begin, :def, :case, :module, :class, :do, :for]
     BACKDENT_KW        = [:elsif, :else, :when, :rescue, :ensure]
     BEGINDENT_KW       = [:if, :unless, :while, :until]
