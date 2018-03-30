@@ -111,6 +111,15 @@ p a
 })
   end
 
+  def test_pct_w
+    assert_parse %q{«0» «@l»«7»%w[«0» «1»a«0» «1»b«0» «1»c«0» «@r»«7»]«0» }
+  end
+
+  def test_pct_q
+    assert_parse %q{«0» «7»%q[«1» a b c «7»]}
+    assert_parse %q{«0» «7»%q[«1» a b c «7»]«0» }
+  end
+
   def test_def
     assert_parse(%q{
 «@b»«10»def«0» «9»simple«@l»«0»(a,b«@r»)
@@ -136,7 +145,6 @@ p a
 «@e»«10»end
 })
   end
-
 
   def test_heredoc_followed_by_if_arg
     assert_parse(%q{
@@ -242,18 +250,18 @@ a«12»=«@l»«0»{«5»a:«0» fds,
 «@r»]
 «@l»[«7»"«1»one«7»"«@r»«0»]
 
-«@l»%w(
-  one
-«@r»)
-«@l»%W( one «3»#«@d»{«5»:two«@e»«3»}«0» «@r»)
+«@l»«7»%w(«0»
+  «1»one«0»
+«@r»«7»)«0»
+«@l»«7»%W(«0» «1»one«0» «3»#«@d»{«5»:two«@e»«3»}«0» «@r»«7»)«0»
 
 «@b»«10»begin«0»
   a «12»=«0» «@l»[
     «7»"«1»one«7»"«0»
   «@r»]
-  a «12»=«0» «@l»%w[
-    one
-  «@r»]
+  a «12»=«0» «@l»«7»%w[«0»
+    «1»one«0»
+  «@r»«7»]«0»
 «@e»«10»end
 })
   end
@@ -263,10 +271,10 @@ a«12»=«@l»«0»{«5»a:«0» fds,
     return if RUBY_VERSION.split(".").first.to_i < 2
 
     assert_parse(%q{
-«@l»«0»%i[one «@r»]
+«@l»«7»%i[«1»one«0» «@r»«7»]«0»
 
-«@l»%I'a \#{a}«@r»'
-«@l»%I'a «3»#«@d»{«0»a«@e»«3»}«@r»«0»'
+«@l»«7»%I'«1»a«0» «1»\#{a}«@r»«7»'«0»
+«@l»«7»%I'«1»a«0» «3»#«@d»{«0»a«@e»«3»}«@r»«7»'
 })
   end
 

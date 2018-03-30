@@ -23,6 +23,7 @@ class ErmBuffer
     embdoc_end:      7,
     tstring_beg:     7,
     tstring_end:     7,
+    words_beg:       7,
     regexp_beg:      8,  # ruby-regexp-delimiter-face
     regexp_end:      8,
     tlambda:         9,  # font-lock-function-name-face
@@ -225,7 +226,7 @@ class ErmBuffer
           add :rem_end_ws, tok[0..-2]
         end
         indent :r
-        add :rem_end_plit, tok[-1]
+        add :tstring_end, tok[-1]
       end
     end
 
@@ -587,7 +588,7 @@ class ErmBuffer
       if @mode == :regexp
         add :regexp_string, tok
       elsif @plit_stack.last # `tstring_content` is ignored by indent in emacs.
-        add :rem_tstring_content, tok
+        add :tstring_content, tok # TODO: figure out this context? or collapse?
       else
         add :tstring_content, tok
       end
@@ -613,7 +614,7 @@ class ErmBuffer
       @plit_stack << (DELIM_MAP[delimiter] || delimiter)
 
       indent :l
-      add :rem_words_beg, tok
+      add :words_beg, tok
     end
 
     def on_words_sep tok
