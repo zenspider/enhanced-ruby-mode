@@ -1,6 +1,40 @@
 require 'ripper'
 
 class ErmBuffer
+  FONT_LOCK_NAMES = {
+    rem:             0,  # remove/ignore
+    sp:              0,
+    ident:           0,
+    tstring_content: 1,  # font-lock-string-face
+    const:           2,  # font-lock-type-face
+    ivar:            3,  # font-lock-variable-name-face
+    arglist:         3,
+    cvar:            3,
+    gvar:            3,
+    embexpr_beg:     3,
+    embexpr_end:     3,
+    comment:         4,  # font-lock-comment-face
+    embdoc:          4,
+    label:           5,  # font-lock-constant-face
+    CHAR:            6,  # font-lock-string-face
+    backtick:        7,  # ruby-string-delimiter-face
+    __end__:         7,
+    embdoc_beg:      7,
+    embdoc_end:      7,
+    tstring_beg:     7,
+    tstring_end:     7,
+    regexp_beg:      8,  # ruby-regexp-delimiter-face
+    regexp_end:      8,
+    tlambda:         9,  # font-lock-function-name-face
+    defname:         9,
+    kw:              10, # font-lock-keyword-face
+    block:           10,
+    heredoc_beg:     11,
+    heredoc_end:     11,
+    op:              12, # ruby-op-face
+    regexp_string:   13, # ruby-regexp-face
+  }
+
   module Adder
     def nadd sym, tok, len = tok.size, ft = false, la = nil
       case sym
@@ -32,7 +66,7 @@ class ErmBuffer
 
       sym
     end
-  end
+  end # module Adder
 
   class Heredoc
     include Adder
@@ -64,7 +98,7 @@ class ErmBuffer
         parser.heredoc = @prev
       end
     end
-  end
+  end # class Heredoc
 
   class Parser < ::Ripper   #:nodoc: internal use only
     include Adder
@@ -593,41 +627,7 @@ class ErmBuffer
     alias on_qwords_beg   on_words_beg
     alias on_rbracket     on_rparen
     alias on_symbols_beg  on_words_beg
-  end
-
-  FONT_LOCK_NAMES= {
-    rem:             0,  # remove/ignore
-    sp:              0,
-    ident:           0,
-    tstring_content: 1,  # font-lock-string-face
-    const:           2,  # font-lock-type-face
-    ivar:            3,  # font-lock-variable-name-face
-    arglist:         3,
-    cvar:            3,
-    gvar:            3,
-    embexpr_beg:     3,
-    embexpr_end:     3,
-    comment:         4,  # font-lock-comment-face
-    embdoc:          4,
-    label:           5,  # font-lock-constant-face
-    CHAR:            6,  # font-lock-string-face
-    backtick:        7,  # ruby-string-delimiter-face
-    __end__:         7,
-    embdoc_beg:      7,
-    embdoc_end:      7,
-    tstring_beg:     7,
-    tstring_end:     7,
-    regexp_beg:      8,  # ruby-regexp-delimiter-face
-    regexp_end:      8,
-    tlambda:         9,  # font-lock-function-name-face
-    defname:         9,
-    kw:              10, # font-lock-keyword-face
-    block:           10,
-    heredoc_beg:     11,
-    heredoc_end:     11,
-    op:              12, # ruby-op-face
-    regexp_string:   13, # ruby-regexp-face
-  }
+  end # class Parser
 
   @@extra_keywords = {}
 
@@ -691,4 +691,4 @@ class ErmBuffer
   def extra_keywords
     @extra_keywords || @@extra_keywords
   end
-end
+end # class ErmBuffer
