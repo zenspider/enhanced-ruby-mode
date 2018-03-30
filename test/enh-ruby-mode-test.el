@@ -120,6 +120,13 @@
     (string-should-indent "c = {a: a,\nb: b,\n c: c}\n"
                           "c = {a: a,\n     b: b,\n     c: c}\n")))
 
+(ert-deftest enh-ruby-indent-bug/90/a ()
+  (string-should-indent-like-ruby "aa.bb(:a => 1,\n      :b => 2,\n      :c => 3)\n"
+                                  'deep))
+
+(ert-deftest enh-ruby-indent-bug/90/b ()
+  (string-should-indent-like-ruby "literal_array = [\n  :a,\n  :b,\n  :c\n]\n"))
+
 (ert-deftest enh-ruby-indent-hash-after-cmd ()
   (with-deep-indent nil
     (string-should-indent "x\n{\na: a,\nb: b\n}"
