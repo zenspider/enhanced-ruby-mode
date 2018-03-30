@@ -596,10 +596,12 @@ class ErmBuffer
     rem:             0,  # 'remove' TODO: make this more debuggable
     sp:              0,
     ident:           0,
+    arglist:         0,
+    block:           0,
+    op:              0,
     tstring_content: 1,  # font-lock-string-face
     const:           2,  # font-lock-type-face
     ivar:            3,  # font-lock-variable-name-face
-    arglist:         3,
     cvar:            3,
     gvar:            3,
     embexpr_beg:     3,
@@ -618,10 +620,8 @@ class ErmBuffer
     tlambda:         9,  # font-lock-function-name-face
     defname:         9,
     kw:              10, # font-lock-keyword-face
-    block:           10,
     heredoc_beg:     11,
     heredoc_end:     11,
-    op:              12, # ruby-op-face
     regexp_string:   13, # ruby-regexp-face
   }
 
