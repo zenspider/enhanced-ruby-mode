@@ -83,8 +83,7 @@
                           "words = [\n         'moo'\n        ]\n")))
 
 (ert-deftest enh-ruby-indent-array-of-strings/ruby ()
-  (with-deep-indent nil
-    (string-should-indent-like-ruby "words = [\n'moo'\n]\n")))
+  (string-should-indent-like-ruby "words = [\n'moo'\n]\n"))
 
 (ert-deftest enh-ruby-indent-def-after-private ()
   (with-deep-indent nil
@@ -107,10 +106,12 @@
   :expected-result :failed
   (with-deep-indent nil
     (string-should-indent "x\n{\na: a,\nb: b\n}"
-                          "x\n{\n a: a,\n b: b\n}")))
+                          "x\n{\n  a: a,\n  b: b\n}")))
 
 (ert-deftest enh-ruby-indent-hash-after-cmd/deep ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
+  ;; TODO: this output doesn't make sense!
+  ;; either it should match non-deep or it should be *deeper*, not shallower.
   :expected-result :failed
   (with-deep-indent t
     (string-should-indent "x\n{\na: a,\nb: b\n}"
@@ -119,8 +120,7 @@
 (ert-deftest enh-ruby-indent-hash-after-cmd/ruby ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
   :expected-result :failed
-  (with-deep-indent nil
-   (string-should-indent-like-ruby "x\n{\na: a,\nb: b\n}")))
+  (string-should-indent-like-ruby "x\n{\na: a,\nb: b\n}"))
 
 (ert-deftest enh-ruby-indent-hash/deep ()
   ;; https://github.com/zenspider/enhanced-ruby-mode/issues/78
@@ -199,14 +199,15 @@
                           "words = %w[\n  a\n  b\n]\n")))
 
 (ert-deftest enh-ruby-indent-pct-w-array/deep ()
+  ;; TODO: I do NOT like this one
+  ;; TODO: "words = %w[ a\n            b\n            c\n          ]\n"
   (with-deep-indent t
-    (string-should-indent "words = %w[\na\nb\n]\n"
-                          "words = %w[\n         a\n         b\n        ]\n")))
+    (string-should-indent "words = %w[ a\nb\nc\n]\n"
+                          "words = %w[ a\n         b\n         c\n        ]\n")))
 
 (ert-deftest enh-ruby-indent-pct-w-array/ruby ()
   :expected-result :failed              ; I think ruby-mode is wrong here
-  (with-deep-indent nil
-    (string-should-indent-like-ruby "words = %w[\na\nb\n]\n")))
+  (string-should-indent-like-ruby "words = %w[ a\nb\nc\n]\n"))
 
 (ert-deftest enh-ruby-indent-trailing-dots ()
   (string-should-indent "a.b.\nc\n"
