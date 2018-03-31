@@ -601,7 +601,7 @@ class ErmBuffer
       if @mode == :regexp
         add :regexp_string, tok
       elsif @plit_stack.last # `tstring_content` is ignored by indent in emacs.
-        add :tstring_content, tok # TODO: figure out this context? or collapse?
+        add :rem_tstring_content, tok # TODO: figure out this context? or collapse?
       else
         add :tstring_content, tok
       end
