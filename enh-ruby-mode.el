@@ -156,7 +156,7 @@ the value changes.
   :type 'boolean :group 'enh-ruby)
 
 (defcustom enh-ruby-use-ruby-mode-show-parens-config nil
-  "If not nil show-parens functionality from ruby-mode in 24.4 will be enabled"
+  "This flag has no effect anymore as ERM supports show-paren-mode directly"
   :type 'boolean :group 'enh-ruby)
 
 (defconst enh-ruby-block-end-re "\\_<end\\_>")
@@ -377,11 +377,8 @@ Warning: does not play well with electric-indent-mode.
   (add-hook 'change-major-mode-hook 'erm-major-mode-changed     nil t)
   (add-hook 'kill-buffer-hook       'erm-buffer-killed          nil t)
 
-  (when enh-ruby-use-ruby-mode-show-parens-config
-    (require 'ruby-mode)
-    (smie-setup ruby-smie-grammar #'ruby-smie-rules
-                :forward-token  #'ruby-smie--forward-token
-                :backward-token #'ruby-smie--backward-token))
+  (add-function :around (local 'show-paren-data-function)
+                #'erm--advise-show-paren-data-function)
 
   (abbrev-mode)
   (erm-reset-buffer))
@@ -1438,6 +1435,42 @@ With ARG, do it that many times."
      (t
       (setq erm-full-parse-p t)
       (error "%s" (substring response 1))))))
+
+(defun erm--end-p ()
+  "Is point directly after a block closing \"end\""
+  (let ((end-pos (- (point) 3)))
+    (and (>= end-pos (point-min)) (string= "end" (buffer-substring end-pos (point))) (eq (get-text-property end-pos 'indent) 'e))))
+
+
+(defun erm--advise-show-paren-data-function (orig &rest args)
+  ;; First check if we are on opening ('b or 'd). We only care about
+  ;; the word openers "if", "do" etc (normal show-paren handles "{")
+  (if (and (memq (get-text-property (point) 'indent) '(b d))
+           (looking-at "\\w"))
+      (save-excursion
+        (let ((opener-beg (point))
+              (opener-end (save-excursion (forward-word) (point)))
+              (closer-end (progn (enh-ruby-forward-sexp 1) (point))))
+          (list
+           opener-beg
+           opener-end
+           (save-excursion (skip-syntax-backward "(w") (point))
+           closer-end
+           (not (erm--end-p)))))
+    ;; Now check if we are at a closer ("end")
+    (if (erm--end-p)
+        (let ((end-pos (point)))
+          (save-excursion
+            (enh-ruby-backward-sexp 1)
+            (list
+             (- end-pos 3)
+             end-pos
+             (point)
+             (save-excursion (skip-syntax-forward "(w") (point))
+             (or (not (looking-at "\\w"))
+                 (not (memq (get-text-property (point) 'indent) '(b d)))))))
+      ;; Otherwise, delegate to normal show-paren-data-function
+      (apply orig args))))
 
 (erm-reset)
 
