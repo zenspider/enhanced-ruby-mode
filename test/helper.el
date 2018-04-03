@@ -54,3 +54,31 @@
    (let ((start (point)))
      (end-of-line)
      (buffer-substring-no-properties start (point)))))
+
+(defun should-show-parens (contents)
+  "CONTENTS is a template specifying expected paren highlighting.
+GfooG means expect foo be green (matching parens), RfooR means
+red (mismatched parens), and | is point. No G/R tags means expect
+no erm highlighting (i.e. delgate to normal paren-mode)"
+  (with-temp-buffer
+    (insert contents)
+    (goto-char (point-min))
+    (let ((case-fold-search nil) (tags ()) point-pos mismatch)
+      (while (re-search-forward "[GR|]" nil t)
+        (let ((found-char (char-before)))
+          (backward-delete-char 1)
+          (cond
+           ((char-equal found-char ?G) (push (point) tags))
+           ((char-equal found-char ?R) (progn (push (point) tags) (setq mismatch t)))
+           ((char-equal found-char ?|) (setq point-pos (point))))))
+      (setq tags (nreverse tags))
+      (when (and tags (< (abs (- point-pos (nth 3 tags))) (abs (- point-pos (car tags)))))
+        (setq tags (list (nth 2 tags) (nth 3 tags) (nth 0 tags) (nth 1 tags))))
+      (setq contents (buffer-substring (point-min) (point-max)))
+      (with-temp-enh-rb-string
+       contents
+       (goto-char point-pos)
+       (should
+        (equal
+         (erm--advise-show-paren-data-function (lambda ()))
+         (if tags (append tags `(,mismatch)) nil)))))))

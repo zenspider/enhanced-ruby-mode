@@ -292,3 +292,89 @@
    "7.times do |i|\n  puts \"number #{i+1}\"\nend\n"
 
    (toggle-to-brace)))
+
+(ert-deftest enh-ruby-paren-mode-if/open ()
+  (should-show-parens
+   "
+G|ifG foo
+  bar
+GendG"))
+
+(ert-deftest enh-ruby-paren-mode-if/close ()
+  (should-show-parens
+   "
+GifG foo
+  bar
+Gend|G"))
+
+(ert-deftest enh-ruby-paren-mode-if/mismatch ()
+  (should-show-parens
+   "
+R|ifR foo
+  bar
+R}R"))
+
+(ert-deftest enh-ruby-paren-mode-while-do/open ()
+  (should-show-parens
+   "
+G|whileG foo do
+  if bar
+    baz
+  end
+GendG"))
+
+(ert-deftest enh-ruby-paren-mode-while-do/close ()
+  (should-show-parens
+   "
+GwhileG foo do
+  if bar
+    baz
+  end
+Gend|G"))
+
+(ert-deftest enh-ruby-paren-mode-while-do/mismatch ()
+  (should-show-parens
+   "
+R|whileR foo do
+  if bar
+    baz
+  end
+RR"))
+
+(ert-deftest enh-ruby-paren-mode-begin-end ()
+  (should-show-parens
+   "
+G|beginG
+  foo
+rescue
+GendG"))
+
+(ert-deftest enh-ruby-paren-mode-if-dont-show ()
+  "point is not in right spot to highlight pairs so nothing
+should be tagged"
+  (should-show-parens
+   "
+i|f foo
+  bar
+end")
+  (should-show-parens
+   "
+if| foo
+  bar
+end")
+  (should-show-parens
+   "
+if foo
+  bar
+en|d")
+  (should-show-parens
+   "
+if foo
+  bar
+e|nd"))
+
+(ert-deftest enh-ruby-paren-mode-delegate ()
+  "delegate braces to show-paren-data-function (i.e. don't
+highlight anything)"
+  (should-show-parens
+   "foo.map |{ there }"))

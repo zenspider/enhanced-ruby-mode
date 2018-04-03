@@ -1439,8 +1439,9 @@ With ARG, do it that many times."
 (defun erm--end-p ()
   "Is point directly after a block closing \"end\""
   (let ((end-pos (- (point) 3)))
-    (and (>= end-pos (point-min)) (string= "end" (buffer-substring end-pos (point))) (eq (get-text-property end-pos 'indent) 'e))))
-
+    (and (>= end-pos (point-min))
+         (string= "end" (buffer-substring end-pos (point)))
+         (eq (get-text-property end-pos 'indent) 'e))))
 
 (defun erm--advise-show-paren-data-function (orig &rest args)
   ;; First check if we are on opening ('b or 'd). We only care about
@@ -1454,7 +1455,7 @@ With ARG, do it that many times."
           (list
            opener-beg
            opener-end
-           (save-excursion (skip-syntax-backward "(w") (point))
+           (save-excursion (skip-syntax-backward ")w") (point))
            closer-end
            (not (erm--end-p)))))
     ;; Now check if we are at a closer ("end")
