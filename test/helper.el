@@ -1,5 +1,6 @@
 (require 'ert)
 (require 'ert-x)
+(require 'paren)                        ; for show-paren tests & helper
 
 ;; I hate this so much... Shuts up "Indenting region..." output
 (defun make-progress-reporter (&rest ignored) nil)
@@ -80,5 +81,5 @@ no erm highlighting (i.e. delgate to normal paren-mode)"
        (goto-char point-pos)
        (should
         (equal
-         (erm--advise-show-paren-data-function (lambda ()))
+         (erm-show-paren-data-function)
          (if tags (append tags `(,mismatch)) nil)))))))
