@@ -377,4 +377,4 @@ e|nd"))
   "delegate braces to show-paren-data-function (i.e. don't
 highlight anything)"
   (should-show-parens
-   "foo.map |{ there }"))
+   "foo.map G|{G there G}G"))
