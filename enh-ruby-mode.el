@@ -1109,14 +1109,18 @@ With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
   (let ((cont t)
-        prop)
+        prop
+        pos)
     (goto-char
      (save-excursion
        (while (>= (setq arg (1- arg)) 0)
          (while (progn
                   (enh-ruby-backward-sexp 1)
-                  (setq prop (get-text-property (point) 'indent))
-                  (not (or (eq prop 'b) (eq prop 'd))))))
+                  (setq pos (point))
+                  (setq prop (get-text-property pos 'indent))
+                  (and
+                   (> pos (point-min))
+                   (not (or (eq prop 'b) (eq prop 'd)))))))
        (point)))))
 
 (defun enh-ruby-end-of-defun (&optional arg)
@@ -1144,14 +1148,16 @@ With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
   (let ((cont t)
-        prop)
+        prop
+        pos)
     (goto-char
      (save-excursion
        (while (>= (setq arg (1- arg)) 0)
          (while (progn
                   (enh-ruby-forward-sexp 1)
-                  (setq prop (get-text-property (- (point) 3) 'indent))
-                  (not (eq prop 'e)))))
+                  (setq pos (point))
+                  (setq prop (get-text-property (- pos 3) 'indent))
+                  (and (< pos (point-max)) (not (eq prop 'e))))))
        (point)))))
 
 (defun enh-ruby-backward-sexp (&optional arg)
