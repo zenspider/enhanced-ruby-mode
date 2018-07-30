@@ -59,7 +59,7 @@
 
    (search-forward "blah")
    (enh-ruby-end-of-defun)
-   (line-should-equal " # method")))
+   (rest-of-line-should-equal " # method")))
 
 (ert-deftest enh-ruby-end-of-block ()
   (with-temp-enh-rb-string
@@ -67,7 +67,7 @@
 
    (search-forward "blah")
    (enh-ruby-end-of-block)
-   (line-should-equal " # method")))
+   (rest-of-line-should-equal " # method")))
 
 ;;; indent-region
 

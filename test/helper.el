@@ -47,8 +47,18 @@
 (defun buffer-should-equal (exp)
   (should (equal exp (buffer-string-plain))))
 
-(defun line-should-equal (exp)
+(defun rest-of-line-should-equal (exp)
   (should (equal exp (rest-of-line))))
+
+(defun line-should-equal (exp)
+  (should (equal exp (all-of-line))))
+
+(defun all-of-line ()
+  (save-excursion
+    (move-beginning-of-line nil)
+    (let ((start (point)))
+      (end-of-line)
+      (buffer-substring-no-properties start (point)))))
 
 (defun rest-of-line ()
   (save-excursion
