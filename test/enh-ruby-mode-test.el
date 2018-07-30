@@ -249,6 +249,21 @@
 
 ;;; indent-for-tab-command -- seems different than indent-region in some places
 
+(ert-deftest enh-ruby-beginning-of-block ()
+  (with-temp-enh-rb-string
+   "RSpec.describe Foo do\n  it 'bar' do\n    HERE\n  end\nend"
+
+   (search-forward "HERE")
+
+   (enh-ruby-beginning-of-block)
+   (line-should-equal "  it 'bar' do")
+
+   (enh-ruby-beginning-of-block)
+   (line-should-equal "RSpec.describe Foo do")
+
+   (enh-ruby-beginning-of-block)
+   (line-should-equal "RSpec.describe Foo do")))
+
 (ert-deftest enh-ruby-indent-for-tab-heredocs/off ()
   (with-temp-enh-rb-string
    "meth <<-DONE\n  a b c\nd e f\nDONE\n"
