@@ -204,6 +204,21 @@
 (ert-deftest enh-ruby-indent-leading-dots/ruby ()
   (string-should-indent-like-ruby "d.e\n.f\n"))
 
+(ert-deftest enh-ruby-indent-leading-dots-with-arguments-and-newlines ()
+  :expected-result :failed
+  (string-should-indent "\na\n.b(\nc\n)\n.d\n\ne"
+                        "\na\n  .b(\n    c\n  )\n  .d\n\ne"))
+
+(ert-deftest enh-ruby-indent-leading-dots-with-block-and-newlines ()
+  :expected-result :failed
+  (string-should-indent "\na\n.b do\nc\nend\n.d\n\ne"
+                        "\na\n  .b do\n    c\n  end\n  .d\n\ne"))
+
+(ert-deftest enh-ruby-indent-leading-dots-with-brackets-and-newlines ()
+  :expected-result :failed
+  (string-should-indent "\na\n.b {\nc\n}\n.d\n\ne"
+                        "\na\n  .b {\n    c\n  }\n  .d\n\ne"))
+
 (ert-deftest enh-ruby-indent-not-on-eol-opening/deep ()
   (with-deep-indent t
    (string-should-indent "\nfoo(:bar,\n:baz)\nfoo(\n:bar,\n:baz,\n)\n[:foo,\n:bar]\n[\n:foo,\n:bar\n]"
