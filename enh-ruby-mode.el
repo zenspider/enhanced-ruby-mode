@@ -540,7 +540,9 @@ Warning: does not play well with electric-indent-mode.
   (concat prefix (number-to-string erm-buff-num) ":" erm-process-delimiter))
 
 (defun erm-buffer-killed ()
-  (process-send-string (erm-ruby-get-process) (erm-proc-string "k")))
+  (remove-hook 'kill-buffer-hook 'erm-buffer-killed t)
+  (catch 'interrupted
+   (process-send-string (erm-ruby-get-process) (erm-proc-string "k"))))
 
 (defun erm-reset-buffer ()
   (setq erm-buff-num erm-next-buff-num)
