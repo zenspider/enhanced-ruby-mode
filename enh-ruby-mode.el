@@ -1478,6 +1478,55 @@ With ARG, do it that many times."
                  (not (memq (get-text-property (point) 'indent) '(b d)))))))
       (show-paren--default))))
 
+;;; Debugging / Bug Reporting:
+
+(defun enh-ruby--all-vars-with (prefix)
+  (let (mode-vars)
+    (mapatoms (lambda (symbol)
+                (when (and (string-prefix-p prefix (symbol-name symbol))
+                           (get symbol 'standard-value))
+                  (add-to-list 'mode-vars symbol))))
+    (sort mode-vars
+          'symbol<)))
+
+(defun enh-ruby--changed-vars-with (prefix)
+  (seq-filter
+   (lambda (symbol)
+     (and (get symbol 'standard-value)
+          (get symbol 'saved-value)
+          (not (equal (car (get symbol 'standard-value))
+                      (car (get symbol 'saved-value))))))
+   (enh-ruby--all-vars-with prefix)))
+
+(defun enh-ruby--variable-values (vars)
+  (mapcar (lambda (symbol) (list symbol (symbol-value symbol)))
+          vars))
+
+(defun enh-ruby--uptime-seconds ()
+  (float-time (time-subtract (current-time) before-init-time)))
+
+(defun enh-ruby-add-file-local-variables ()
+  "Insert all currently customized variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
+  (interactive)
+  (mapc (lambda (kv) (apply 'add-file-local-variable kv))
+   (enh-ruby--variable-values (enh-ruby--changed-vars-with "enh-ruby"))))
+
+(defun enh-ruby-bug-report ()
+  "Fill a buffer with data to make a enh-ruby-mode bug report."
+  (interactive)
+  (with-help-window "*enh-ruby-mode bug report*"
+    (princ "Please provide the following output in your bug report:\n")
+    (princ "\n")
+    (let ((print-quoted t))
+      (pp (append `((emacs-uptime ,(enh-ruby--uptime-seconds))
+                    (mode-path    ,(find-library-name "enh-ruby-mode")))
+                  (enh-ruby--variable-values
+                   (append '(emacs-version system-type major-mode)
+                           (enh-ruby--changed-vars-with "enh-ruby-"))))))
+    (princ "\n")
+    (princ "Also consider using enh-ruby-add-file-local-variables with any code you provide.\n\n")
+    (princ "Hit 'q' to close this buffer.")))
+
 (erm-reset)
 
 (provide 'enh-ruby-mode)
