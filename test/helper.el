@@ -5,6 +5,16 @@
 ;; I hate this so much... Shuts up "Indenting region..." output
 (defun make-progress-reporter (&rest ignored) nil)
 
+(setq enh-tests '())
+
+;; turns out I had a duplicate test and it was driving me crazy. This is my fix.
+(defmacro enh-deftest (name &rest rest)
+  (if (memq name enh-tests)
+      (error "Duplicate test name! %S" name)
+    (setq enh-tests (cons name enh-tests))
+    `(ert-deftest ,name ,@rest)))
+(put 'enh-deftest 'lisp-indent-function 'defun)
+
 (defmacro with-temp-enh-rb-string (str &rest body)
   `(with-temp-buffer
      (insert ,str)
