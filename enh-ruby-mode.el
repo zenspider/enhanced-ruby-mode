@@ -133,13 +133,13 @@ the value changes."
   :safe #'integerp
   :group 'enh-ruby)
 
-(defcustom enh-ruby-hanging-paren-deep-indent-level 0 ; TODO: enh-ruby-hanging-brace-indent-level
+(defcustom enh-ruby-hanging-paren-deep-indent-level 0
   "*Extra hanging deep indentation for continued ruby parenthesis."
   :type 'integer
   :safe #'integerp
   :group 'enh-ruby)
 
-(defcustom enh-ruby-hanging-brace-deep-indent-level 0 ; TODO: enh-ruby-hanging-brace-indent-level
+(defcustom enh-ruby-hanging-brace-deep-indent-level 1
   "*Extra hanging deep indentation for continued ruby curly braces."
   :type 'integer
   :safe #'integerp
@@ -926,9 +926,8 @@ modifications to the buffer."
          col max bc pc)
 
     (setq enh-ruby-last-bounce-deep
-          (if (eq enh-ruby-last-bounce-line (line-number-at-pos))
-              (not enh-ruby-last-bounce-deep)
-            t))
+          (and (eq enh-ruby-last-bounce-line (line-number-at-pos))
+               (not enh-ruby-last-bounce-deep)))
     (setq enh-ruby-last-bounce-line (line-number-at-pos))
 
     (while (< pos limit)
