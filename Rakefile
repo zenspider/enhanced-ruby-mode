@@ -6,17 +6,29 @@ namespace :test do
     sh(%q[ruby -I. test/test_erm_buffer.rb]){}
   end
 
+  def emacs args
+    emacs = "emacs -Q -l enh-ruby-mode-test.el"
+
+    sh(%Q[#{emacs} #{args}]){} # block prevents ruby backtrace on failure
+  end
+
   desc "Run tests for Emacs Lisp"
   task :elisp do
+    n=ENV["N"]
+
     Dir.chdir "test" do
-      sh(%q[emacs --batch -Q -l enh-ruby-mode-test.el -f ert-run-tests-batch-and-exit]){}
+      if n then
+        emacs "--batch -eval '(ert-run-tests-batch-and-exit #{n.dump})'"
+      else
+        emacs "--batch -f ert-run-tests-batch-and-exit"
+      end
     end
   end
 
   desc "Run tests for Emacs Lisp interactively"
   task :elispi do
     Dir.chdir "test" do
-      sh(%q[emacs -Q -l enh-ruby-mode-test.el -eval "(ert-run-tests-interactively 't)"]){}
+      emacs %q[-eval "(ert-run-tests-interactively 't)"]
     end
   end
 
