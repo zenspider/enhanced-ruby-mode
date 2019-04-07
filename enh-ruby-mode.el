@@ -105,6 +105,7 @@ the value changes."
 
 (defcustom enh-ruby-deep-indent-paren t
   "*Deep indent lists in parenthesis when non-nil."
+  ;; FIX: this applies to square brackets as well
   :type 'boolean
   :safe  'booleanp
   :group 'enh-ruby)
@@ -849,7 +850,7 @@ modifications to the buffer."
                    (current-indentation))
                   (t
                    (current-column)))))
-         ((eq 'r prop)
+         ((eq 'r prop)                  ; TODO: make these consistent file-wide
           (let (opening-col opening-is-last-thing-on-line)
             (save-excursion
               (enh-ruby-backward-sexp)
@@ -860,7 +861,7 @@ modifications to the buffer."
             (if (and enh-ruby-deep-indent-paren
                      (not enh-ruby-bounce-deep-indent)
                      (not opening-is-last-thing-on-line))
-                opening-col
+                opening-col             ; deep + !bounce + !hanging = match open
               (forward-line -1)
               (enh-ruby-skip-non-indentable)
               (let ((opening-char
