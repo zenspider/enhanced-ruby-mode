@@ -114,10 +114,90 @@
     (string-should-indent "c = {\na: a,\nb: b\n}\n"
                           "c = {\n  a: a,\n  b: b\n}\n")))
 
+(setq input/indent-hash/trail "\nc = { a: a,\nb: b,\n c: c\n}")
+(setq input/indent-hash/hang  "\nc = {\na: a,\nb: b,\n c: c\n}")
+(setq exp/indent-hash/hang    "\nc = {\n  a: a,\n  b: b,\n  c: c\n}")
+(setq exp/indent-hash/trail   "\nc = { a: a,\n      b: b,\n      c: c\n    }")
+(setq exp/indent-hash/trail/8 "\nc = { a: a,\n             b: b,\n             c: c\n    }")
+
+(defmacro with-bounce-and-hang (bounce indent1 indent2 &rest body)
+  `(let ((enh-ruby-bounce-deep-indent              ,bounce)
+         (enh-ruby-deep-indent-paren               t)
+         (enh-ruby-hanging-brace-indent-level      (or ,indent1
+                                                       enh-ruby-hanging-brace-indent-level))
+         (enh-ruby-hanging-brace-deep-indent-level (or ,indent2
+                                                       enh-ruby-hanging-brace-deep-indent-level)))
+     ,@body))
+(put 'with-bounce-and-hang 'lisp-indent-function 'defun)
+
+(enh-deftest enh-ruby-indent-hash/deep/hang/def ()
+  (with-deep-indent t
+    (with-bounce-and-hang nil nil nil
+      (string-should-indent input/indent-hash/hang
+                            exp/indent-hash/hang))))
+
+(enh-deftest enh-ruby-indent-hash/deep/bounce/hang/def ()
+  (with-deep-indent t
+    (with-bounce-and-hang t nil nil
+      (string-should-indent input/indent-hash/hang
+                            "\nc = {\n      a: a,\n      b: b,\n      c: c\n    }"))))
+
+;; if bounce off, hanging-brace-deep-indent-level doesn't matter
+(enh-deftest enh-ruby-indent-hash/deep/hang/99 ()
+  (with-deep-indent t
+    (with-bounce-and-hang nil nil 99
+      (string-should-indent input/indent-hash/hang
+                            exp/indent-hash/hang))))
+
+;; 3 < 4, so close brace is at 1
+(enh-deftest enh-ruby-indent-hash/deep/hang/bil-3 ()
+  (with-deep-indent t
+    (with-bounce-and-hang nil 3 nil
+      (string-should-indent input/indent-hash/hang
+                            "\nc = {\n   a: a,\n   b: b,\n   c: c\n}"))))
+
+;; 8 > 4, so close brace is at 4
+(enh-deftest enh-ruby-indent-hash/deep/hang/bil-8 ()
+  (with-deep-indent t
+    (with-bounce-and-hang nil 8 nil
+      (string-should-indent input/indent-hash/hang
+                            "\nc = {\n        a: a,\n        b: b,\n        c: c\n    }"))))
+
 (enh-deftest enh-ruby-indent-hash/deep/trail/def ()
   (with-deep-indent t
-    (string-should-indent "\nc = {a: a,\nb: b,\n c: c}\n"
-                          "\nc = {a: a,\n     b: b,\n     c: c}\n")))
+    (with-bounce-and-hang nil nil nil
+      (string-should-indent input/indent-hash/trail
+                            exp/indent-hash/trail))))
+
+(enh-deftest enh-ruby-indent-hash/deep/bounce/trail/def ()
+  (with-deep-indent t
+    (with-bounce-and-hang t nil nil
+      (string-should-indent input/indent-hash/trail
+                            exp/indent-hash/trail))))
+
+(enh-deftest enh-ruby-indent-hash/deep/trail/3 ()
+  (with-deep-indent t
+    (with-bounce-and-hang nil 3 8
+      (string-should-indent input/indent-hash/trail
+                            exp/indent-hash/trail/8))))
+
+(enh-deftest enh-ruby-indent-hash/deep/bounce/trail/3 ()
+  (with-deep-indent t
+    (with-bounce-and-hang t 3 8
+      (string-should-indent input/indent-hash/trail
+                            exp/indent-hash/trail/8))))
+
+(enh-deftest enh-ruby-indent-hash/deep/trail/8 ()
+  (with-deep-indent t
+    (with-bounce-and-hang nil 8 8
+      (string-should-indent input/indent-hash/trail
+                            exp/indent-hash/trail/8))))
+
+(enh-deftest enh-ruby-indent-hash/deep/bounce/trail/8 ()
+  (with-deep-indent t
+    (with-bounce-and-hang t 8 8
+      (string-should-indent input/indent-hash/trail
+                            exp/indent-hash/trail/8))))
 
 (enh-deftest enh-ruby-indent-bug/90/a ()
   (string-should-indent-like-ruby "aa.bb(:a => 1,\n      :b => 2,\n      :c => 3)\n"
