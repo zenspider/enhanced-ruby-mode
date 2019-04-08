@@ -5,11 +5,12 @@
 ;;   Geoff Jacobsen
 
 ;; Author: Geoff Jacobsen
+;; Maintainer: Ryan Davis
 ;; URL: http://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
 ;; Keywords: languages, elisp, ruby
-;; Package-Requires: ((emacs "24"))
-;; Version: 1.1.1
+;; Package-Requires: ((emacs "24.3"))
+;; Version: 1.2.0
 
 ;; This file is not part of GNU Emacs.
 
@@ -32,7 +33,7 @@
 ;; to provide further enhancements and bug fixes.
 ;;
 ;; It has been renamed to enh-ruby-mode.el to avoid name conflicts
-;; with ruby-mode that ships with emacs. All symbols that started with
+;; with ruby-mode that ships with Emacs. All symbols that started with
 ;; 'ruby now start with 'enh-ruby. This also makes it possible to
 ;; switch back and forth for testing purposes.
 
@@ -45,11 +46,31 @@
 ;;    (setq enh-ruby-program "(path-to-ruby1.9)/bin/ruby") ; so that still works if ruby points to ruby1.8
 ;;
 
-(require 'cl) ; for cdddr, caddr
+(require 'cl-lib)                       ; for cdddr, caddr
+(require 'files)                        ; for mode-require-final-newline
+;; (require 'paragraphs) -- but is missing a provides decl
+
+;;; Properties & Other Bullshit Codes:
+
+;; l - [, (, {, %w/%i open  or | goalpost open
+;; r - ], ), }, %w/%i close or | goalpost close
+;; b - begin, def, case, if
+;; d - do, {, embexpr (interpolation) start
+;; e - end, embexpr (interpolation) end, close block }
+;; s - statement start on BACKDENT_KW else/when/rescue etc
+;; c - continue - period followed by return (or other way around?)
+
+;; pc
+;; bc
+;; nbc
+;; npc
 
 ;;; Variables:
 
+;;; Code:
+
 (defun enh/symbol-or-null-p (x)
+  "Return true if X is either a symbol or null. Used for defcustom safe check."
   (or (symbolp x)
       (null x)))
 
@@ -98,7 +119,7 @@
     (shift-jis      . cp932)     ;; Emacs charset name of Shift_JIS
     (shift_jis      . cp932)     ;; MIME charset name of Shift_JIS
     (japanese-cp932 . cp932))    ;; Emacs charset name of CP932
-  "Alist to map encoding name from emacs to ruby."
+  "Alist to map encoding name from Emacs to ruby."
   :type '(alist :key-type symbol :value-type enh/symbol-or-null-p)
   :safe (lambda (xs)
           (and (listp xs)
@@ -109,8 +130,10 @@
   :group 'enh-ruby)
 
 (defcustom enh-ruby-extra-keywords nil
-  "List of idents that will be fontified as keywords. `erm-reset'
-will need to be called in order for any global changes to take effect.
+  "*A list of idents that will be fontified as keywords.
+
+`erm-reset' will need to be called in order for any global
+changes to take effect.
 
 This variable can also be buffer local in which case it will
 override the global value for the buffer it is local
@@ -163,9 +186,9 @@ the value changes."
   :group 'enh-ruby)
 
 (defcustom enh-ruby-preserve-indent-in-heredocs nil
-  "Indent heredocs and multiline strings like text-mode.
+  "Indent heredocs and multiline strings like ‘text-mode’.
 
-Warning: does not play well with electric-indent-mode."
+Warning: does not play well with command ‘electric-indent-mode’."
   :type 'boolean
   :safe #'booleanp
   :group 'enh-ruby)
@@ -183,7 +206,7 @@ Warning: does not play well with electric-indent-mode."
   :group 'enh-ruby)
 
 (defcustom enh-ruby-use-ruby-mode-show-parens-config nil
-  "This flag has no effect anymore as ERM supports show-paren-mode directly"
+  "This flag has no effect anymore as ERM supports command ‘show-paren-mode’ directly."
   :type 'boolean
   :safe #'booleanp
   :group 'enh-ruby)
@@ -207,7 +230,7 @@ Warning: does not play well with electric-indent-mode."
                                          ;; \\. and :: for class method
                                          "\\([A-Za-z_]" enh-ruby-symbol-re "*\\|\\.\\|::" "\\)"
                                          "+\\)")
-  "Regexp to match definitions and their name")
+  "Regexp to match definitions and their name.")
 
 
 (defconst erm-process-delimiter
@@ -238,7 +261,7 @@ Warning: does not play well with electric-indent-mode."
     (define-key map (kbd "M-C-u")   'enh-ruby-up-sexp)
     (define-key map (kbd "C-j")     'reindent-then-newline-and-indent)
     map)
-  "Syntax table in use in enh-ruby-mode buffers.")
+  "Syntax table in use in ‘enh-ruby-mode’ buffers.")
 
 (defvar enh-ruby-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -270,7 +293,7 @@ Warning: does not play well with electric-indent-mode."
     (modify-syntax-entry ?\[ "(]" table)
     (modify-syntax-entry ?\] ")[" table)
     table)
-  "Syntax table used by enh-ruby-mode buffers.")
+  "Syntax table used by ‘enh-ruby-mode’ buffers.")
 
 (defconst enh-ruby-font-lock-keyword-beg-re "\\(?:^\\|[^.@$:]\\|\\.\\.\\)")
 
@@ -358,7 +381,31 @@ Warning: does not play well with electric-indent-mode."
         'symbols))
      (1 font-lock-builtin-face))
     )
-  "Additional expressions to highlight in enh-ruby-mode.")
+  "Additional expressions to highlight in ‘enh-ruby-mode’.")
+
+(defconst enh-ruby-font-names
+  '(nil
+    font-lock-string-face
+    font-lock-type-face
+    font-lock-variable-name-face
+    font-lock-comment-face
+    font-lock-constant-face
+    font-lock-string-face
+    enh-ruby-string-delimiter-face
+    enh-ruby-regexp-delimiter-face
+    font-lock-function-name-face
+    font-lock-keyword-face
+    enh-ruby-heredoc-delimiter-face
+    enh-ruby-op-face
+    enh-ruby-regexp-face)
+  "Font faces used by ‘enh-ruby-mode’.")
+
+(defvar page-delimiter)                 ; from paragraphs.el (no provide?!?)
+(defvar paragraph-start)                ; from paragraphs.el
+(defvar need-syntax-check-p)
+(defvar erm-buff-num)
+(defvar erm-e-w-status)
+(defvar erm-full-parse-p)
 
 ;;;###autoload
 (define-derived-mode enh-ruby-mode prog-mode "EnhRuby"
@@ -376,16 +423,15 @@ Warning: does not play well with electric-indent-mode."
   (setq-local indent-line-function         'enh-ruby-indent-line)
   (setq-local need-syntax-check-p          nil)
   (setq-local paragraph-ignore-fill-prefix t)
-  (setq-local paragraph-separate           paragraph-start)
   (setq-local parse-sexp-ignore-comments   t)
   (setq-local parse-sexp-lookup-properties t)
   (setq-local require-final-newline        mode-require-final-newline)
   (setq-local beginning-of-defun-function  'enh-ruby-beginning-of-defun)
   (setq-local end-of-defun-function        'enh-ruby-end-of-defun)
   (setq-local show-paren-data-function     'erm-show-paren-data-function)
+  (setq-local paragraph-start              (concat "$\\|" page-delimiter))
+  (setq-local paragraph-separate           paragraph-start)
 
-  (setq-local paragraph-start
-              (concat "$\\|" page-delimiter))
   (setq-local add-log-current-defun-function
               'enh-ruby-add-log-current-method)
 
@@ -408,12 +454,15 @@ Warning: does not play well with electric-indent-mode."
 (require 'color nil t)
 
 (defun erm-darken-color (name)
+  "Return color NAME with foreground 20% darker."
   (color-darken-name (face-attribute name :foreground) 20))
 
 (defun erm-define-faces ()
+  "Define faces for ‘enh-ruby-mode’."
+
  (defface enh-ruby-string-delimiter-face
    `((t :foreground ,(erm-darken-color font-lock-string-face)))
-   "Face used to highlight string delimiters like \" and %Q."
+   "Face used to highlight string delimiters like quotes and %Q."
    :group 'enh-ruby)
 
  (defface enh-ruby-heredoc-delimiter-face
@@ -451,6 +500,7 @@ Warning: does not play well with electric-indent-mode."
 ;;; Support Functions:
 
 (defun enh-ruby-mode-set-encoding ()
+  "Check encoding on save and create a magic comment if non-standard encoding."
   (save-excursion
     (widen)
     (goto-char (point-min))
@@ -486,6 +536,7 @@ Warning: does not play well with electric-indent-mode."
               )))))
 
 (defun erm-ruby-get-process ()
+  "Return (or create) the current ruby parser process."
   (when (and erm-ruby-process (not (equal (process-status erm-ruby-process) 'run)))
     (let ((message (and erm-parsing-p erm-response)))
       (erm-reset)
@@ -512,17 +563,19 @@ Warning: does not play well with electric-indent-mode."
   erm-ruby-process)
 
 (defvar erm-response          nil "Private variable.")
-(defvar erm-parsing-p         nil "Private variable.")
+(defvar erm-parsing-p         nil "Parsing: t, nil, 'a (all?), 'p (partial?).")
 (defvar erm-no-parse-needed-p nil "Private variable.")
 (defvar erm-source-dir        nil "Private variable.")
 
 (defun erm-source-dir ()
+  "Return the directory for enh-ruby-mode.el."
   (or erm-source-dir
     (setq erm-source-dir (file-name-directory (find-lisp-object-file-name
-                                               'erm-source-dir (symbol-function 'erm-source-dir))))))
+                                               'erm-source-dir
+                                               (symbol-function 'erm-source-dir))))))
 
 (defvar erm-ruby-process nil
-  "The current erm process where emacs is interacting with")
+  "The current erm process where Emacs is interacting with.")
 
 (defvar erm-next-buff-num nil "Private variable.")
 (defvar erm-parse-buff nil "Private variable.")
@@ -537,7 +590,7 @@ Warning: does not play well with electric-indent-mode."
       (erm-reset-syntax-buffers (cdr list)))))
 
 (defun erm-reset ()
-  "Reset all enh-ruby-mode buffers and restart the ruby parser."
+  "Reset all ‘enh-ruby-mode’ buffers and restart the ruby parser."
   (interactive)
   (erm-reset-syntax-buffers erm-syntax-check-list)
   (setq erm-reparse-list nil
@@ -575,8 +628,7 @@ Warning: does not play well with electric-indent-mode."
     (enh-ruby-fontify-buffer)))
 
 (defun enh-ruby-local-enable-extra-keywords ()
-  "If the variable `ruby-extra-keywords' is buffer local then
-  enable the keywords for current buffer."
+  "If the variable `ruby-extra-keywords' is buffer local then enable the keywords for current buffer."
   (when (local-variable-p 'enh-ruby-extra-keywords)
       (process-send-string (erm-ruby-get-process)
                            (concat "x"
@@ -589,7 +641,7 @@ Warning: does not play well with electric-indent-mode."
 (defun enh-ruby-electric-brace (arg)
   (interactive "P")
   (insert-char last-command-event 1)
-  (enh-ruby-indent-line t)
+  (enh-ruby-indent-line)
   (delete-char -1)
   (self-insert-command (prefix-numeric-value arg)))
 
@@ -720,9 +772,9 @@ If the result is do-end block, it will always be multiline."
 
 ;; Stolen shamelessly from James Clark's nxml-mode.
 (defmacro erm-with-unmodifying-text-property-changes (&rest body)
-  "Evaluate BODY without any text property changes modifying the buffer.
-Any text properties changes happen as usual but the changes are not treated as
-modifications to the buffer."
+  "Evaluate BODY without modifying the buffer's text properties.
+Any text properties changes happen as usual but the changes are
+not treated as modifications to the buffer."
   (let ((modified (make-symbol "modified")))
     `(let ((,modified (buffer-modified-p))
            (inhibit-read-only t)
@@ -738,9 +790,10 @@ modifications to the buffer."
            (restore-buffer-modified-p nil))))))
 
 (defun enh-ruby-fontify-buffer ()
-  "Fontify the current buffer. Useful if faces are out of sync"
+  "Fontify the current buffer. Useful if faces are out of sync."
   (interactive)
-  (if (and erm-parsing-p (not (eq erm-parse-buff (current-buffer))))
+  (if (and erm-parsing-p
+           (not (eq erm-parse-buff (current-buffer))))
       (erm-reparse-diff-buf)
     (setq erm-full-parse-p t)
     (erm-req-parse nil nil nil)))
@@ -759,7 +812,9 @@ modifications to the buffer."
               (setq erm-response "")
               (setq erm-parsing-p t)
               (if (not erm-full-parse-p)
-                  (if erm-no-parse-needed-p (progn (setq erm-parsing-p nil) 'a) 'p)
+                  (if erm-no-parse-needed-p
+                      (progn (setq erm-parsing-p nil) 'a)
+                    'p)
                 (setq min (point-min)
                       max (point-max)
                       len 0
@@ -802,36 +857,20 @@ modifications to the buffer."
         (erm-with-unmodifying-text-property-changes
          (erm-parse response))))))
 
-(defsubst erm-ready ()
+(defun erm-ready ()
   (if erm-full-parse-p
       (enh-ruby-fontify-buffer)
     (setq erm-parsing-p t)
     (process-send-string (erm-ruby-get-process) (erm-proc-string "g"))))
 
-(setq enh-ruby-font-names
-      '(nil
-        font-lock-string-face
-        font-lock-type-face
-        font-lock-variable-name-face
-        font-lock-comment-face
-        font-lock-constant-face
-        font-lock-string-face
-        enh-ruby-string-delimiter-face
-        enh-ruby-regexp-delimiter-face
-        font-lock-function-name-face
-        font-lock-keyword-face
-        enh-ruby-heredoc-delimiter-face
-        enh-ruby-op-face
-        enh-ruby-regexp-face
-        ))
-
 (defun extra-col-% ()
+  "Return extra column adjustments in case we are ‘looking-at’ a % construct."
   (or (and (looking-at "%\\([^[:alnum:]]\\|[QqWwIixrs].\\)")
            (1- (length (match-string-no-properties 0))))
       0))
 
 (defun enh-ruby-calculate-indent (&optional start-point)
-  "Calculate the indentation of the previous line and its level."
+  "Calculate the indentation of the previous line and its level at START-POINT."
   (save-excursion
     (when start-point (goto-char start-point))
     (if (bobp)
@@ -954,10 +993,11 @@ modifications to the buffer."
                (cond ((char-equal (char-after pos) ?{)
                       (+ enh-ruby-hanging-brace-deep-indent-level col))
                      ((char-equal (char-after pos) ?%)
-                      (setq extra-col (save-excursion
-                                        (goto-char pos)
-                                        (extra-col-%)))
-                      (+ enh-ruby-hanging-brace-deep-indent-level col extra-col))
+                      (+ enh-ruby-hanging-brace-deep-indent-level
+                         col
+                         (save-excursion
+                           (goto-char pos)
+                           (extra-col-%))))
                      (t (+ enh-ruby-hanging-paren-deep-indent-level col))))
               (at-eol (save-excursion
                         (goto-char (1+ pos))
@@ -1002,7 +1042,7 @@ modifications to the buffer."
     (+
      (if (eq 'c (get-text-property limit 'indent)) enh-ruby-hanging-indent-level 0)
      (cond
-      ((= max 0)         ; TODO: how is this possible? look up 5 lines
+      ((= max 0)
        (if (not (memq (get-text-property start-pos 'font-lock-face)
                       '(enh-ruby-heredoc-delimiter-face font-lock-string-face)))
            indent
@@ -1055,13 +1095,12 @@ modifications to the buffer."
     (message "%s" (mapconcat 'identity messages "\n"))
     messages))
 
-(defun enh-ruby-find-error (&optional arg)
-  "Search back, then forward for a syntax error/warning.
-Display contents in mini-buffer."
+(defun enh-ruby-find-error (&optional warnings)
+  "Search back, then forward for a syntax error/warning. Display contents in mini-buffer. Optional WARNINGS will highlight warnings instead of errors. (I think)."
   (interactive "^P")
   (let (overlays
         overlay
-        (face (if arg 'erm-syn-warnline 'erm-syn-errline))
+        (face (if warnings 'erm-syn-warnline 'erm-syn-errline))
         messages
         (pos (point)))
     (unless (eq last-command 'enh-ruby-find-error)
@@ -1074,7 +1113,7 @@ Display contents in mini-buffer."
 
     (if messages
         (goto-char pos)
-      (unless arg
+      (unless warnings
         (enh-ruby-find-error t)))))
 
 (defun enh-ruby-up-sexp (&optional arg)
@@ -1098,7 +1137,7 @@ With ARG, do it that many times."
          (point))))))
 
 (defun enh-ruby-beginning-of-defun (&optional arg)
-  "Move backward across one balanced expression (sexp) looking for a definition begining.
+  "Move backward across expression (sexp) looking for a definition begining.
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
@@ -1138,7 +1177,7 @@ balanced expression is found."
     (indent-region (point) end-pos)))
 
 (defun enh-ruby-beginning-of-block (&optional arg)
-  "Move backward across one balanced expression (sexp) looking for a block begining.
+  "Move backward across one expression (sexp) looking for a block begining.
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
@@ -1158,7 +1197,7 @@ With ARG, do it that many times."
        (point)))))
 
 (defun enh-ruby-end-of-defun (&optional arg)
-  "Move forwards across one balanced expression (sexp) looking for a definition end.
+  "Move forwards across one expression (sexp) looking for a definition end.
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
@@ -1272,7 +1311,7 @@ With ARG, do it that many times."
                       "\n}"
                     "\nend")))))
     (insert text)
-    (enh-ruby-indent-line t)
+    (enh-ruby-indent-line)
     ))
 
 (defun enh-ruby-previous-indent-change (pos)
@@ -1297,7 +1336,7 @@ With ARG, do it that many times."
                 (1+ pos))
            (next-single-property-change pos 'indent))))
 
-(defun enh-ruby-indent-line (&optional flag)
+(defun enh-ruby-indent-line (&optional _ignored)
   "Correct indentation of the current ruby line."
   (erm-wait-for-parse)
   (unwind-protect
@@ -1307,7 +1346,7 @@ With ARG, do it that many times."
     (setq erm-no-parse-needed-p nil)))
 
 (defun enh-ruby-indent-to (indent)
-  "Indent the current line."
+  "Indent the current line until INDENT is reached."
   (unless (= (current-indentation) indent)
     (save-excursion
       (beginning-of-line)
@@ -1324,7 +1363,7 @@ With ARG, do it that many times."
   (let* ((ipos     (car   list))
          (buf-size (car   ipos))
          (istart   (cadr  ipos))
-         (iend     (caddr ipos))
+         (iend     (cl-caddr ipos))
          (rpos     (cdr   (cadr list))))
 
     (unless (and (= (buffer-size) buf-size))
@@ -1336,7 +1375,7 @@ With ARG, do it that many times."
       (when (> iend 0)
         (remove-text-properties istart iend '(indent nil))
 
-        (setq ipos (cdddr ipos))
+        (setq ipos (cl-cdddr ipos))
 
         (while ipos
           (put-text-property (cadr ipos) (1+ (cadr ipos)) 'indent (car ipos))
@@ -1475,7 +1514,7 @@ With ARG, do it that many times."
       (error "%s" (substring response 1))))))
 
 (defun erm--end-p ()
-  "Is point directly after a block closing \"end\""
+  "Is point directly after a block closing \"end\"."
   (let ((end-pos (- (point) 3)))
     (and (>= end-pos (point-min))
          (string= "end" (buffer-substring end-pos (point)))
@@ -1513,6 +1552,8 @@ With ARG, do it that many times."
 ;;; Debugging / Bug Reporting:
 
 (defun enh-ruby--all-vars-with (prefix)
+  "Return all defcustom variables that start with PREFIX.
+Used for inserting file-local-variables and sending in bug reports."
   (let (mode-vars)
     (mapatoms (lambda (symbol)
                 (when (and (string-prefix-p prefix (symbol-name symbol))
@@ -1522,6 +1563,8 @@ With ARG, do it that many times."
           'symbol<)))
 
 (defun enh-ruby--changed-vars-with (prefix)
+  "Return all changed defcustom varibles that start with PREFIX.
+Used for inserting file-local-variables and sending in bug reports."
   (seq-filter
    (lambda (symbol)
      (and (get symbol 'standard-value)
@@ -1531,10 +1574,12 @@ With ARG, do it that many times."
    (enh-ruby--all-vars-with prefix)))
 
 (defun enh-ruby--variable-values (vars)
+  "Map VARS to a list of (variable value) pairs."
   (mapcar (lambda (symbol) (list symbol (symbol-value symbol)))
           vars))
 
 (defun enh-ruby--uptime-seconds ()
+  "Return the number of seconds that Emacs has been running."
   (float-time (time-subtract (current-time) before-init-time)))
 
 (defun enh-ruby-add-file-local-variables ()
@@ -1544,7 +1589,7 @@ With ARG, do it that many times."
    (enh-ruby--variable-values (enh-ruby--changed-vars-with "enh-ruby"))))
 
 (defun enh-ruby-bug-report ()
-  "Fill a buffer with data to make a enh-ruby-mode bug report."
+  "Fill a buffer with data to make a ‘enh-ruby-mode’ bug report."
   (interactive)
   (with-help-window "*enh-ruby-mode bug report*"
     (princ "Please provide the following output in your bug report:\n")
