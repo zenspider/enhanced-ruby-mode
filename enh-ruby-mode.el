@@ -53,65 +53,8 @@
   (or (symbolp x)
       (null x)))
 
-(defcustom enh-ruby-program "ruby"
-  "The ruby program to parse the source."
-  :type 'string
-  :safe #'stringp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-check-syntax 'errors-and-warnings
-  "Highlight syntax errors and warnings."
-  :type '(radio (const :tag "None" nil)
-                (const :tag "Errors" errors)
-                (const :tag "Errors and warnings" errors-and-warnings))
-  :safe #'enh/symbol-or-null-p
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-extra-keywords nil
-  "List of idents that will be fontified as keywords. `erm-reset'
-will need to be called in order for any global changes to take effect.
-
-This variable can also be buffer local in which case it will
-override the global value for the buffer it is local
-to. `ruby-local-enable-extra-keywords' needs to be called after
-the value changes."
-  :type '(repeat string)
-  :safe #'listp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-indent-tabs-mode nil
-  "*Indentation can insert tabs in ruby mode if this is non-nil."
-  :type 'boolean
-  :safe #'booleanp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-indent-level 2
-  "*Indentation of ruby statements."
-  :type 'integer
-  :safe #'integerp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-hanging-indent-level 2
-  "*Extra hanging Indentation for continued ruby statements."
-  :type 'integer
-  :safe #'integerp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-comment-column 32
-  "*Indentation column of comments."
-  :type 'integer
-  :safe #'integerp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-deep-indent-paren t
-  "*Deep indent lists in parenthesis when non-nil."
-  ;; FIX: this applies to square brackets as well
-  :type 'boolean
-  :safe  'booleanp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-deep-indent-construct t
-  "*Deep indent constructs such as if, def, class and module when non-nil."
+(defcustom enh-ruby-add-encoding-comment-on-save t
+  "Adds ruby magic encoding comment on save when non-nil."
   :type 'boolean
   :safe #'booleanp
   :group 'enh-ruby)
@@ -122,34 +65,31 @@ the value changes."
   :safe #'booleanp
   :group 'enh-ruby)
 
-(defcustom enh-ruby-hanging-paren-indent-level 2
-  "*Extra hanging indentation for continued ruby parenthesis."
+(defcustom enh-ruby-check-syntax 'errors-and-warnings
+  "Highlight syntax errors and warnings."
+  :type '(radio (const :tag "None" nil)
+                (const :tag "Errors" errors)
+                (const :tag "Errors and warnings" errors-and-warnings))
+  :safe #'enh/symbol-or-null-p
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-comment-column 32
+  "*Indentation column of comments."
   :type 'integer
   :safe #'integerp
   :group 'enh-ruby)
 
-(defcustom enh-ruby-hanging-brace-indent-level 2
-  "*Extra hanging indentation for continued ruby curly braces."
-  :type 'integer
-  :safe #'integerp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-hanging-paren-deep-indent-level 0
-  "*Extra hanging deep indentation for continued ruby parenthesis."
-  :type 'integer
-  :safe #'integerp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-hanging-brace-deep-indent-level 0
-  "*Extra hanging deep indentation for continued ruby curly or square braces."
-  :type 'integer
-  :safe #'integerp
-  :group 'enh-ruby)
-
-(defcustom enh-ruby-add-encoding-comment-on-save t
-  "Adds ruby magic encoding comment on save when non-nil."
+(defcustom enh-ruby-deep-indent-construct t
+  "*Deep indent constructs such as if, def, class and module when non-nil."
   :type 'boolean
   :safe #'booleanp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-deep-indent-paren t
+  "*Deep indent lists in parenthesis when non-nil."
+  ;; FIX: this applies to square brackets as well
+  :type 'boolean
+  :safe  'booleanp
   :group 'enh-ruby)
 
 (defcustom enh-ruby-encoding-map
@@ -168,14 +108,56 @@ the value changes."
                      xs)))
   :group 'enh-ruby)
 
-(defcustom enh-ruby-use-encoding-map t
-  "*Use `enh-ruby-encoding-map' to set encoding magic comment if this is non-nil."
-  :type 'boolean
-  :safe #'booleanp
+(defcustom enh-ruby-extra-keywords nil
+  "List of idents that will be fontified as keywords. `erm-reset'
+will need to be called in order for any global changes to take effect.
+
+This variable can also be buffer local in which case it will
+override the global value for the buffer it is local
+to. `ruby-local-enable-extra-keywords' needs to be called after
+the value changes."
+  :type '(repeat string)
+  :safe #'listp
   :group 'enh-ruby)
 
-(defcustom enh-ruby-use-ruby-mode-show-parens-config nil
-  "This flag has no effect anymore as ERM supports show-paren-mode directly"
+(defcustom enh-ruby-hanging-brace-deep-indent-level 0
+  "*Extra hanging deep indentation for continued ruby curly or square braces."
+  :type 'integer
+  :safe #'integerp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-hanging-brace-indent-level 2
+  "*Extra hanging indentation for continued ruby curly braces."
+  :type 'integer
+  :safe #'integerp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-hanging-indent-level 2
+  "*Extra hanging Indentation for continued ruby statements."
+  :type 'integer
+  :safe #'integerp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-hanging-paren-deep-indent-level 0
+  "*Extra hanging deep indentation for continued ruby parenthesis."
+  :type 'integer
+  :safe #'integerp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-hanging-paren-indent-level 2
+  "*Extra hanging indentation for continued ruby parenthesis."
+  :type 'integer
+  :safe #'integerp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-indent-level 2
+  "*Indentation of ruby statements."
+  :type 'integer
+  :safe #'integerp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-indent-tabs-mode nil
+  "*Indentation can insert tabs in ruby mode if this is non-nil."
   :type 'boolean
   :safe #'booleanp
   :group 'enh-ruby)
@@ -184,6 +166,24 @@ the value changes."
   "Indent heredocs and multiline strings like text-mode.
 
 Warning: does not play well with electric-indent-mode."
+  :type 'boolean
+  :safe #'booleanp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-program "ruby"
+  "The ruby program to parse the source."
+  :type 'string
+  :safe #'stringp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-use-encoding-map t
+  "*Use `enh-ruby-encoding-map' to set encoding magic comment if this is non-nil."
+  :type 'boolean
+  :safe #'booleanp
+  :group 'enh-ruby)
+
+(defcustom enh-ruby-use-ruby-mode-show-parens-config nil
+  "This flag has no effect anymore as ERM supports show-paren-mode directly"
   :type 'boolean
   :safe #'booleanp
   :group 'enh-ruby)
