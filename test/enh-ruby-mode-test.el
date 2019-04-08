@@ -114,11 +114,11 @@
     (string-should-indent "c = {\na: a,\nb: b\n}\n"
                           "c = {\n  a: a,\n  b: b\n}\n")))
 
-(setq input/indent-hash/trail "\nc = { a: a,\nb: b,\n c: c\n}")
+(setq input/indent-hash/trail "\nc = {a: a,\nb: b,\n c: c\n}")
 (setq input/indent-hash/hang  "\nc = {\na: a,\nb: b,\n c: c\n}")
 (setq exp/indent-hash/hang    "\nc = {\n  a: a,\n  b: b,\n  c: c\n}")
-(setq exp/indent-hash/trail   "\nc = { a: a,\n      b: b,\n      c: c\n    }")
-(setq exp/indent-hash/trail/8 "\nc = { a: a,\n             b: b,\n             c: c\n    }")
+(setq exp/indent-hash/trail   "\nc = {a: a,\n     b: b,\n     c: c\n    }")
+(setq exp/indent-hash/trail/8 "\nc = {a: a,\n             b: b,\n             c: c\n    }")
 
 (defmacro with-bounce-and-hang (bounce indent1 indent2 &rest body)
   `(let ((enh-ruby-bounce-deep-indent              ,bounce)
@@ -140,7 +140,7 @@
   (with-deep-indent t
     (with-bounce-and-hang t nil nil
       (string-should-indent input/indent-hash/hang
-                            "\nc = {\n      a: a,\n      b: b,\n      c: c\n    }"))))
+                            "\nc = {\n     a: a,\n     b: b,\n     c: c\n    }"))))
 
 ;; if bounce off, hanging-brace-deep-indent-level doesn't matter
 (enh-deftest enh-ruby-indent-hash/deep/hang/99 ()
@@ -304,15 +304,32 @@
                           "words = %w[\n  a\n  b\n]\n")))
 
 (enh-deftest enh-ruby-indent-pct-w-array/deep ()
-  ;; TODO: I do NOT like this one
-  ;; TODO: "words = %w[ a\n            b\n            c\n          ]\n"
   (with-deep-indent t
-    (string-should-indent "words = %w[ a\nb\nc\n]\n"
-                          "words = %w[ a\n         b\n         c\n        ]\n")))
+    (with-bounce-and-hang nil nil nil
+     (string-should-indent "\nwords = %w[a\nb\nc\n]\n"
+                           "\nwords = %w[a\n           b\n           c\n          ]\n"))))
 
-(enh-deftest enh-ruby-indent-pct-w-array/ruby ()
-  (ert-skip 'ruby-mode-is-wrong)
-  (string-should-indent-like-ruby "words = %w[ a\nb\nc\n]\n"))
+;; NO! ruby-mode refuses to indent %w at all
+;; words = %w[ a
+;; b
+;; c
+;; ]
+;;
+;; vs enh-ruby-mode:
+;;
+;; words = %w[ a
+;;   b
+;;   c
+;; ]
+;;
+;; and w/ deep-indent-paren t:
+;; words = %w[ a
+;;             b
+;;             c
+;;           ]
+;;
+;; (enh-deftest enh-ruby-indent-pct-w-array/ruby ()
+;;   (string-should-indent-like-ruby "words = %w[ a\nb\nc\n]\n"))
 
 (enh-deftest enh-ruby-indent-trailing-dots ()
   (string-should-indent "a.b.\nc\n"

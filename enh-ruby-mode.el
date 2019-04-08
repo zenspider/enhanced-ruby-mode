@@ -140,8 +140,8 @@ the value changes."
   :safe #'integerp
   :group 'enh-ruby)
 
-(defcustom enh-ruby-hanging-brace-deep-indent-level 1
-  "*Extra hanging deep indentation for continued ruby curly braces."
+(defcustom enh-ruby-hanging-brace-deep-indent-level 0
+  "*Extra hanging deep indentation for continued ruby curly or square braces."
   :type 'integer
   :safe #'integerp
   :group 'enh-ruby)
@@ -825,6 +825,11 @@ modifications to the buffer."
         enh-ruby-regexp-face
         ))
 
+(defun extra-col-% ()
+  (or (and (looking-at "%\\([^[:alnum:]]\\|[QqWwIixrs].\\)")
+           (1- (length (match-string-no-properties 0))))
+      0))
+
 (defun enh-ruby-calculate-indent (&optional start-point)
   "Calculate the indentation of the previous line and its level."
   (save-excursion
@@ -854,7 +859,8 @@ modifications to the buffer."
           (let (opening-col opening-is-last-thing-on-line)
             (save-excursion
               (enh-ruby-backward-sexp)
-              (setq opening-col (current-column))
+              (setq opening-col (+ (current-column)
+                                   (extra-col-%)))
               (forward-char 1)
               (skip-syntax-forward " " (line-end-position))
               (setq opening-is-last-thing-on-line (eolp)))
@@ -945,9 +951,14 @@ modifications to the buffer."
                    (+ enh-ruby-hanging-brace-indent-level indent)
                  (+ enh-ruby-hanging-paren-indent-level indent)))
               (deep-indent
-               (if (char-equal (char-after pos) ?{)
-                   (+ enh-ruby-hanging-brace-deep-indent-level col)
-                 (+ enh-ruby-hanging-paren-deep-indent-level col)))
+               (cond ((char-equal (char-after pos) ?{)
+                      (+ enh-ruby-hanging-brace-deep-indent-level col))
+                     ((char-equal (char-after pos) ?%)
+                      (setq extra-col (save-excursion
+                                        (goto-char pos)
+                                        (extra-col-%)))
+                      (+ enh-ruby-hanging-brace-deep-indent-level col extra-col))
+                     (t (+ enh-ruby-hanging-paren-deep-indent-level col))))
               (at-eol (save-excursion
                         (goto-char (1+ pos))
                         (skip-syntax-forward " " (line-end-position))
@@ -991,7 +1002,7 @@ modifications to the buffer."
     (+
      (if (eq 'c (get-text-property limit 'indent)) enh-ruby-hanging-indent-level 0)
      (cond
-      ((= max 0)
+      ((= max 0)         ; TODO: how is this possible? look up 5 lines
        (if (not (memq (get-text-property start-pos 'font-lock-face)
                       '(enh-ruby-heredoc-delimiter-face font-lock-string-face)))
            indent
