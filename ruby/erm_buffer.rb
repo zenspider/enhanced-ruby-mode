@@ -571,11 +571,9 @@ class ErmBuffer
       d :ident => ident
       d :lsf => line_so_far
 
-      if ident
-        line_so_far_str = line_so_far.map {|a| a[1] }.join
-        if line_so_far_str.strip == ""
-          indent :c, -line_so_far_str.length
-        end
+      line_so_far_str = line_so_far.map {|a| a[1] }.join
+      if line_so_far_str.strip == ""
+        indent :c, -line_so_far_str.length
       end
 
       add :rem_period, tok, tok.size, false, :cont

@@ -98,6 +98,19 @@
   (string-should-indent-like-ruby "words = ['cow',\n'moo'\n]\n"
                                   'deep))
 
+(enh-deftest enh-ruby-indent-not-method ()
+  :expected-result :failed
+  (string-should-indent-like-ruby
+   "\nclass Object\ndef !\n100\nend\nend"))
+
+(enh-deftest enh-ruby-indent-hanging-period-after-parens ()
+  (string-should-indent-like-ruby
+   ":a\n(b)\n.c"))
+
+(enh-deftest enh-ruby-indent-hanging-period ()
+  (string-should-indent-like-ruby
+   ":a\nb\n.c"))
+
 (enh-deftest enh-ruby-indent-def-after-private ()
   (with-deep-indent nil
    (string-should-indent "class Foo\nprivate def foo\nx\nend\nend\n"
