@@ -67,13 +67,6 @@
 
 ;;; Variables:
 
-;;; Code:
-
-(defun enh/symbol-or-null-p (x)
-  "Return true if X is either a symbol or null. Used for defcustom safe check."
-  (or (symbolp x)
-      (null x)))
-
 (defcustom enh-ruby-add-encoding-comment-on-save t
   "Adds ruby magic encoding comment on save when non-nil."
   :type 'boolean
@@ -120,7 +113,9 @@
     (shift_jis      . cp932)     ;; MIME charset name of Shift_JIS
     (japanese-cp932 . cp932))    ;; Emacs charset name of CP932
   "Alist to map encoding name from Emacs to ruby."
-  :type '(alist :key-type symbol :value-type enh/symbol-or-null-p)
+  :type '(alist :key-type   (symbol :tag "Encoding")
+                :value-type (choice (const :tag "Ignore" nil)
+                                    (symbol :tag "Charset")))
   :safe (lambda (xs)
           (and (listp xs)
            (cl-every (lambda (x)
@@ -205,13 +200,19 @@ Warning: does not play well with command ‘electric-indent-mode’."
   :safe #'booleanp
   :group 'enh-ruby)
 
-(defcustom enh-ruby-use-ruby-mode-show-parens-config nil
-  "This flag has no effect anymore as ERM supports command ‘show-paren-mode’ directly."
-  :type 'boolean
-  :safe #'booleanp
-  :group 'enh-ruby)
+(defvar enh-ruby-use-ruby-mode-show-parens-config nil
+  "This flag has no effect anymore as ERM supports command ‘show-paren-mode’ directly.")
 
 (make-obsolete-variable 'enh-ruby-use-ruby-mode-show-parens-config "2018-04-03")
+
+(defvar page-delimiter)                 ; from paragraphs.el (no provide?!?)
+(defvar paragraph-start)                ; from paragraphs.el
+(defvar need-syntax-check-p)
+(defvar erm-buff-num)
+(defvar erm-e-w-status)
+(defvar erm-full-parse-p)
+
+;;; Constants
 
 (defconst enh-ruby-block-end-re "\\_<end\\_>")
 
@@ -233,7 +234,6 @@ Warning: does not play well with command ‘electric-indent-mode’."
                                          "\\([A-Za-z_]" enh-ruby-symbol-re "*\\|\\.\\|::" "\\)"
                                          "+\\)")
   "Regexp to match definitions and their name.")
-
 
 (defconst erm-process-delimiter
   "\n\0\0\0\n")
@@ -402,12 +402,13 @@ Warning: does not play well with command ‘electric-indent-mode’."
     enh-ruby-regexp-face)
   "Font faces used by ‘enh-ruby-mode’.")
 
-(defvar page-delimiter)                 ; from paragraphs.el (no provide?!?)
-(defvar paragraph-start)                ; from paragraphs.el
-(defvar need-syntax-check-p)
-(defvar erm-buff-num)
-(defvar erm-e-w-status)
-(defvar erm-full-parse-p)
+;;; Code:
+
+;;;###autoload
+(defun enh/symbol-or-null-p (x)
+  "Return true if X is either a symbol or null. Used for defcustom safe check."
+  (or (symbolp x)
+      (null x)))
 
 ;;;###autoload
 (define-derived-mode enh-ruby-mode prog-mode "EnhRuby"
