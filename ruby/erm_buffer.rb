@@ -37,30 +37,40 @@ class ErmBuffer
   }
 
   module Adder
+    attr_accessor :statement_start
+    attr_accessor :ident
+    attr_accessor :first_token
+    attr_accessor :last_add
+
     def nadd sym, tok, len = tok.size, ft = false, la = nil
+      d :nadd => [sym, tok, len, ft, la]
       case sym
       when :sp, :comment then
         case parser.mode
         when :predef, :expdef then
+          # do nothing
         else
           parser.mode = nil
         end
       else
-        @statement_start = false
+        self.statement_start = false
 
         parser.mode = :def if parser.mode == :predef
-        @block = false     if @block == :b4args
+        self.block = false if block == :b4args
 
         case sym
         when :ident, :const, :ivar, :gvar, :cvar then
-          @ident = true
+          self.ident = true
+        when :rem_rparen, :indent then
+          # leave alone?
         else
-          @ident = false
+          d "self.ident = false"
+          self.ident = false
         end
       end
 
-      @first_token = ft
-      @last_add = la
+      self.first_token = ft
+      self.last_add = la
 
       target = parser.equal?(self) || lineno != parser.lineno ? self : prev
       target.realadd sym, tok, len
@@ -73,30 +83,35 @@ class ErmBuffer
     include Adder
 
     attr_accessor :lineno, :lines, :parser, :prev, :tok
+    attr_accessor :block
 
     def initialize parser, prev, tok, lineno
       # TODO: tok?
-      @parser = parser
-      @prev   = prev
-      @lineno = lineno
-      @lines  = []
-      @block  = nil
+      self.parser = parser
+      self.prev   = prev
+      self.lineno = lineno
+      self.lines  = []
+      self.block  = nil
+    end
+
+    def d o
+      parser.d o
     end
 
     def realadd(*args)
-      @lines << args
+      lines << args
     end
 
     def restore
-      @lines << [:heredoc_end, nil, nil] if lines.empty?
+      lines << [:heredoc_end, nil, nil] if lines.empty?
       if parser.equal? prev then
         for args in lines
           parser.nadd(*args)
         end
         parser.heredoc = nil
       else
-        @prev.lines += lines
-        parser.heredoc = @prev
+        prev.lines += lines
+        parser.heredoc = prev
       end
     end
   end # class Heredoc
@@ -104,7 +119,7 @@ class ErmBuffer
   class Parser < ::Ripper   #:nodoc: internal use only
     include Adder
 
-    # TODO: add @prev_line and copy it when we clear @line_so_far
+    # TODO: add prev_line and copy it when we clear line_so_far
     # TODO: use this to calculate hanging indent for parenless args
 
     # Indents:
@@ -128,15 +143,31 @@ class ErmBuffer
 
     attr_accessor :heredoc, :mode
     attr_accessor :indent_stack, :ident_stack, :brace_stack
+    attr_accessor :parser
+    attr_accessor :file_encoding
+    attr_accessor :ermbuffer
+    attr_accessor :point_min
+    attr_accessor :point_max
+    attr_accessor :src
+    attr_accessor :src_size
+    attr_accessor :first_count
+    attr_accessor :count
+    attr_accessor :res
+    attr_accessor :block
+    attr_accessor :list_count
+    attr_accessor :cond_stack
+    attr_accessor :plit_stack
+    attr_accessor :line_so_far
 
     def initialize ermbuffer, src, point_min, point_max, first_count
-      @ermbuffer     = ermbuffer
-      @point_min     = point_min
-      @point_max     = point_max
-      @src           = src
-      @src_size      = src.size
-      @file_encoding = @src.encoding
-      @first_count   = nil
+      self.ermbuffer     = ermbuffer
+      self.point_min     = point_min
+      self.point_max     = point_max
+      self.src           = src
+      self.src_size      = src.size
+      self.file_encoding = src.encoding
+      self.first_count   = nil
+      self.parser        = self # stupid hack for Adder module above
       super src
     end
 
@@ -151,87 +182,83 @@ class ErmBuffer
     # Bugs in Ripper:
     # empty here doc fails to fire on_heredoc_end
     def parse
-      @count          = 1
-      @mode           = nil
-      @brace_stack    = []
-      @heredoc        = nil
-      @first_token    = true
-      @last_add       = nil
-      @res            = []
-      @ident          = false
-      @ident_stack    = []
-      @block          = false
-      @statement_start = true
-      @indent_stack   = []
-      @list_count     = 0
-      @cond_stack     = []
-      @plit_stack     = []
-      @line_so_far    = []
+      self.count          = 1
+      self.mode           = nil
+      self.brace_stack    = []
+      self.heredoc        = nil
+      self.first_token    = true
+      self.last_add       = nil
+      self.res            = []
+      self.ident          = false
+      self.ident_stack    = []
+      self.block          = false
+      self.statement_start = true
+      self.indent_stack   = []
+      self.list_count     = 0
+      self.cond_stack     = []
+      self.plit_stack     = []
+      self.line_so_far    = []
 
       catch :parse_complete do
         super
 
-        realadd :rem_heredoc, '', @src_size-@count if heredoc
+        realadd :rem_heredoc, '', src_size-count if heredoc
       end
 
-      res = @res.map.with_index { |v, i|
+      self.res = res.map.with_index { |v, i|
         "(%d %s)" % [i, v.join(" ")] if v
       }
 
-      "((%s %s %s %s)%s)" % [@src_size,
-                             @point_min,
-                             @point_max,
-                             @indent_stack.join(' '),
+      "((%s %s %s %s)%s)" % [src_size,
+                             point_min,
+                             point_max,
+                             indent_stack.join(' '),
                              res.join]
-    end
-
-    def parser # TODO: remove
-      self
     end
 
     def realadd sym, tok, len
       if sym == :indent
-        pos = @count + len
-        @indent_stack << tok << pos if pos.between? @point_min, @point_max
+        pos = count + len
+        indent_stack << tok << pos if pos.between? point_min, point_max
 
         return
       end
 
-      start = @count
-      throw :parse_complete if start > @point_max
+      start = count
+      throw :parse_complete if start > point_max
 
-      len = 2 + @src.index("\n", start) - start unless len
+      len = 2 + src.index("\n", start) - start unless len
 
-      pos = @count += len
-      return if pos < @point_min
-      start = @point_min if start < @point_min
-      pos = @point_max   if pos   > @point_max
+      pos = self.count += len
+      return if pos < point_min
+      start = point_min if start < point_min
+      pos = point_max   if pos   > point_max
 
       sym = :rem if sym =~ /^rem_/
       idx = FONT_LOCK_NAMES[sym]
 
-      if t = @res[idx] then
+      if t = res[idx] then
         if t.last == start then
           t[-1] = pos
         else
           t << start << pos
         end
       else
-        @res[idx] = [start, pos]
+        res[idx] = [start, pos]
       end
 
       if (sym == :sp && tok == "\n") || (sym == :comment && tok.end_with?("\n"))
-        @line_so_far.clear
+        line_so_far.clear
       else
-        @line_so_far << [sym, tok, len]
+        line_so_far << [sym, tok, len]
       end
 
-      throw :parse_complete if pos == @point_max
+      throw :parse_complete if pos == point_max
     end
 
     def maybe_plit_ending tok
-      if tok[-1] == @plit_stack.last
-        @plit_stack.pop
+      if tok[-1] == plit_stack.last
+        plit_stack.pop
 
         # Token can sometimes have preceding whitespace, which needs to be added
         # as a separate token to work with indents.
@@ -247,49 +274,67 @@ class ErmBuffer
     # on_* handlers
     # TODO: I don't like these generated methods. Harder to trace/debug.
 
+    def d o
+      ermbuffer.d o
+    end
+
+    def debug_on tok
+      return unless ermbuffer.debug
+      loc  = caller_locations.first.label.to_sym
+      rest = line_so_far.map {|a| a[1] }.join
+      d "%-10s %p %p %p" % [loc, tok, ident, rest]
+    end
+
     [:CHAR, :__end__, :backtick, :embdoc, :embdoc_beg, :embdoc_end,
      :label, :tlambda, :tstring_beg].each do |event|
       define_method "on_#{event}" do |tok|
-        tok.force_encoding @file_encoding if tok.encoding != @file_encoding
+        tok.force_encoding file_encoding if tok.encoding != file_encoding
+        debug_on tok
         add event, tok
       end
     end
 
     [:backref, :float, :int].each do |event|
       define_method "on_#{event}" do |tok|
+        debug_on tok
         add :"rem_#{event}", tok
       end
     end
 
     [:cvar, :gvar, :ivar].each do |event|
       define_method "on_#{event}" do |tok|
-        if @mode == :sym then
+        if mode == :sym then
+          debug_on [tok, :sym]
           add :label, tok
         else
+          debug_on [tok, :not_sym]
           add event, tok
         end
       end
     end
 
     def on_comma tok
-      @mode = nil
-      r = add :rem_comma, tok, tok.size, false, @list_count <= 0
-      @statement_start = true
+      debug_on tok
+      self.mode = nil
+      r = add :rem_comma, tok, tok.size, false, list_count <= 0
+      self.statement_start = true
       r
     end
 
     def on_comment tok
+      debug_on tok
       on_eol :comment, tok
     end
 
     def on_const tok
-      case @mode
+      debug_on [tok, mode]
+      case mode
       when :sym then
-        @mode = nil
+        self.mode = nil
         add :label, tok
       when :def, :predef then
         r = add :const, tok # TODO: why this order?
-        @mode = :predef
+        self.mode = :predef
         r
       else
         add :const, tok
@@ -297,29 +342,32 @@ class ErmBuffer
     end
 
     def on_embexpr_beg tok
+      debug_on tok
       len = tok.size
       if len > 2 then
         add :tstring_content, tok, len - 2
         len = 2
       end
 
-      @brace_stack << :embexpr
-      @cond_stack << false
-      @plit_stack << false
+      brace_stack << :embexpr
+      cond_stack << false
+      plit_stack << false
 
       indent :d, 1
       add :embexpr_beg, tok, len
     end
 
     def on_embexpr_end tok
-      @brace_stack.pop
-      @cond_stack.pop
-      @plit_stack.pop
+      debug_on tok
+      brace_stack.pop
+      cond_stack.pop
+      plit_stack.pop
       indent :e
       add :embexpr_beg, tok
     end
 
     def on_embvar tok
+      debug_on tok
       len = tok.size
       if len > 1 then
         add :tstring_content, tok, len - 1
@@ -330,7 +378,8 @@ class ErmBuffer
     end
 
     def on_eol sym, tok
-      indent :c, tok.size if @last_add
+      debug_on tok
+      indent :c, tok.size if last_add
 
       r = add sym, tok, tok.size, true
 
@@ -338,13 +387,14 @@ class ErmBuffer
         heredoc.restore
       end
 
-      @cond_stack.pop if @cond_stack.last
-      @statement_start = true
+      cond_stack.pop if cond_stack.last
+      self.statement_start = true
 
       r
     end
 
     def on_heredoc_beg tok
+      debug_on tok
       r = add :heredoc_beg, tok
       if !heredoc || heredoc.lineno < lineno then
         self.heredoc = Heredoc.new self, heredoc||self, tok, lineno
@@ -353,11 +403,13 @@ class ErmBuffer
     end
 
     def on_heredoc_end tok
+      debug_on tok
       add :heredoc_end, tok
     end
 
     def on_ident tok
-      case @mode
+      debug_on [tok, mode]
+      case mode
       when :sym then
         add :label, tok
       when :predef, :def then
@@ -365,7 +417,7 @@ class ErmBuffer
       when :period then
         add :ident, tok
       else
-        if @ermbuffer.extra_keywords.include? tok then
+        if ermbuffer.extra_keywords.include? tok then
           add :kw, tok
         else
           add :ident, tok
@@ -374,6 +426,7 @@ class ErmBuffer
     end
 
     def on_ignored_nl tok
+      debug_on tok
       if tok then
         on_nl tok
       end
@@ -381,7 +434,8 @@ class ErmBuffer
 
     def on_kw sym # TODO: break up. 61 lines long
       sym = sym.to_sym
-      case @mode
+      debug_on [sym, mode]
+      case mode
       when :sym then
         add :label, sym
       when :def, :predef then
@@ -389,7 +443,7 @@ class ErmBuffer
           add :defname, sym
         else
           r = add :kw, sym
-          @mode = :def
+          self.mode = :def
           r
         end
       else
@@ -399,14 +453,14 @@ class ErmBuffer
         when :end then
           indent :e
         when :do then
-          if @cond_stack.last then
-            @cond_stack.pop
+          if cond_stack.last then
+            cond_stack.pop
             r = add :kw, sym
           else
             # `indent` precedes `add` for the compatibility of parsing result.
             #
-            # `add` and `indent` must precede `@block = :b4args`.
-            # Otherwise @block is overwritten, and indentation is broken
+            # `add` and `indent` must precede `self.block = :b4args`.
+            # Otherwise block is overwritten, and indentation is broken
             # in the following code:
             #  each do |a| # <- `|` for argument list is recognized as operator,
             #      # <- which produces an extra indentation.
@@ -414,12 +468,12 @@ class ErmBuffer
 
             indent :d
             r = add :kw, sym
-            @block = :b4args
+            self.block = :b4args
           end
 
           return r
         when *BEGINDENT_KW then
-          if @statement_start then
+          if statement_start then
             indent :b
           elsif POSTCOND_KW.include? sym then
             last_add = :cont
@@ -429,53 +483,53 @@ class ErmBuffer
         when *INDENT_KW then
           indent :b
         when *BACKDENT_KW then
-          indent :s if @statement_start
+          indent :s if statement_start
         end
 
-        @cond_stack << true if PRE_OPTIONAL_DO_KW.include? sym
+        cond_stack << true if PRE_OPTIONAL_DO_KW.include? sym
 
         r = add :kw, sym, sym.size, false, last_add
-        @mode = :predef if [:def, :alias].include? sym
+        self.mode = :predef if [:def, :alias].include? sym
         r
       end
     end
 
     def on_lbrace tok
-      @cond_stack << false
-      @ident_stack << [@ident, mode]
+      cond_stack << false
+      ident_stack << [ident, mode]
 
-      is_start_of_line = @line_so_far.all? {|a| a[0] == :sp }
-      if @ident && !is_start_of_line then
-        @brace_stack << :block
+      is_start_of_line = line_so_far.all? {|a| a[0] == :sp }
+      if ident && !is_start_of_line then
+        brace_stack << :block
         indent :d
         r = add :block, tok
-        @block = :b4args
+        self.block = :b4args
         r
       else
-        @brace_stack << :brace
-        @list_count += 1
+        brace_stack << :brace
+        self.list_count += 1
         indent :l
         add :rem_lbrace, tok
       end
     end
 
     def on_lparen tok
-      mode = case @mode
-             when :def then
-               @mode = nil
-             when :predef then
-               @mode = :expdef
-               :predef
-             else
-               @mode
-             end
+      newmode = case mode
+                when :def then
+                  self.mode = nil
+                when :predef then
+                  self.mode = :expdef
+                  :predef
+                else
+                  mode
+                end
 
-      @ident_stack << [@ident, mode]
-      @cond_stack << false
+      ident_stack << [ident, newmode]
+      cond_stack << false
       indent :l
-      @list_count += 1
+      self.list_count += 1
       r = add :rem_lparen, tok
-      @statement_start = true
+      self.statement_start = true
       r
     end
 
@@ -484,37 +538,41 @@ class ErmBuffer
     end
 
     def on_op tok
-      if @mode == :sym then
+      if mode == :sym then
          add :label, tok
       else
-        @mode = nil
-        r = if @block && tok == '|'
-            case @block
+        self.mode = nil
+        r = if block && tok == '|'
+            case block
             when :b4args then
               indent :l
-              @list_count += 1
-              @block = :arglist
+              self.list_count += 1
+              self.block = :arglist
             else
               indent :r
-              @list_count -= 1
-              @block = false
+              self.list_count -= 1
+              self.block = false
             end
             add :arglist, tok, 1
           else
             add :op, tok, tok.size, false, :cont
           end
-        @statement_start = true
+        self.statement_start = true
         r
       end
     end
 
     def on_period tok
-      @mode ||= :period
+      self.mode ||= :period
+
+      debug_on tok
 
       indent :c, tok.size if tok == "\n"
+      d :ident => ident
+      d :lsf => line_so_far
 
-      if @ident
-        line_so_far_str = @line_so_far.map {|a| a[1] }.join
+      if ident
+        line_so_far_str = line_so_far.map {|a| a[1] }.join
         if line_so_far_str.strip == ""
           indent :c, -line_so_far_str.length
         end
@@ -524,12 +582,13 @@ class ErmBuffer
     end
 
     def on_rbrace tok
-      @cond_stack.pop
-      type = case @brace_stack.pop
+      debug_on tok
+      cond_stack.pop
+      type = case brace_stack.pop
              when :embexpr then
                indent :e
-               if @plit_stack.last == false
-                 @plit_stack.pop
+               if plit_stack.last == false
+                 plit_stack.pop
                end
                :embexpr_beg
              when :block then
@@ -537,70 +596,78 @@ class ErmBuffer
                :block
              when :brace then
                indent :r
-               @list_count -= 1
+               self.list_count -= 1
                :rem_brace
              else
                :rem_other
              end
 
       add(type, tok).tap do
-        @ident, @mode = @ident_stack.pop
+        self.ident, self.mode = ident_stack.pop
       end
     end
 
     def on_regexp_beg tok
-      tok.force_encoding @file_encoding if tok.encoding != @file_encoding
-      @mode = :regexp
+      tok.force_encoding file_encoding if tok.encoding != file_encoding
+      self.mode = :regexp
+      debug_on tok
       add :regexp_beg, tok
     end
 
     def on_regexp_end tok
-      @mode = nil
+      self.mode = nil
+      debug_on tok
       add :regexp_end, tok
     end
 
     def on_rparen tok
+      debug_on tok
       indent :r
       r = add :rem_rparen, tok
 
-      @list_count -= 1
-      @ident, @mode = @ident_stack.pop
-      @cond_stack.pop
+      self.list_count -= 1
+      self.ident, self.mode = ident_stack.pop
+      cond_stack.pop
 
       r
     end
 
     def on_semicolon tok
+      debug_on tok
       r = add :kw, :semicolon, 1, true
-      @cond_stack.pop if @cond_stack.last
-      @statement_start = true
+      cond_stack.pop if cond_stack.last
+      self.statement_start = true
       r
     end
 
     def on_sp tok
+      debug_on tok
       if tok == ESCAPE_LINE_END then
         indent :c, 2
       end
-      add :sp, tok, tok.size, @first_token, @last_add
+      add :sp, tok, tok.size, first_token, last_add
     end
 
     def on_symbeg tok
+      debug_on tok
       r = add :label, tok
-      @mode = :sym
+      self.mode = :sym
       r
     end
 
     def on_tlambeg tok
-      @brace_stack << :block
+      debug_on tok
+      brace_stack << :block
       indent :d
       add :block, tok
     end
 
     def on_tstring_content tok
-      tok.force_encoding @file_encoding if tok.encoding != @file_encoding
-      if @mode == :regexp
+      debug_on tok
+      tok.force_encoding file_encoding if tok.encoding != file_encoding
+      if mode == :regexp
         add :regexp_string, tok
-      elsif @plit_stack.last # `tstring_content` is ignored by indent in emacs.
+      elsif plit_stack.last # `tstring_content` is ignored by indent in emacs.
         add :rem_tstring_content, tok # TODO: figure out this context? or collapse?
       else
         add :tstring_content, tok
@@ -608,9 +675,11 @@ class ErmBuffer
     end
 
     def on_tstring_end tok
+      debug_on [tok, mode]
+
       return if maybe_plit_ending(tok)
 
-      if @mode == :sym then
+      if mode == :sym then
         add :label, tok
       else
         add :tstring_end, tok # TODO: fix this to be :tstring_end
@@ -618,19 +687,22 @@ class ErmBuffer
     end
 
     def on_label_end tok
+      debug_on tok
       add :tstring_beg, tok[0]
       add :label, tok[1]
     end
 
     def on_words_beg tok
+      debug_on tok
       delimiter = tok.strip[-1]  # ie. "%w(\n" => "("
-      @plit_stack << (DELIM_MAP[delimiter] || delimiter)
+      plit_stack << (DELIM_MAP[delimiter] || delimiter)
 
       indent :l
       add :words_beg, tok
     end
 
     def on_words_sep tok
+      debug_on tok
       return if maybe_plit_ending(tok)
 
       add :rem_words_sep, tok
@@ -645,36 +717,49 @@ class ErmBuffer
 
   @@extra_keywords = {}
 
-  attr_reader :buffer
+  attr_writer :extra_keywords
+  attr_accessor :point_min
+  attr_accessor :point_max
+  attr_accessor :first_count
+  attr_accessor :buffer
+  attr_accessor :debug
 
   def initialize
-    @extra_keywords = nil
-    @first_count    = nil
-    @buffer         = ''
+    self.extra_keywords = nil
+    self.first_count    = nil
+    self.buffer         = ''
+    self.debug          = false
+  end
+
+  def d o
+    return unless debug
+    require "pp"
+    o = o.pretty_inspect unless String === o
+    puts o.gsub(/^/, "     # ")
   end
 
   def add_content cmd, point_min, point_max, pbeg, len, content
-    @point_min = point_min.to_i
-    @point_max = point_max.to_i
+    self.point_min = point_min.to_i
+    self.point_max = point_max.to_i
 
     pbeg = pbeg.to_i
 
-    @first_count = pbeg if !@first_count || pbeg < @first_count
+    self.first_count = pbeg if !first_count || pbeg < first_count
 
-    if cmd == :r || @buffer.empty? then
-      @buffer = content
+    if cmd == :r || buffer.empty? then
+      self.buffer = content
     else
       len = pbeg + len.to_i - 2
       if pbeg == 1 && len < 0 then
-        @buffer[0..0] = content << @buffer[0]
+        buffer[0..0] = content << buffer[0]
       else
-        @buffer[pbeg - 1..len] = content
+        buffer[pbeg - 1..len] = content
       end
     end
   end
 
   # verify that this is used in erm.rb. I don't know how to trigger it. & args??
-  def check_syntax fname = '', code = @buffer
+  def check_syntax fname = '', code = buffer
     $VERBOSE = true
     # eval but do not run code
     eval "BEGIN{return}\n#{code}", nil, fname, 0
@@ -687,10 +772,10 @@ class ErmBuffer
   end
 
   def parse
-    parser = ErmBuffer::Parser.new(self, @buffer,
-                                   @point_min, @point_max,
-                                   @first_count||0)
-    @first_count = nil
+    parser = ErmBuffer::Parser.new(self, buffer,
+                                   point_min, point_max,
+                                   first_count||0)
+    self.first_count = nil
     parser.parse
   end
 
@@ -699,7 +784,7 @@ class ErmBuffer
   end
 
   def set_extra_keywords keywords
-    @extra_keywords = Hash[keywords.map { |o| [o, true] }]
+    self.extra_keywords = Hash[keywords.map { |o| [o, true] }]
   end
 
   def extra_keywords
