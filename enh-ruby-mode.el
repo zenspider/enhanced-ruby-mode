@@ -1570,10 +1570,10 @@ Used for inserting file-local-variables and sending in bug reports."
 Used for inserting file-local-variables and sending in bug reports."
   (seq-filter
    (lambda (symbol)
-     (and (get symbol 'standard-value)
-          (get symbol 'saved-value)
-          (not (equal (car (get symbol 'standard-value))
-                      (car (get symbol 'saved-value))))))
+     (let ((stdval (get symbol 'standard-value)))
+       (and stdval
+            (not (equal (car stdval)
+                        (symbol-value symbol))))))
    (enh-ruby--all-vars-with prefix)))
 
 (defun enh-ruby--variable-values (vars)
@@ -1590,6 +1590,19 @@ Used for inserting file-local-variables and sending in bug reports."
   (interactive)
   (mapc (lambda (kv) (apply 'add-file-local-variable kv))
    (enh-ruby--variable-values (enh-ruby--changed-vars-with "enh-ruby"))))
+
+(defun enh-ruby-add-all-file-local-variables ()
+  "Insert all currently customized variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
+  (interactive)
+  (mapc (lambda (kv) (apply 'add-file-local-variable kv))
+   (enh-ruby--variable-values (enh-ruby--all-vars-with "enh-ruby"))))
+
+(defun enh-ruby-del-file-local-variables ()
+  "Delete all file-local-variables that aren't customized"
+  (interactive)
+  (mapc #'delete-file-local-variable
+        (seq-difference (enh-ruby--all-vars-with "enh-ruby")
+                        (enh-ruby--changed-vars-with "enh-ruby"))))
 
 (defun enh-ruby-bug-report ()
   "Fill a buffer with data to make a ‘enh-ruby-mode’ bug report."
