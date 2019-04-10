@@ -684,7 +684,7 @@ class ErmBuffer
       if mode == :sym then
         add :label, tok
       else
-        add :tstring_end, tok # TODO: fix this to be :tstring_end
+        add :tstring_end, tok
       end
     end
 
