@@ -295,6 +295,19 @@
   (string-should-indent "\na\n.b(\nc\n)\n.d\n\ne"
                         "\na\n  .b(\n    c\n  )\n  .d\n\ne"))
 
+(enh-deftest enh-ruby-add-log-current-method/nested-modules ()
+  :expected-result :failed
+  (with-temp-enh-rb-string
+   "module One\nmodule Two\nclass Class\ndef method\n# blah\nend # method\nend # class\nend # One\nend # Two"
+   (search-forward "blah")
+   (should (equal "One::Two::Class#method" (enh-ruby-add-log-current-method)))))
+
+(enh-deftest enh-ruby-add-log-current-method/compact-modules ()
+  (with-temp-enh-rb-string
+   "class One::Two::Class\ndef method\n# blah\nend # method\nend # class"
+   (search-forward "blah")
+   (should (equal "One::Two::Class#method" (enh-ruby-add-log-current-method)))))
+
 (enh-deftest enh-ruby-indent-leading-dots-with-block-and-newlines ()
   :expected-result :failed
   (string-should-indent "\na\n.b do\nc\nend\n.d\n\ne"
