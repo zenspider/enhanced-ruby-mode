@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby -w
 
 require_relative '../ruby/erm_buffer'
 
