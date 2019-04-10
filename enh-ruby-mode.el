@@ -211,6 +211,8 @@ Warning: does not play well with command ‘electric-indent-mode’."
   :safe #'booleanp
   :group 'enh-ruby)
 
+(make-obsolete-variable 'enh-ruby-use-ruby-mode-show-parens-config "2018-04-03")
+
 (defconst enh-ruby-block-end-re "\\_<end\\_>")
 
 (defconst enh-ruby-symbol-chars "a-zA-Z0-9_=?!")
