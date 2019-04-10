@@ -333,7 +333,7 @@ class ErmBuffer
         self.mode = nil
         add :label, tok
       when :def, :predef then
-        r = add :const, tok # TODO: why this order?
+        r = add :const, tok
         self.mode = :predef
         r
       else
@@ -541,7 +541,6 @@ class ErmBuffer
       if mode == :sym then
          add :label, tok
       else
-        self.mode = nil
         r = if block && tok == '|'
             case block
             when :b4args then
@@ -555,7 +554,12 @@ class ErmBuffer
             end
             add :arglist, tok, 1
           else
-            add :op, tok, tok.size, false, :cont
+            case mode
+            when :def, :predef then
+              add :ident, tok
+            else
+              add :op, tok, tok.size, false, :cont
+            end
           end
         self.statement_start = true
         r

@@ -99,7 +99,6 @@
                                   'deep))
 
 (enh-deftest enh-ruby-indent-not-method ()
-  :expected-result :failed
   (string-should-indent-like-ruby
    "\nclass Object\ndef !\n100\nend\nend"))
 
