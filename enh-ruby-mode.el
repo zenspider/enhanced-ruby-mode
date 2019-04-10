@@ -52,13 +52,13 @@
 
 ;;; Properties & Other Bullshit Codes:
 
-;; l - [, (, {, %w/%i open  or | goalpost open
-;; r - ], ), }, %w/%i close or | goalpost close
-;; b - begin, def, case, if
-;; d - do, {, embexpr (interpolation) start
-;; e - end, embexpr (interpolation) end, close block }
-;; s - statement start on BACKDENT_KW else/when/rescue etc
-;; c - continue - period followed by return (or other way around?)
+;; 'l - [, (, {, %w/%i open  or | goalpost open
+;; 'r - ], ), }, %w/%i close or | goalpost close
+;; 'b - begin, def, case, if
+;; 'd - do, {, embexpr (interpolation) start
+;; 'e - end, embexpr (interpolation) end, close block }
+;; 's - statement start on BACKDENT_KW else/when/rescue etc
+;; 'c - continue - period followed by return (or other way around?)
 
 ;; pc
 ;; bc
