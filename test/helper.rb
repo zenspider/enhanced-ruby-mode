@@ -22,7 +22,7 @@ module Minitest::Assertions
     expected_sexp, code = Markup.parse_markup(markedup_code)
     actual_sexp = Markup.parse_code(code, buf)
 
-    msg = message(msg, "") do
+    msg = message(msg || code, "") do
       expected_markup = markedup_code
       actual_markup   = Markup.markup(code, Markup.parse_sexp(actual_sexp))
 
@@ -36,4 +36,3 @@ module Minitest::Assertions
     assert(expected_sexp == actual_sexp, msg)
   end
 end
-
