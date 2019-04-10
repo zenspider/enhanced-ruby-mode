@@ -72,9 +72,13 @@ Developing requires minitest 5.x gem.
 
 Testing parser:
 
-ruby test/test_erm_buffer.rb
+    rake test:ruby [N=name or /pattern/]
 
-Sorry, no test suite for enh-ruby-mode.el
+    rake test:elisp [N=pattern]
+
+    rake test:all
+
+    rake                            # same as test:all
 
 Tests for Emacs Lisp require ERT. It is built-in since Emacs 24.1.
 

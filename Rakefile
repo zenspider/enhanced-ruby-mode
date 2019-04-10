@@ -3,7 +3,13 @@ task :default => "test:all"
 namespace :test do
   desc "Run tests for Ruby"
   task :ruby do
-    sh(%q[ruby -I. test/test_erm_buffer.rb]){}
+    n = ENV["N"]
+
+    if n then
+      sh(%Q[ruby -wI. test/test_erm_buffer.rb -n #{n.dump}]){}
+    else
+      sh(%Q[ruby -wI. test/test_erm_buffer.rb]){}
+    end
   end
 
   def emacs args
