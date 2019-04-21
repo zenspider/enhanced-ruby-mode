@@ -205,6 +205,24 @@ Warning: does not play well with command ‘electric-indent-mode’."
 
 (make-obsolete-variable 'enh-ruby-use-ruby-mode-show-parens-config "2018-04-03")
 
+;; TODO: renames:
+;;
+;; enh-ruby-indent-level:                    2
+;; enh-ruby-hanging-indent-level:            2
+;; enh-ruby-hanging-brace-deep-indent-level: 0
+;; enh-ruby-hanging-brace-indent-level:      2
+;; enh-ruby-hanging-paren-deep-indent-level: 0
+;; enh-ruby-hanging-paren-indent-level:      2
+;;
+;; Versus:
+;;
+;; enh-ruby-indent-level:                    2
+;; enh-ruby-indent-level-hanging:            2
+;; enh-ruby-indent-level-hanging-paren:      2
+;; enh-ruby-indent-level-hanging-paren-deep: 0
+;; enh-ruby-indent-level-hanging-brace:      2
+;; enh-ruby-indent-level-hanging-brace-deep: 0
+
 (defvar page-delimiter)                 ; from paragraphs.el (no provide?!?)
 (defvar paragraph-start)                ; from paragraphs.el
 (defvar need-syntax-check-p)
@@ -304,7 +322,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
     (,(concat
        enh-ruby-font-lock-keyword-beg-re
        (regexp-opt
-        '( ;; built-in methods on Kernel
+        '( ;; built-in methods on Kernel TODO: add more via reflection?
           "at_exit"
           "autoload"
           "autoload?"
@@ -424,6 +442,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
   (setq-local erm-e-w-status               nil)
   (setq-local erm-full-parse-p             nil)
   (setq-local indent-line-function         'enh-ruby-indent-line)
+  (setq-local forward-sexp-function        'enh-ruby-forward-sexp)
   (setq-local need-syntax-check-p          nil)
   (setq-local paragraph-ignore-fill-prefix t)
   (setq-local parse-sexp-ignore-comments   t)
@@ -1418,7 +1437,7 @@ With ARG, do it that many times."
 
           (when (or (eq face 'erm-syn-errline) (eq enh-ruby-check-syntax 'errors-and-warnings))
             (if (and (not (eq ?: (string-to-char response)))
-                     (string-match "\\`[^\n]*\n\\( *\\)^\n" response))
+                     (string-match "\\`[^\n]*\n\\( *\\)\\^\n" response))
                 (progn
                   (setq beg (point))
                   (condition-case nil
