@@ -576,7 +576,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
       (set-process-filter erm-ruby-process 'erm-filter)
       (set-process-query-on-exit-flag erm-ruby-process nil)
       (process-send-string
-       (erm-ruby-get-process)
+       erm-ruby-process
        (concat "x0:"
                (mapconcat 'identity (default-value 'enh-ruby-extra-keywords) " ")
                ":"
