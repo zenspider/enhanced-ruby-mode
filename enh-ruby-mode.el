@@ -67,7 +67,7 @@
 
 ;;; Variables:
 
-(defcustom enh-ruby-add-encoding-comment-on-save t
+(defcustom enh-ruby-add-encoding-comment-on-save nil
   "Adds ruby magic encoding comment on save when non-nil."
   :type 'boolean
   :safe #'booleanp
@@ -526,7 +526,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
   (save-excursion
     (widen)
     (goto-char (point-min))
-    (when (re-search-forward "[^\0-\177]" nil t)
+    (when (re-search-forward "[^[:ascii:]]" nil t)
       (goto-char (point-min))
       (let ((coding-system
              (or coding-system-for-write
@@ -554,6 +554,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
                               ((forward-char)))))
                  (insert coding-system)))
               ((looking-at "\\s *#.*coding\\s *[:=]"))
+              ((equal "utf-8" coding-system) 'do-nothing) ; hack? should check version?
               (t (insert "# -*- coding: " coding-system " -*-\n"))
               )))))
 
