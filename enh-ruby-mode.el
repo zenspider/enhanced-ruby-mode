@@ -937,17 +937,20 @@ not treated as modifications to the buffer."
                 opening-col             ; deep + !bounce + !hanging = match open
               (forward-line -1)
               (enh-ruby-skip-non-indentable)
-              (let ((opening-char
-                     (save-excursion (enh-ruby-backward-sexp) (char-after)))
-                    (proposed-col
-                     (enh-ruby-calculate-indent-1 pos
-                                                  (line-beginning-position))))
-                (if (< proposed-col opening-col)
-                    (- proposed-col
-                       (if (char-equal opening-char ?{)
-                           enh-ruby-hanging-brace-indent-level
-                         enh-ruby-hanging-paren-indent-level))
-                     opening-col)))))
+              (let* ((opening-char (save-excursion
+                                     (enh-ruby-backward-sexp)
+                                     (char-after)))
+                     (proposed-col (enh-ruby-calculate-indent-1 pos
+                                                                (line-beginning-position)))
+                     (chained-stmt-p (eq 'c (save-excursion (enh-ruby-backward-sexp)
+                                                            (forward-line 0)
+                                                            (get-text-property (point) 'indent))))
+                     (offset (if (char-equal opening-char ?{)
+                                 enh-ruby-hanging-brace-indent-level
+                               enh-ruby-hanging-paren-indent-level)))
+                (cond ((and chained-stmt-p (not enh-ruby-bounce-deep-indent)) (- proposed-col offset))
+                      ((< proposed-col opening-col) (- proposed-col offset))
+                      (t opening-col))))))
 
          ((or (memq face '(font-lock-string-face enh-ruby-heredoc-delimiter-face))
               (and (eq 'font-lock-variable-name-face face)
@@ -1039,7 +1042,8 @@ not treated as modifications to the buffer."
                              pc))
             (setq pc (cons (if (and (not at-eol) enh-ruby-deep-indent-paren)
                                deep-indent
-                             shallow-indent)
+                             (let ((chained-stmt-p (eq 'c start-prop)))
+                               (+ shallow-indent (if chained-stmt-p enh-ruby-hanging-paren-indent-level 0))))
                            pc)))))
 
        ((eq prop 'r)

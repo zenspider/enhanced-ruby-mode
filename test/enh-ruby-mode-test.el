@@ -291,9 +291,13 @@
   (string-should-indent-like-ruby "d.e\n.f\n"))
 
 (enh-deftest enh-ruby-indent-leading-dots-with-arguments-and-newlines ()
-  :expected-result :failed
   (string-should-indent "\na\n.b(\nc\n)\n.d\n\ne"
                         "\na\n  .b(\n    c\n  )\n  .d\n\ne"))
+
+(enh-deftest enh-ruby-indent-leading-dots-with-arguments-and-newlines/bounce ()
+  (with-bounce-and-hang t nil nil
+    (string-should-indent "\na\n.b(\nc\n)\n.d\n\ne"
+                          "\na\n  .b(\n     c\n    )\n  .d\n\ne")))
 
 (enh-deftest enh-ruby-add-log-current-method/nested-modules ()
   :expected-result :failed
