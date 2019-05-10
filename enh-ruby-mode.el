@@ -891,6 +891,14 @@ not treated as modifications to the buffer."
            (1- (length (match-string-no-properties 0))))
       0))
 
+(defun enh-ruby-continue-p (prop)
+  "Return whether PROP is a continue property."
+  (eq 'c prop))
+
+(defun enh-ruby-point-continue-p (point)
+  "Return whether property at POINT is a continue property."
+  (enh-ruby-continue-p (get-text-property point 'indent)))
+
 (defun enh-ruby-calculate-indent (&optional start-point)
   "Calculate the indentation of the previous line and its level at START-POINT."
   (save-excursion
@@ -911,9 +919,9 @@ not treated as modifications to the buffer."
                    (setq pos (point))
                    (enh-ruby-skip-non-indentable)
                    (let ((indent (enh-ruby-calculate-indent-1 pos (line-beginning-position)))
-                         (chained-stmt-p (eq 'c (save-excursion
-                                                  (forward-line 0)
-                                                  (get-text-property (point) 'indent)))))
+                         (chained-stmt-p (save-excursion
+                                           (forward-line 0)
+                                           (enh-ruby-point-continue-p (point)))))
                      (+ indent
                         (if chained-stmt-p enh-ruby-hanging-indent-level 0))))
                   ((and (not enh-ruby-deep-indent-construct)
@@ -941,9 +949,9 @@ not treated as modifications to the buffer."
                                      (char-after)))
                      (proposed-col (enh-ruby-calculate-indent-1 pos
                                                                 (line-beginning-position)))
-                     (chained-stmt-p (eq 'c (save-excursion (enh-ruby-backward-sexp)
-                                                            (forward-line 0)
-                                                            (get-text-property (point) 'indent))))
+                     (chained-stmt-p (save-excursion (enh-ruby-backward-sexp)
+                                                     (forward-line 0)
+                                                     (enh-ruby-point-continue-p (point))))
                      (offset (if (char-equal opening-char ?{)
                                  enh-ruby-hanging-brace-indent-level
                                enh-ruby-hanging-paren-indent-level)))
@@ -1041,7 +1049,7 @@ not treated as modifications to the buffer."
                              pc))
             (setq pc (cons (if (and (not at-eol) enh-ruby-deep-indent-paren)
                                deep-indent
-                             (let ((chained-stmt-p (eq 'c start-prop)))
+                             (let ((chained-stmt-p (enh-ruby-continue-p start-prop)))
                                (+ shallow-indent (if chained-stmt-p enh-ruby-hanging-paren-indent-level 0))))
                            pc)))))
 
@@ -1087,7 +1095,7 @@ not treated as modifications to the buffer."
 
       ((= max bc)
        (if (eq 'd (get-text-property (+ start-pos bc -1) 'indent))
-           (let ((chained-stmt-p (eq 'c start-prop)))
+           (let ((chained-stmt-p (enh-ruby-continue-p start-prop)))
              (+ (enh-ruby-calculate-indent-1 (+ start-pos bc -1) start-pos)
                 (* (if chained-stmt-p 2 1) enh-ruby-indent-level)))
          (+ bc enh-ruby-indent-level -1)))
