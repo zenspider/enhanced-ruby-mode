@@ -442,7 +442,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
   (setq-local erm-e-w-status               nil)
   (setq-local erm-full-parse-p             nil)
   (setq-local indent-line-function         'enh-ruby-indent-line)
-  (setq-local forward-sexp-function        'enh-ruby-forward-sexp)
+  ;; (setq-local forward-sexp-function        'enh-ruby-forward-sexp)
   (setq-local need-syntax-check-p          nil)
   (setq-local paragraph-ignore-fill-prefix t)
   (setq-local parse-sexp-ignore-comments   t)
