@@ -290,14 +290,19 @@
 (enh-deftest enh-ruby-indent-leading-dots/ruby ()
   (string-should-indent-like-ruby "d.e\n.f\n"))
 
+(setq leading-dot-input  "\na\n.b\n.c(\nd,\ne\n)\n.f\n")
+
 (enh-deftest enh-ruby-indent-leading-dots-with-arguments-and-newlines ()
-  (string-should-indent "\na\n.b(\nc\n)\n.d\n\ne"
-                        "\na\n  .b(\n    c\n  )\n  .d\n\ne"))
+  (string-should-indent leading-dot-input
+                        "\na\n  .b\n  .c(\n    d,\n    e\n  )\n  .f\n"))
 
 (enh-deftest enh-ruby-indent-leading-dots-with-arguments-and-newlines/bounce ()
   (with-bounce-and-hang t nil nil
-    (string-should-indent "\na\n.b(\nc\n)\n.d\n\ne"
-                          "\na\n  .b(\n     c\n    )\n  .d\n\ne")))
+    (string-should-indent leading-dot-input
+                          "\na\n  .b\n  .c(\n     d,\n     e\n    )\n  .f\n")))
+
+(enh-deftest enh-ruby-indent-leading-dots-with-arguments-and-newlines/ruby ()
+  (string-should-indent-like-ruby leading-dot-input))
 
 (enh-deftest enh-ruby-add-log-current-method/nested-modules ()
   :expected-result :failed
