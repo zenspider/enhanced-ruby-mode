@@ -274,8 +274,8 @@ Warning: does not play well with command ‘electric-indent-mode’."
     (define-key map (kbd "M-C-n")   'enh-ruby-end-of-block)
     (define-key map (kbd "M-C-h")   'enh-ruby-mark-defun)
     (define-key map (kbd "M-C-q")   'enh-ruby-indent-exp)
+    (define-key map (kbd "C-c C-f") 'enh-ruby-find-file)
     (define-key map (kbd "C-c C-e") 'enh-ruby-find-error)
-    (define-key map (kbd "C-c C-f") 'enh-ruby-insert-end)
     (define-key map (kbd "C-c /")   'enh-ruby-insert-end)
     (define-key map (kbd "C-c {")   'enh-ruby-toggle-block)
     (define-key map (kbd "M-C-u")   'enh-ruby-up-sexp)
@@ -1157,6 +1157,12 @@ not treated as modifications to the buffer."
         (goto-char pos)
       (unless warnings
         (enh-ruby-find-error t)))))
+
+(defun enh-ruby-find-file (FILENAME)
+  "Search for and edit FILENAME. Searching is done with `gem
+which` but works for standard lib as well as gems."
+  (interactive "sgem which ")
+  (find-file (substring (shell-command-to-string (concat "gem which " s)) 0 -1)))
 
 (defun enh-ruby-up-sexp (&optional arg)
   "Move up one balanced expression (sexp).
