@@ -1654,7 +1654,7 @@ Used for inserting file-local-variables and sending in bug reports."
                     (mode-path    ,(find-library-name "enh-ruby-mode")))
                   (enh-ruby--variable-values
                    (append '(emacs-version system-type major-mode)
-                           (enh-ruby--changed-vars-with "enh-ruby-"))))))
+                           (enh-ruby--changed-vars-with "enh-ruby"))))))
     (princ "\n")
     (princ "Also consider using enh-ruby-add-file-local-variables with any code you provide.\n\n")
     (princ "Hit 'q' to close this buffer.")))
