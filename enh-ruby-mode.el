@@ -1639,17 +1639,24 @@ stuff by changing vars over and over."
   (hack-local-variables)
   (indent-region (point-min) (point-max)))
 
+(defun enh-ruby--add-fl-variables (pairs)
+  (mapc (lambda (kv) (apply 'add-file-local-variable kv))
+        (enh-ruby--variable-values pairs)))
+
 (defun enh-ruby-add-file-local-variables ()
   "Insert all currently customized variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
   (interactive)
-  (mapc (lambda (kv) (apply 'add-file-local-variable kv))
-   (enh-ruby--variable-values (enh-ruby--changed-vars-with "enh-ruby"))))
+  (enh-ruby--add-fl-variables (enh-ruby--changed-vars-with "enh-ruby")))
 
 (defun enh-ruby-add-all-file-local-variables ()
-  "Insert all currently customized variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
+  "Insert all variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
   (interactive)
-  (mapc (lambda (kv) (apply 'add-file-local-variable kv))
-   (enh-ruby--variable-values (enh-ruby--all-vars-with "enh-ruby"))))
+  (enh-ruby--add-fl-variables (enh-ruby--all-vars-with "enh-ruby")))
+
+(defun enh-ruby-add-indent-file-local-variables ()
+  "Insert all indent variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
+  (interactive)
+  (enh-ruby--add-fl-variables (enh-ruby--all-vars-with "enh-ruby.*indent")))
 
 (defun enh-ruby-del-file-local-variables ()
   "Delete all file-local-variables that aren't customized"
