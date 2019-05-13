@@ -1610,15 +1610,17 @@ Used for inserting file-local-variables and sending in bug reports."
     (sort mode-vars
           'symbol<)))
 
+(defun enh-ruby--variable-standard-p (sym)
+  (and (equal (custom-variable-state sym (symbol-value sym))
+              'standard)
+       (equal (symbol-value sym)
+              (default-value sym))))
+
 (defun enh-ruby--changed-vars-with (pattern)
   "Return all changed defcustom varibles that match PATTERN.
 Used for inserting file-local-variables and sending in bug reports."
-  (seq-filter
-   (lambda (symbol)
-     (let ((stdval (get symbol 'standard-value)))
-       (and stdval
-            (not (equal (eval (car stdval))
-                        (symbol-value symbol)))))) ; TODO: maybe default-value
+  (seq-remove
+   'enh-ruby--variable-standard-p
    (enh-ruby--all-vars-with pattern)))
 
 (defun enh-ruby--variable-values (vars)
