@@ -1593,27 +1593,27 @@ With ARG, do it that many times."
 
 ;;; Debugging / Bug Reporting:
 
-(defun enh-ruby--all-vars-with (prefix)
-  "Return all defcustom variables that start with PREFIX.
+(defun enh-ruby--all-vars-with (pattern)
+  "Return all defcustom variables that match PATTERN.
 Used for inserting file-local-variables and sending in bug reports."
   (let (mode-vars)
     (mapatoms (lambda (symbol)
-                (when (and (string-prefix-p prefix (symbol-name symbol))
+                (when (and (string-match-p pattern (symbol-name symbol))
                            (get symbol 'standard-value))
                   (add-to-list 'mode-vars symbol))))
     (sort mode-vars
           'symbol<)))
 
-(defun enh-ruby--changed-vars-with (prefix)
-  "Return all changed defcustom varibles that start with PREFIX.
+(defun enh-ruby--changed-vars-with (pattern)
+  "Return all changed defcustom varibles that match PATTERN.
 Used for inserting file-local-variables and sending in bug reports."
   (seq-filter
    (lambda (symbol)
      (let ((stdval (get symbol 'standard-value)))
        (and stdval
-            (not (equal (car stdval)
-                        (symbol-value symbol))))))
-   (enh-ruby--all-vars-with prefix)))
+            (not (equal (eval (car stdval))
+                        (symbol-value symbol)))))) ; TODO: maybe default-value
+   (enh-ruby--all-vars-with pattern)))
 
 (defun enh-ruby--variable-values (vars)
   "Map VARS to a list of (variable value) pairs."
