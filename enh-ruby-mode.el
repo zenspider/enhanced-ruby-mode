@@ -1630,6 +1630,15 @@ Used for inserting file-local-variables and sending in bug reports."
   "Return the number of seconds that Emacs has been running."
   (float-time (time-subtract (current-time) before-init-time)))
 
+(defun enh-ruby-eval-file-local-variables ()
+  "Re-evaluate file-local variables and reindent the file.
+
+Really only useful for my debugging sessions when I'm debugging
+stuff by changing vars over and over."
+  (interactive)
+  (hack-local-variables)
+  (indent-region (point-min) (point-max)))
+
 (defun enh-ruby-add-file-local-variables ()
   "Insert all currently customized variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
   (interactive)
