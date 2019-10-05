@@ -462,6 +462,10 @@ Warning: does not play well with command ‘electric-indent-mode’."
   (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
   (setq imenu-create-index-function 'enh-ruby-imenu-create-index)
 
+  (add-hook 'before-change-functions
+            (lambda (_beg _end) (erm-wait-for-parse))
+            nil t)
+
   (if enh-ruby-add-encoding-comment-on-save
     (add-hook 'before-save-hook 'enh-ruby-mode-set-encoding nil t))
 
