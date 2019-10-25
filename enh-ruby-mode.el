@@ -203,7 +203,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
 (defvar enh-ruby-use-ruby-mode-show-parens-config nil
   "This flag has no effect anymore as ERM supports command ‘show-paren-mode’ directly.")
 
-(make-obsolete-variable 'enh-ruby-use-ruby-mode-show-parens-config "2018-04-03")
+(make-obsolete-variable 'enh-ruby-use-ruby-mode-show-parens-config nil "2018-04-03")
 
 ;; TODO: renames:
 ;;
@@ -562,6 +562,10 @@ Warning: does not play well with command ‘electric-indent-mode’."
               (t (insert "# -*- coding: " coding-system " -*-\n"))
               )))))
 
+(defvar erm-ruby-process nil "The current erm process where Emacs is interacting with.")
+(defvar erm-response     nil "Private variable.")
+(defvar erm-parsing-p    nil "Parsing: t, nil, 'a (all?), 'p (partial?).")
+
 (defun erm-ruby-get-process ()
   "Return (or create) the current ruby parser process."
   (when (and erm-ruby-process (not (equal (process-status erm-ruby-process) 'run)))
@@ -589,8 +593,6 @@ Warning: does not play well with command ‘electric-indent-mode’."
 
   erm-ruby-process)
 
-(defvar erm-response          nil "Private variable.")
-(defvar erm-parsing-p         nil "Parsing: t, nil, 'a (all?), 'p (partial?).")
 (defvar erm-no-parse-needed-p nil "Private variable.")
 (defvar erm-source-dir        nil "Private variable.")
 
@@ -601,8 +603,6 @@ Warning: does not play well with command ‘electric-indent-mode’."
                                                'erm-source-dir
                                                (symbol-function 'erm-source-dir))))))
 
-(defvar erm-ruby-process nil
-  "The current erm process where Emacs is interacting with.")
 
 (defvar erm-next-buff-num nil "Private variable.")
 (defvar erm-parse-buff nil "Private variable.")
@@ -1166,7 +1166,7 @@ not treated as modifications to the buffer."
   "Search for and edit FILENAME. Searching is done with `gem
 which` but works for standard lib as well as gems."
   (interactive "sgem which ")
-  (find-file (substring (shell-command-to-string (concat "gem which " s)) 0 -1)))
+  (find-file (substring (shell-command-to-string (concat "gem which " FILENAME)) 0 -1)))
 
 (defun enh-ruby-up-sexp (&optional arg)
   "Move up one balanced expression (sexp).
