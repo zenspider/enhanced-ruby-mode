@@ -1,14 +1,30 @@
-task :default => "test:all"
+task :default => %w[clean test:all compile]
+
+def run cmd
+  sh cmd do
+    # block prevents ruby backtrace on failure
+  end
+end
+
+def emacs args
+  emacs_cmd = Dir[
+    "/usr/local/bin/emacs",
+    "/{My,}Applications/Emacs.app/Contents/MacOS/Emacs" # homebrew
+  ].first || "emacs" # trust the path
+
+  run %Q[#{emacs_cmd} #{args}]
+end
+
+def emacs_test args
+  emacs "-Q -l enh-ruby-mode-test.el #{args}"
+end
 
 task :compile do
-  emacs =
-    Dir[
-      "/usr/local/bin/emacs",
-      "/{My,}Applications/Emacs.app/Contents/MacOS/Emacs" # homebrew
-    ].first || "emacs" # trust the path
+  emacs "--batch -f batch-byte-compile enh-ruby-mode.el"
+end
 
-  # block prevents ruby backtrace on failure
-  sh(%Q[#{emacs} --batch -f batch-byte-compile enh-ruby-mode.el]){}
+task :clean do
+  rm_f Dir["**/*~", "**/*.elc"]
 end
 
 namespace :test do
@@ -17,22 +33,10 @@ namespace :test do
     n = ENV["N"]
 
     if n then
-      sh(%Q[ruby -wI. test/test_erm_buffer.rb -n #{n.dump}]){}
+      run %Q[ruby -wI. test/test_erm_buffer.rb -n #{n.dump}]
     else
-      sh(%Q[ruby -wI. test/test_erm_buffer.rb]){}
+      run %Q[ruby -wI. test/test_erm_buffer.rb]
     end
-  end
-
-  def emacs args
-    emacs =
-      Dir[
-        "/usr/local/bin/emacs",
-        "/{My,}Applications/Emacs.app/Contents/MacOS/Emacs" # homebrew
-      ].first || "emacs" # trust the path
-
-    cmd = "#{emacs} -Q -l enh-ruby-mode-test.el"
-
-    sh(%Q[#{cmd} #{args}]){} # block prevents ruby backtrace on failure
   end
 
   desc "Run tests for Emacs Lisp"
@@ -41,9 +45,9 @@ namespace :test do
 
     Dir.chdir "test" do
       if n then
-        emacs "--batch -eval '(ert-run-tests-batch-and-exit #{n.dump})'"
+        emacs_test "--batch -eval '(ert-run-tests-batch-and-exit #{n.dump})'"
       else
-        emacs "--batch -f ert-run-tests-batch-and-exit"
+        emacs_test "--batch -f ert-run-tests-batch-and-exit"
       end
     end
   end
@@ -51,7 +55,7 @@ namespace :test do
   desc "Run tests for Emacs Lisp interactively"
   task :elispi do
     Dir.chdir "test" do
-      emacs %q[-eval "(ert-run-tests-interactively 't)"]
+      emacs_test %q[-eval "(ert-run-tests-interactively 't)"]
     end
   end
 
