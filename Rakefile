@@ -1,5 +1,16 @@
 task :default => "test:all"
 
+task :compile do
+  emacs =
+    Dir[
+      "/usr/local/bin/emacs",
+      "/{My,}Applications/Emacs.app/Contents/MacOS/Emacs" # homebrew
+    ].first || "emacs" # trust the path
+
+  # block prevents ruby backtrace on failure
+  sh(%Q[#{emacs} --batch -f batch-byte-compile enh-ruby-mode.el]){}
+end
+
 namespace :test do
   desc "Run tests for Ruby"
   task :ruby do

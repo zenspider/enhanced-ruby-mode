@@ -48,7 +48,11 @@
 
 (require 'cl-lib)                       ; for cdddr, caddr
 (require 'files)                        ; for mode-require-final-newline
-;; (require 'paragraphs) -- but is missing a provides decl
+(require 'paren)                        ; show-paren-data-function
+(require 'seq)                          ; seq-remove, seq-difference
+(require 'subr-x)                       ; string-trim-right
+(require 'cus-edit)                     ; custom-variable-state
+(require 'find-func)                    ; find-library-name
 
 ;;; Properties & Other Bullshit Codes:
 
@@ -223,8 +227,6 @@ Warning: does not play well with command ‘electric-indent-mode’."
 ;; enh-ruby-indent-level-hanging-brace:      2
 ;; enh-ruby-indent-level-hanging-brace-deep: 0
 
-(defvar page-delimiter)                 ; from paragraphs.el (no provide?!?)
-(defvar paragraph-start)                ; from paragraphs.el
 (defvar need-syntax-check-p)
 (defvar erm-buff-num)
 (defvar erm-e-w-status)
