@@ -458,6 +458,7 @@
    (toggle-to-do)))
 
 (enh-deftest enh-ruby-toggle-block/do ()
+  :expected-result t ; https://github.com/zenspider/enhanced-ruby-mode/issues/132
   (with-temp-enh-rb-string
    "7.times do |i|\n  puts \"number #{i+1}\"\nend\n"
 
