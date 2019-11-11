@@ -13,9 +13,15 @@ namespace :test do
   end
 
   def emacs args
-    emacs = "emacs -Q -l enh-ruby-mode-test.el"
+    emacs =
+      Dir[
+        "/usr/local/bin/emacs",
+        "/{My,}Applications/Emacs.app/Contents/MacOS/Emacs" # homebrew
+      ].first || "emacs" # trust the path
 
-    sh(%Q[#{emacs} #{args}]){} # block prevents ruby backtrace on failure
+    cmd = "#{emacs} -Q -l enh-ruby-mode-test.el"
+
+    sh(%Q[#{cmd} #{args}]){} # block prevents ruby backtrace on failure
   end
 
   desc "Run tests for Emacs Lisp"
