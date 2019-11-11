@@ -1162,11 +1162,16 @@ not treated as modifications to the buffer."
       (unless warnings
         (enh-ruby-find-error t)))))
 
-(defun enh-ruby-find-file (FILENAME)
+(defun enh-ruby-find-file (filename)
   "Search for and edit FILENAME. Searching is done with `gem
 which` but works for standard lib as well as gems."
   (interactive "sgem which ")
-  (find-file (substring (shell-command-to-string (concat "gem which " FILENAME)) 0 -1)))
+  (let* ((command (concat "gem which " filename))
+         (output  (shell-command-to-string command))
+         (path    (string-trim-right output)))
+    (if (file-exists-p path)
+        (find-file path)
+      (message "%S found nothing" command))))
 
 (defun enh-ruby-up-sexp (&optional arg)
   "Move up one balanced expression (sexp).
