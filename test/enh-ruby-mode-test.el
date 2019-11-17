@@ -440,15 +440,6 @@
   (erm-wait-for-parse)
   (font-lock-fontify-buffer))
 
-(enh-deftest enh-ruby-toggle-block/both ()
-  (with-temp-enh-rb-string
-   "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
-
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
-
 (enh-deftest enh-ruby-toggle-block/brace ()
   (with-temp-enh-rb-string
    "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
@@ -462,6 +453,39 @@
 
    (enh-ruby-toggle-block-and-wait)
    (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
+
+(enh-deftest enh-ruby-toggle-block/both ()
+  (with-temp-enh-rb-string
+   "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
+
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
+
+(enh-deftest enh-ruby-toggle-block/does-not-trigger-when-point-is-beyond-block ()
+  (with-temp-enh-rb-string
+   "7.times { |i| puts i }\n"
+
+   (search-forward "}")
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "7.times { |i| puts i }\n")))
+
+(enh-deftest enh-ruby-toggle-block/triggers-when-point-is-at-end-of-block ()
+  (with-temp-enh-rb-string
+   "7.times { |i| puts i }\n"
+
+   (search-forward "}")
+   (backward-char)
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "7.times do |i|\n  puts i \nend\n")))
+
+(enh-deftest enh-ruby-toggle-block/with-no-block-in-buffer-does-not-fail ()
+  (with-temp-enh-rb-string
+   "puts \"test\""
+
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "puts \"test\"")))
 
 (enh-deftest enh-ruby-toggle-block/brace-with-inner-hash ()
   (with-temp-enh-rb-string
