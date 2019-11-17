@@ -701,8 +701,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
       (unless (looking-at "\\s *$")
         (insert "\n"))
       (indent-region beg-marker end-marker)
-      (goto-char beg-marker)
-      t)))
+      (goto-char beg-marker))))
 
 (defun enh-ruby-do-end-to-brace (orig end)
   (let (beg-marker end-marker beg-pos end-pos)
@@ -733,28 +732,28 @@ Warning: does not play well with command ‘electric-indent-mode’."
         (just-one-space -1)
         (goto-char end-marker)
         (just-one-space -1))
-      (goto-char beg-marker)
-      t)))
+      (goto-char beg-marker))))
 
 (defun enh-ruby-toggle-block ()
   "Toggle block type from do-end to braces or back.
 The block must begin on the current line or above it and end after the point.
 If the result is do-end block, it will always be multiline."
   (interactive)
-  (let ((start (point)) beg end)
-    (end-of-line)
-    (unless
-        (if (and (re-search-backward "\\(?:[^#]\\)\\({\\)\\|\\(\\_<do\\_>\\)")
-                 (progn
-                   (goto-char (or (match-beginning 1) (match-beginning 2)))
-                   (setq beg (point))
-                   (save-match-data (enh-ruby-forward-sexp))
-                   (setq end (point))
-                   (> end start)))
-            (if (match-beginning 1)
-                (enh-ruby-brace-to-do-end beg end)
-              (enh-ruby-do-end-to-brace beg end)))
-      (goto-char start))))
+  (let* ((pos (point))
+         (block-start (save-excursion
+                        (end-of-line)
+                        (while (and (not (bobp))
+                                    (not (enh-ruby-point-block-p)))
+                          (backward-char))
+                        (point)))
+         (block-end (save-excursion
+                      (goto-char block-start)
+                      (enh-ruby-forward-sexp)
+                      (point))))
+    (if (< pos block-end)
+        (if (eq (char-after block-start) ?{)
+            (enh-ruby-brace-to-do-end block-start block-end)
+          (enh-ruby-do-end-to-brace block-start block-end)))))
 
 (defun enh-ruby-imenu-create-index-in-block (prefix beg end)
   (let* ((index-alist '())
@@ -902,9 +901,18 @@ not treated as modifications to the buffer."
   "Return whether PROP is a continue property."
   (eq 'c prop))
 
+(defun enh-ruby-block-p (prop)
+  "Return whether PROP is a block property."
+  (eq 'd prop))
+
 (defun enh-ruby-point-continue-p (point)
   "Return whether property at POINT is a continue property."
   (enh-ruby-continue-p (get-text-property point 'indent)))
+
+(defun enh-ruby-point-block-p (&optional point)
+  "Return whether property at POINT is a block property."
+  (or point (setq point (point)))
+  (enh-ruby-block-p (get-text-property point 'indent)))
 
 (defun enh-ruby-calculate-indent (&optional start-point)
   "Calculate the indentation of the previous line and its level at START-POINT."
