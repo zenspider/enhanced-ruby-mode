@@ -435,34 +435,40 @@
 
 ;;; enh-ruby-toggle-block
 
-(defun toggle-to-do ()
+(defun enh-ruby-toggle-block-and-wait ()
   (enh-ruby-toggle-block)
-  (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n"))
-
-(defun toggle-to-brace ()
-  (enh-ruby-toggle-block)
-  (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n"))
+  (erm-wait-for-parse)
+  (font-lock-fontify-buffer))
 
 (enh-deftest enh-ruby-toggle-block/both ()
   (with-temp-enh-rb-string
    "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
 
-   (toggle-to-do)
-   (toggle-to-brace)))
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
 
 (enh-deftest enh-ruby-toggle-block/brace ()
-  :expected-result t ; https://github.com/zenspider/enhanced-ruby-mode/issues/132
   (with-temp-enh-rb-string
    "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
 
-   (toggle-to-do)))
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")))
 
 (enh-deftest enh-ruby-toggle-block/do ()
-  :expected-result t ; https://github.com/zenspider/enhanced-ruby-mode/issues/132
   (with-temp-enh-rb-string
    "7.times do |i|\n  puts \"number #{i+1}\"\nend\n"
 
-   (toggle-to-brace)))
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
+
+(enh-deftest enh-ruby-toggle-block/brace-with-inner-hash ()
+  (with-temp-enh-rb-string
+   "let(:dont_let) { { a: 1, b: 2 } }\n"
+
+   (enh-ruby-toggle-block-and-wait)
+   (buffer-should-equal "let(:dont_let) do\n  { a: 1, b: 2 } \nend\n")))
 
 (enh-deftest enh-ruby-paren-mode-if/open ()
   (should-show-parens
