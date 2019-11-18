@@ -19,10 +19,12 @@ def emacs_test args
   emacs "-Q -l enh-ruby-mode-test.el #{args}"
 end
 
+desc "byte compile the project. Helps drive out warnings, but also faster."
 task :compile do
   emacs "--batch -f batch-byte-compile enh-ruby-mode.el"
 end
 
+desc "Clean the project"
 task :clean do
   rm_f Dir["**/*~", "**/*.elc"]
 end
@@ -63,6 +65,7 @@ namespace :test do
   task :all => [:ruby, :elisp]
 end
 
+desc "build on circleci? does this work?"
 task :circleci do
   sh "circleci build"
 end
@@ -71,18 +74,22 @@ def docker cmd
   sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test zenspider/emacs-ruby #{cmd})
 end
 
+desc "test in a docker container"
 task :docker do
   docker "rake test:all"
 end
 
+desc "interactive test in a docker container"
 task :dockeri do
   docker "rake test:elispi"
 end
 
+desc "run a shell in a docker container"
 task :sh do
   docker "/bin/sh"
 end
 
+desc "debug a file (F=path)"
 task :debug do
   f = ENV["F"]
   system "ruby tools/debug.rb #{f}"
