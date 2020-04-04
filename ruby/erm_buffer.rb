@@ -133,7 +133,7 @@ class ErmBuffer
     # c - continue - period followed by return (or other way around?)
 
     INDENT_KW          = [:begin, :def, :case, :module, :class, :do, :for]
-    BACKDENT_KW        = [:elsif, :else, :when, :rescue, :ensure]
+    BACKDENT_KW        = [:elsif, :else, :when, :in, :rescue, :ensure]
     BEGINDENT_KW       = [:if, :unless, :while, :until]
     POSTCOND_KW        = [:if, :unless, :or, :and]
     PRE_OPTIONAL_DO_KW = [:in, :while, :until]
