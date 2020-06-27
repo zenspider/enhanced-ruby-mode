@@ -1,8 +1,9 @@
 task :default => %w[clean test:all compile]
 
 def run cmd
-  sh cmd do
+  sh cmd do |good|
     # block prevents ruby backtrace on failure
+    exit 1 unless good
   end
 end
 
