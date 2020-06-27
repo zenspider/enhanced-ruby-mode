@@ -1,0 +1,39 @@
+name: test
+
+on:
+  push:
+    branches:
+      - master
+      - test
+  pull_request:
+    branches:
+      - master
+      - test
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        emacs_version:
+          - 26.3
+          - snapshot
+    steps:
+      - name: Set up Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: ${{matrix.emacs_version}}
+
+      - name: Check out project
+        uses: actions/checkout@v2
+
+      - name: Ubuntu Hates Ruby
+        run: sudo gem update -N --system 3.0.3
+
+      - name: Version Info
+        run: |
+          ruby -v
+          gem -v
+
+      - name: Test
+        run: rake test:all
