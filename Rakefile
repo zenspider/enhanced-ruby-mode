@@ -66,11 +66,6 @@ namespace :test do
   task :all => [:ruby, :elisp]
 end
 
-desc "build on circleci? does this work?"
-task :circleci do
-  sh "circleci build"
-end
-
 def docker cmd
   sh %(docker run -v $PWD:/erm --rm -i -t -w /erm/test zenspider/emacs-ruby #{cmd})
 end
