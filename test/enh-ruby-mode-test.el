@@ -435,64 +435,66 @@
 
 ;;; enh-ruby-toggle-block
 
+(setq ruby-do-block      "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
+(setq ruby-brace-block/1 "7.times { |i| puts \"number #{i+1}\" }\n")
+(setq ruby-brace-block/3 "7.times { |i|\n  puts \"number #{i+1}\"\n}\n")
+
 (defun enh-ruby-toggle-block-and-wait ()
   (enh-ruby-toggle-block)
   (erm-wait-for-parse)
   (font-lock-fontify-buffer))
 
-(enh-deftest enh-ruby-toggle-block/brace ()
-  (with-temp-enh-rb-string
-   "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
+(defun toggle-to-do ()
+  (enh-ruby-toggle-block-and-wait)
+  (buffer-should-equal ruby-do-block))
 
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")))
-
-(enh-deftest enh-ruby-toggle-block/do ()
-  (with-temp-enh-rb-string
-   "7.times do |i|\n  puts \"number #{i+1}\"\nend\n"
-
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
+(defun toggle-to-brace ()
+  (enh-ruby-toggle-block-and-wait)
+  (buffer-should-equal ruby-brace-block/1))
 
 (enh-deftest enh-ruby-toggle-block/both ()
-  (with-temp-enh-rb-string
-   "7.times { |i|\n  puts \"number #{i+1}\"\n}\n"
+  (with-temp-enh-rb-string ruby-brace-block/3
+    (toggle-to-do)
+    (toggle-to-brace)))
 
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "7.times { |i| puts \"number #{i+1}\" }\n")))
+(enh-deftest enh-ruby-toggle-block/brace ()
+  (with-temp-enh-rb-string ruby-brace-block/3
+    (toggle-to-do)))
+
+(enh-deftest enh-ruby-toggle-block/do ()
+  (with-temp-enh-rb-string ruby-do-block
+    (toggle-to-brace)))
+
+(setq ruby-brace-block/puts "7.times { |i| puts i }\n")
+(setq ruby-do-block/puts    "7.times do |i|\n  puts i \nend\n")
 
 (enh-deftest enh-ruby-toggle-block/does-not-trigger-when-point-is-beyond-block ()
-  (with-temp-enh-rb-string
-   "7.times { |i| puts i }\n"
-
-   (search-forward "}")
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "7.times { |i| puts i }\n")))
+  (with-temp-enh-rb-string ruby-brace-block/puts
+    (search-forward "}")
+    (enh-ruby-toggle-block-and-wait)
+    (buffer-should-equal ruby-brace-block/puts)))
 
 (enh-deftest enh-ruby-toggle-block/triggers-when-point-is-at-end-of-block ()
-  (with-temp-enh-rb-string
-   "7.times { |i| puts i }\n"
+  (with-temp-enh-rb-string ruby-brace-block/puts
+    (search-forward "}")
+    (backward-char)
+    (enh-ruby-toggle-block-and-wait)
+    (buffer-should-equal ruby-do-block/puts)))
 
-   (search-forward "}")
-   (backward-char)
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "7.times do |i|\n  puts i \nend\n")))
+(setq ruby-puts "puts \"test\"")
 
 (enh-deftest enh-ruby-toggle-block/with-no-block-in-buffer-does-not-fail ()
-  (with-temp-enh-rb-string
-   "puts \"test\""
+  (with-temp-enh-rb-string ruby-puts
+    (enh-ruby-toggle-block-and-wait)
+    (buffer-should-equal ruby-puts)))
 
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "puts \"test\"")))
+(setq ruby-brace/let "let(:dont_let) { { a: 1, b: 2 } }\n")
+(setq ruby-do/let    "let(:dont_let) do\n  { a: 1, b: 2 } \nend\n")
 
 (enh-deftest enh-ruby-toggle-block/brace-with-inner-hash ()
-  (with-temp-enh-rb-string
-   "let(:dont_let) { { a: 1, b: 2 } }\n"
-
-   (enh-ruby-toggle-block-and-wait)
-   (buffer-should-equal "let(:dont_let) do\n  { a: 1, b: 2 } \nend\n")))
+  (with-temp-enh-rb-string ruby-brace/let
+    (enh-ruby-toggle-block-and-wait)
+    (buffer-should-equal ruby-do/let)))
 
 (enh-deftest enh-ruby-paren-mode-if/open ()
   (should-show-parens
