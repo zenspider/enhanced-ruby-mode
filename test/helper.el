@@ -23,6 +23,7 @@
      (font-lock-fontify-buffer)
      (goto-char (point-min))
      (progn ,@body)))
+(put 'with-temp-enh-rb-string 'lisp-indent-function 1)
 
 (defmacro with-temp-ruby-string (str &rest body)
   `(with-temp-buffer
