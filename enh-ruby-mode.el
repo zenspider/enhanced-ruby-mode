@@ -820,7 +820,9 @@ not treated as modifications to the buffer."
            (not (eq erm-parse-buff (current-buffer))))
       (erm-reparse-diff-buf)
     (setq erm-full-parse-p t)
-    (erm-req-parse nil nil nil)))
+    (condition-case nil
+        (erm-req-parse nil nil nil)
+      (error nil))))
 
 (defun erm-reparse-diff-buf ()
   (setq erm-reparse-list (cons (current-buffer) erm-reparse-list)))
