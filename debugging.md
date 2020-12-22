@@ -7,6 +7,10 @@ These are notes to myself because I don't work on this project much.
 Make sure that everything else is currently good before you go
 debugging new issues.
 
+```
+rm *.elc; cmacs -Q -l loader.el  wtf.rb
+```
+
 ## 1. First, get a reproduction in a file named bug###.rb.
 
 This helps you track back to a github issue (create one if necessary).
@@ -215,3 +219,93 @@ to
 ```
 
 (with 2 extra tests) made the tests pass and things seem happier.
+
+# Profiling
+
+misc dump for now:
+
+https://github.com/zenspider/enhanced-ruby-mode/issues/171
+
+```elisp
+(with-current-buffer "big_file.rb"
+  (profiler-start 'cpu)
+  (--dotimes 10 (self-insert-command 1 ?s))
+  (profiler-report)
+  (profiler-stop))
+```
+
+https://github.com/zenspider/enhanced-ruby-mode/issues/146
+
+profiling electric-indent-mode vs not:
+
+```elisp
+(with-current-buffer "ruby25_parser.rb"
+  (goto-char (point-max))
+  (electric-indent-mode (if electric-indent-mode -1 1))
+
+  (profiler-start 'cpu)
+  (--dotimes 10 (call-interactively 'newline))
+  (profiler-report)
+  (profiler-stop))
+```
+
+versus electric-indent-mode under text-mode:
+
+```elisp
+(with-current-buffer "ruby25_parser.rb"
+  (goto-char (point-max))
+  (text-mode)
+  (setq start (float-time))
+  (electric-indent-mode (if electric-indent-mode -1 1))
+  (enh-ruby-mode)
+  (erm-wait-for-parse)
+  (message "%f" (- (float-time) start)))
+```
+
+for testing N large operations across a file/buffer
+```elisp
+(progn
+  (profiler-start 'cpu)
+  (--dotimes 20
+    (message "attempt %d" it)
+    (let ((buf (find-file "lib/ruby27_parser.rb")))
+      (with-current-buffer buf
+        (enh-ruby-mode)
+        ;; (erm-wait-for-parse)
+
+        (goto-char (point-max))
+
+        (--dotimes 10 (call-interactively 'newline))
+
+        (erm-wait-for-parse)
+
+        (set-buffer-modified-p nil)
+        (kill-buffer buf))))
+  (profiler-report)
+  (profiler-stop))
+```
+
+for profiling N operations on an open buffer and reverting any changes made:
+```elisp
+(with-current-buffer "ruby25_parser.rb"
+  (goto-char (point-max))
+
+  ;; (electric-indent-mode (if electric-indent-mode -1 1))
+  (electric-indent-mode -1)
+  ;; (electric-indent-mode 1)
+
+  ;; (erm-wait-for-parse)
+  ;; (message "starting")
+  (profiler-start 'cpu)
+
+  (--dotimes 10 (call-interactively 'newline))
+  ;; (erm-wait-for-parse)
+
+  (profiler-report)
+  (profiler-stop)
+
+  (with-current-buffer "ruby25_parser.rb"
+    (erm-wait-for-parse)
+    (revert-buffer nil t))
+  )
+```
