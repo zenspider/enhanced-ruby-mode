@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 (eval-and-compile
   (add-to-list 'load-path default-directory))
 (require 'helper)

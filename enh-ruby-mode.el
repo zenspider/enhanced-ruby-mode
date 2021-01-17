@@ -1,4 +1,4 @@
-;;; enh-ruby-mode.el --- Major mode for editing Ruby files
+;;; enh-ruby-mode.el --- Major mode for editing Ruby files -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2012 -- Ryan Davis
 ;; Copyright (C) 2010, 2011, 2012
@@ -751,7 +751,7 @@ If the result is do-end block, it will always be multiline."
             (enh-ruby-brace-to-do-end block-start block-end)
           (enh-ruby-do-end-to-brace block-start block-end)))))
 
-(defun enh-ruby-imenu-create-index-in-block (prefix beg end)
+(defun enh-ruby-imenu-create-index-in-block (beg end)
   (let* ((index-alist '())
          (pos beg)
          (prop (get-text-property pos 'indent)))
@@ -767,7 +767,7 @@ If the result is do-end block, it will always be multiline."
     index-alist))
 
 (defun enh-ruby-imenu-create-index ()
-  (nreverse (enh-ruby-imenu-create-index-in-block nil (point-min) nil)))
+  (nreverse (enh-ruby-imenu-create-index-in-block (point-min) nil)))
 
 (defun enh-ruby-add-log-current-method ()
   "Return current method string."
@@ -781,8 +781,7 @@ If the result is do-end block, it will always be multiline."
                 (progn
                   (enh-ruby-up-sexp)
                   (when (looking-at enh-ruby-defun-and-name-re)
-                    (let ((mod-or-class (match-string-no-properties 1))
-                          (mod-name   (match-string-no-properties 2)))
+                    (let ((mod-name (match-string-no-properties 2)))
                       (let* ((meth-name-re (concat
                                             (regexp-opt (list "self" mod-name)
                                                         'words)
@@ -870,7 +869,7 @@ not treated as modifications to the buffer."
   (while erm-parsing-p
     (accept-process-output (erm-ruby-get-process) 0.5)))
 
-(defun erm-filter (proc response)
+(defun erm-filter (_proc response)
   (setq erm-response (concat erm-response response))
   (when (and (> (length erm-response) 5)
              (string= erm-process-delimiter (substring erm-response -5 nil)))
@@ -1152,9 +1151,7 @@ not treated as modifications to the buffer."
 (defun enh-ruby-find-error (&optional warnings)
   "Search back, then forward for a syntax error/warning. Display contents in mini-buffer. Optional WARNINGS will highlight warnings instead of errors. (I think)."
   (interactive "^P")
-  (let (overlays
-        overlay
-        (face (if warnings 'erm-syn-warnline 'erm-syn-errline))
+  (let ((face (if warnings 'erm-syn-warnline 'erm-syn-errline))
         messages
         (pos (point)))
     (unless (eq last-command #'enh-ruby-find-error)
@@ -1206,8 +1203,7 @@ With ARG, do it that many times."
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
-  (let ((cont t)
-        prop)
+  (let (prop)
     (goto-char
      (save-excursion
        (while (>= (setq arg (1- arg)) 0)
@@ -1232,10 +1228,8 @@ With ARG, do it that many times."
   (enh-ruby-backward-sexp 1)
   (forward-line 0))
 
-(defun enh-ruby-indent-exp (&optional shutup-p)
-  "Indent each line in the balanced expression following point syntactically.
-If optional SHUTUP-P is non-nil, no errors are signalled if no
-balanced expression is found."
+(defun enh-ruby-indent-exp ()
+  "Indent each line in the balanced expression following point syntactically."
   (interactive "*P")
   (erm-wait-for-parse)
   (let ((end-pos (save-excursion (enh-ruby-forward-sexp 1) (point))))
@@ -1246,8 +1240,7 @@ balanced expression is found."
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
-  (let ((cont t)
-        prop
+  (let (prop
         pos)
     (goto-char
      (save-excursion
@@ -1266,8 +1259,7 @@ With ARG, do it that many times."
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
-  (let ((cont t)
-        prop)
+  (let (prop)
     (while (>= (setq arg (1- arg)) 0)
          (while (and
                  (< (point) (point-max))
@@ -1285,8 +1277,7 @@ With ARG, do it that many times."
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
-  (let ((cont t)
-        prop
+  (let (prop
         pos)
     (goto-char
      (save-excursion
