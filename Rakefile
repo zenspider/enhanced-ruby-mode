@@ -1,5 +1,7 @@
 task :default => %w[clean test:all compile]
 
+el_files = Rake::FileList['**/*.el']
+
 def run cmd
   sh cmd do |good|
     # block prevents ruby backtrace on failure
@@ -21,8 +23,10 @@ def emacs_test args
 end
 
 desc "byte compile the project. Helps drive out warnings, but also faster."
-task :compile do
-  emacs "--batch -f batch-byte-compile enh-ruby-mode.el"
+task compile: el_files.ext('.elc')
+
+rule '.elc' => '.el' do |t|
+  emacs "--batch -f batch-byte-compile #{t.source}"
 end
 
 desc "Clean the project"

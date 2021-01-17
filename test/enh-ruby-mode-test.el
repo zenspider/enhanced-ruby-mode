@@ -1,5 +1,6 @@
-(load-file "helper.el")
-(load-file "../enh-ruby-mode.el")
+(eval-and-compile
+  (add-to-list 'load-path default-directory))
+(require 'helper)
 
 (local-set-key (kbd "C-c C-r")
                (lambda ()
@@ -126,11 +127,11 @@
     (string-should-indent "c = {\na: a,\nb: b\n}\n"
                           "c = {\n  a: a,\n  b: b\n}\n")))
 
-(setq input/indent-hash/trail "\nc = {a: a,\nb: b,\n c: c\n}")
-(setq input/indent-hash/hang  "\nc = {\na: a,\nb: b,\n c: c\n}")
-(setq exp/indent-hash/hang    "\nc = {\n  a: a,\n  b: b,\n  c: c\n}")
-(setq exp/indent-hash/trail   "\nc = {a: a,\n     b: b,\n     c: c\n    }")
-(setq exp/indent-hash/trail/8 "\nc = {a: a,\n             b: b,\n             c: c\n    }")
+(defconst input/indent-hash/trail "\nc = {a: a,\nb: b,\n c: c\n}")
+(defconst input/indent-hash/hang  "\nc = {\na: a,\nb: b,\n c: c\n}")
+(defconst exp/indent-hash/hang    "\nc = {\n  a: a,\n  b: b,\n  c: c\n}")
+(defconst exp/indent-hash/trail   "\nc = {a: a,\n     b: b,\n     c: c\n    }")
+(defconst exp/indent-hash/trail/8 "\nc = {a: a,\n             b: b,\n             c: c\n    }")
 
 (defmacro with-bounce-and-hang (bounce indent1 indent2 &rest body)
   `(let ((enh-ruby-bounce-deep-indent              ,bounce)
@@ -290,8 +291,8 @@
 (enh-deftest enh-ruby-indent-leading-dots/ruby ()
   (string-should-indent-like-ruby "d.e\n.f\n"))
 
-(setq leading-dot-input  "\na\n.b\n.c(\nd,\ne\n)\n.f\n")
-(setq trailing-dot-input "\na.\nb.\nc(\nd,\ne\n).\nf\n")
+(defconst leading-dot-input  "\na\n.b\n.c(\nd,\ne\n)\n.f\n")
+(defconst trailing-dot-input "\na.\nb.\nc(\nd,\ne\n).\nf\n")
 
 (enh-deftest enh-ruby-indent-leading-dots-with-arguments-and-newlines ()
   (string-should-indent leading-dot-input
@@ -435,14 +436,14 @@
 
 ;;; enh-ruby-toggle-block
 
-(setq ruby-do-block      "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
-(setq ruby-brace-block/1 "7.times { |i| puts \"number #{i+1}\" }\n")
-(setq ruby-brace-block/3 "7.times { |i|\n  puts \"number #{i+1}\"\n}\n")
+(defconst ruby-do-block      "7.times do |i|\n  puts \"number #{i+1}\"\nend\n")
+(defconst ruby-brace-block/1 "7.times { |i| puts \"number #{i+1}\" }\n")
+(defconst ruby-brace-block/3 "7.times { |i|\n  puts \"number #{i+1}\"\n}\n")
 
 (defun enh-ruby-toggle-block-and-wait ()
   (enh-ruby-toggle-block)
   (erm-wait-for-parse)
-  (font-lock-fontify-buffer))
+  (font-lock-ensure))
 
 (defun toggle-to-do ()
   (enh-ruby-toggle-block-and-wait)
@@ -465,8 +466,8 @@
   (with-temp-enh-rb-string ruby-do-block
     (toggle-to-brace)))
 
-(setq ruby-brace-block/puts "7.times { |i| puts i }\n")
-(setq ruby-do-block/puts    "7.times do |i|\n  puts i \nend\n")
+(defconst ruby-brace-block/puts "7.times { |i| puts i }\n")
+(defconst ruby-do-block/puts    "7.times do |i|\n  puts i \nend\n")
 
 (enh-deftest enh-ruby-toggle-block/does-not-trigger-when-point-is-beyond-block ()
   (with-temp-enh-rb-string ruby-brace-block/puts
@@ -481,15 +482,15 @@
     (enh-ruby-toggle-block-and-wait)
     (buffer-should-equal ruby-do-block/puts)))
 
-(setq ruby-puts "puts \"test\"")
+(defconst ruby-puts "puts \"test\"")
 
 (enh-deftest enh-ruby-toggle-block/with-no-block-in-buffer-does-not-fail ()
   (with-temp-enh-rb-string ruby-puts
     (enh-ruby-toggle-block-and-wait)
     (buffer-should-equal ruby-puts)))
 
-(setq ruby-brace/let "let(:dont_let) { { a: 1, b: 2 } }\n")
-(setq ruby-do/let    "let(:dont_let) do\n  { a: 1, b: 2 } \nend\n")
+(defconst ruby-brace/let "let(:dont_let) { { a: 1, b: 2 } }\n")
+(defconst ruby-do/let    "let(:dont_let) do\n  { a: 1, b: 2 } \nend\n")
 
 (enh-deftest enh-ruby-toggle-block/brace-with-inner-hash ()
   (with-temp-enh-rb-string ruby-brace/let
