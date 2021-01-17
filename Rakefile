@@ -13,11 +13,11 @@ def emacs args
     "/{My,}Applications/Emacs.app/Contents/MacOS/Emacs" # homebrew
   ].first || "emacs" # trust the path
 
-  run %Q[#{emacs_cmd} #{args}]
+  run %Q[#{emacs_cmd} -Q #{args}]
 end
 
 def emacs_test args
-  emacs "-Q -l enh-ruby-mode-test.el #{args}"
+  emacs "-l enh-ruby-mode-test.el #{args}"
 end
 
 desc "byte compile the project. Helps drive out warnings, but also faster."
