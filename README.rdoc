@@ -28,7 +28,7 @@ Syntax checking is also performed.
 
    (add-to-list 'load-path "(path-to)/Enhanced-Ruby-Mode") ; must be added after any path containing old ruby-mode
    (autoload 'enh-ruby-mode "enh-ruby-mode" "Major mode for ruby files" t)
-   (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+   (add-to-list 'auto-mode-alist '("\\.rb\\'" . enh-ruby-mode))
    (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 
    ;; optional
@@ -52,7 +52,7 @@ For these to work with enh-ruby-mode, you need to add hooks to the enh-ruby-mode
 == Load enh-ruby-mode for Ruby files
 
 To use enh-ruby-mode for <tt>.rb</tt> add the following to your init file:
-    (add-to-list 'auto-mode-alist '("\\.rb$" . enh-ruby-mode))
+    (add-to-list 'auto-mode-alist '("\\.rb\\'" . enh-ruby-mode))
 
 To use enh-ruby-mode for all common Ruby files and the following to your init file:
     (add-to-list 'auto-mode-alist
