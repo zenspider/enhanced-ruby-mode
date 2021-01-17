@@ -29,7 +29,7 @@
 
 ;;; Commentary:
 
-;; This is a fork of http://http://github.com/jacott/Enhanced-Ruby-Mode
+;; This is a fork of https://github.com/jacott/Enhanced-Ruby-Mode
 ;; to provide further enhancements and bug fixes.
 ;;
 ;; It has been renamed to enh-ruby-mode.el to avoid name conflicts
