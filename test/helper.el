@@ -1,11 +1,14 @@
 (require 'ert)
 (require 'ert-x)
 (require 'paren)                        ; for show-paren tests & helper
+(eval-and-compile
+  (add-to-list 'load-path (file-name-directory (directory-file-name default-directory))))
+(require 'enh-ruby-mode)
 
 ;; I hate this so much... Shuts up "Indenting region..." output
 (defun make-progress-reporter (&rest ignored) nil)
 
-(setq enh-tests '())
+(defvar enh-tests '())
 
 ;; turns out I had a duplicate test and it was driving me crazy. This is my fix.
 (defmacro enh-deftest (name &rest rest)
@@ -20,7 +23,7 @@
      (insert ,str)
      (enh-ruby-mode)
      (erm-wait-for-parse)
-     (font-lock-fontify-buffer)
+     (font-lock-ensure)
      (goto-char (point-min))
      (progn ,@body)))
 (put 'with-temp-enh-rb-string 'lisp-indent-function 1)
@@ -29,7 +32,7 @@
   `(with-temp-buffer
      (insert ,str)
      (ruby-mode)
-     (font-lock-fontify-buffer)
+     (font-lock-ensure)
      (goto-char (point-min))
      (progn ,@body)))
 
@@ -104,3 +107,5 @@ no erm highlighting (i.e. delgate to normal paren-mode)"
         (equal
          (erm-show-paren-data-function)
          (if tags (append tags `(,mismatch)) nil)))))))
+
+(provide 'helper)
