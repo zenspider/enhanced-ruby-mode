@@ -107,7 +107,7 @@
   "*Deep indent lists in parenthesis when non-nil."
   ;; FIX: this applies to square brackets as well
   :type 'boolean
-  :safe  'booleanp
+  :safe  #'booleanp
   :group 'enh-ruby)
 
 (defcustom enh-ruby-encoding-map
@@ -262,26 +262,26 @@ Warning: does not play well with command ‘electric-indent-mode’."
   "Abbrev table used by enhanced-ruby-mode.")
 
 (define-abbrev enh-ruby-mode-abbrev-table "end" "end"
-  'indent-for-tab-command :system t)
+  #'indent-for-tab-command :system t)
 
 (defvar enh-ruby-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "{"             'enh-ruby-electric-brace)
-    (define-key map "}"             'enh-ruby-electric-brace)
-    (define-key map (kbd "M-C-a")   'enh-ruby-beginning-of-defun)
-    (define-key map (kbd "M-C-e")   'enh-ruby-end-of-defun)
-    (define-key map (kbd "M-C-b")   'enh-ruby-backward-sexp)
-    (define-key map (kbd "M-C-f")   'enh-ruby-forward-sexp)
-    (define-key map (kbd "M-C-p")   'enh-ruby-beginning-of-block)
-    (define-key map (kbd "M-C-n")   'enh-ruby-end-of-block)
-    (define-key map (kbd "M-C-h")   'enh-ruby-mark-defun)
-    (define-key map (kbd "M-C-q")   'enh-ruby-indent-exp)
-    (define-key map (kbd "C-c C-f") 'enh-ruby-find-file)
-    (define-key map (kbd "C-c C-e") 'enh-ruby-find-error)
-    (define-key map (kbd "C-c /")   'enh-ruby-insert-end)
-    (define-key map (kbd "C-c {")   'enh-ruby-toggle-block)
-    (define-key map (kbd "M-C-u")   'enh-ruby-up-sexp)
-    (define-key map (kbd "C-j")     'reindent-then-newline-and-indent)
+    (define-key map "{"             #'enh-ruby-electric-brace)
+    (define-key map "}"             #'enh-ruby-electric-brace)
+    (define-key map (kbd "M-C-a")   #'enh-ruby-beginning-of-defun)
+    (define-key map (kbd "M-C-e")   #'enh-ruby-end-of-defun)
+    (define-key map (kbd "M-C-b")   #'enh-ruby-backward-sexp)
+    (define-key map (kbd "M-C-f")   #'enh-ruby-forward-sexp)
+    (define-key map (kbd "M-C-p")   #'enh-ruby-beginning-of-block)
+    (define-key map (kbd "M-C-n")   #'enh-ruby-end-of-block)
+    (define-key map (kbd "M-C-h")   #'enh-ruby-mark-defun)
+    (define-key map (kbd "M-C-q")   #'enh-ruby-indent-exp)
+    (define-key map (kbd "C-c C-f") #'enh-ruby-find-file)
+    (define-key map (kbd "C-c C-e") #'enh-ruby-find-error)
+    (define-key map (kbd "C-c /")   #'enh-ruby-insert-end)
+    (define-key map (kbd "C-c {")   #'enh-ruby-toggle-block)
+    (define-key map (kbd "M-C-u")   #'enh-ruby-up-sexp)
+    (define-key map (kbd "C-j")     #'reindent-then-newline-and-indent)
     map)
   "Syntax table in use in ‘enh-ruby-mode’ buffers.")
 
@@ -443,16 +443,16 @@ Warning: does not play well with command ‘electric-indent-mode’."
   (setq-local erm-buff-num                 nil)
   (setq-local erm-e-w-status               nil)
   (setq-local erm-full-parse-p             nil)
-  (setq-local indent-line-function         'enh-ruby-indent-line)
-  ;; (setq-local forward-sexp-function        'enh-ruby-forward-sexp)
+  (setq-local indent-line-function         #'enh-ruby-indent-line)
+  ;; (setq-local forward-sexp-function        #'enh-ruby-forward-sexp)
   (setq-local need-syntax-check-p          nil)
   (setq-local paragraph-ignore-fill-prefix t)
   (setq-local parse-sexp-ignore-comments   t)
   (setq-local parse-sexp-lookup-properties t)
   (setq-local require-final-newline        mode-require-final-newline)
-  (setq-local beginning-of-defun-function  'enh-ruby-beginning-of-defun)
-  (setq-local end-of-defun-function        'enh-ruby-end-of-defun)
-  (setq-local show-paren-data-function     'erm-show-paren-data-function)
+  (setq-local beginning-of-defun-function  #'enh-ruby-beginning-of-defun)
+  (setq-local end-of-defun-function        #'enh-ruby-end-of-defun)
+  (setq-local show-paren-data-function     #'erm-show-paren-data-function)
   (setq-local paragraph-start              (concat "$\\|" page-delimiter))
   (setq-local paragraph-separate           paragraph-start)
 
@@ -462,13 +462,13 @@ Warning: does not play well with command ‘electric-indent-mode’."
   (setq-local font-lock-keywords    enh-ruby-font-lock-keywords)
   (setq font-lock-defaults          '((enh-ruby-font-lock-keywords) t))
   (setq indent-tabs-mode            enh-ruby-indent-tabs-mode)
-  (setq imenu-create-index-function 'enh-ruby-imenu-create-index)
+  (setq imenu-create-index-function #'enh-ruby-imenu-create-index)
 
   (if enh-ruby-add-encoding-comment-on-save
-    (add-hook 'before-save-hook 'enh-ruby-mode-set-encoding nil t))
+    (add-hook 'before-save-hook #'enh-ruby-mode-set-encoding nil t))
 
-  (add-hook 'change-major-mode-hook 'erm-major-mode-changed     nil t)
-  (add-hook 'kill-buffer-hook       'erm-buffer-killed          nil t)
+  (add-hook 'change-major-mode-hook #'erm-major-mode-changed     nil t)
+  (add-hook 'kill-buffer-hook       #'erm-buffer-killed          nil t)
 
   (abbrev-mode)
   (erm-reset-buffer))
@@ -519,7 +519,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
    "Face used for marking warning lines."
    :group 'enh-ruby))
 
-(add-hook 'enh-ruby-mode-hook 'erm-define-faces)
+(add-hook 'enh-ruby-mode-hook #'erm-define-faces)
 
 ;;; Support Functions:
 
@@ -580,12 +580,12 @@ Warning: does not play well with command ‘electric-indent-mode’."
                            enh-ruby-program (concat (erm-source-dir)
                                                     "ruby/erm.rb")))
       (set-process-coding-system erm-ruby-process 'utf-8 'utf-8)
-      (set-process-filter erm-ruby-process 'erm-filter)
+      (set-process-filter erm-ruby-process #'erm-filter)
       (set-process-query-on-exit-flag erm-ruby-process nil)
       (process-send-string
        erm-ruby-process
        (concat "x0:"
-               (mapconcat 'identity (default-value 'enh-ruby-extra-keywords) " ")
+               (mapconcat #'identity (default-value 'enh-ruby-extra-keywords) " ")
                ":"
                erm-process-delimiter))))
 
@@ -633,14 +633,14 @@ Warning: does not play well with command ‘electric-indent-mode’."
         (erm-reset-buffer)))))
 
 (defun erm-major-mode-changed ()
-  (remove-hook 'kill-buffer-hook 'erm-buffer-killed t)
+  (remove-hook 'kill-buffer-hook #'erm-buffer-killed t)
   (erm-buffer-killed))
 
 (defun erm-proc-string (prefix)
   (concat prefix (number-to-string erm-buff-num) ":" erm-process-delimiter))
 
 (defun erm-buffer-killed ()
-  (remove-hook 'kill-buffer-hook 'erm-buffer-killed t)
+  (remove-hook 'kill-buffer-hook #'erm-buffer-killed t)
   (catch 'interrupted
    (process-send-string (erm-ruby-get-process) (erm-proc-string "k"))))
 
@@ -658,7 +658,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
       (process-send-string (erm-ruby-get-process)
                            (concat "x"
                                    (number-to-string erm-buff-num) ":"
-                                   (mapconcat 'identity enh-ruby-extra-keywords " ")
+                                   (mapconcat #'identity enh-ruby-extra-keywords " ")
                                    ":" erm-process-delimiter))
       (enh-ruby-fontify-buffer)
       t))
@@ -1146,7 +1146,7 @@ not treated as modifications to the buffer."
         (setq messages (cons (overlay-get overlay 'help-echo) messages)))
       (setq overlays (cdr overlays)))
 
-    (message "%s" (mapconcat 'identity messages "\n"))
+    (message "%s" (mapconcat #'identity messages "\n"))
     messages))
 
 (defun enh-ruby-find-error (&optional warnings)
@@ -1157,7 +1157,7 @@ not treated as modifications to the buffer."
         (face (if warnings 'erm-syn-warnline 'erm-syn-errline))
         messages
         (pos (point)))
-    (unless (eq last-command 'enh-ruby-find-error)
+    (unless (eq last-command #'enh-ruby-find-error)
       (while (and (not messages) (> pos (point-min)))
         (setq messages (enh-ruby-show-errors-at (setq pos (previous-overlay-change pos)) face))))
 
@@ -1637,7 +1637,7 @@ Used for inserting file-local-variables and sending in bug reports."
   "Return all changed defcustom varibles that match PATTERN.
 Used for inserting file-local-variables and sending in bug reports."
   (seq-remove
-   'enh-ruby--variable-standard-p
+   #'enh-ruby--variable-standard-p
    (enh-ruby--all-vars-with pattern)))
 
 (defun enh-ruby--variable-values (vars)
