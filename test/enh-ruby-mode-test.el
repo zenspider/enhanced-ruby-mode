@@ -1,6 +1,6 @@
 (eval-and-compile
   (add-to-list 'load-path default-directory))
-(require 'helper)
+(load "helper")
 
 (local-set-key (kbd "C-c C-r")
                (lambda ()

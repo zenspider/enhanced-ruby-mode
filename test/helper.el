@@ -107,5 +107,3 @@ no erm highlighting (i.e. delgate to normal paren-mode)"
         (equal
          (erm-show-paren-data-function)
          (if tags (append tags `(,mismatch)) nil)))))))
-
-(provide 'helper)
