@@ -6,6 +6,7 @@
                (lambda ()
                  (interactive)
                  (require 'ert)
+                 (setq enh-tests nil)
                  (ert-delete-all-tests)
                  (load-file "../enh-ruby-mode.el")
                  (eval-buffer)
