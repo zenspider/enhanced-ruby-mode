@@ -15,7 +15,7 @@ def emacs args
     "/{My,}Applications/Emacs.app/Contents/MacOS/Emacs" # homebrew
   ].first || "emacs" # trust the path
 
-  run %Q[#{emacs_cmd} -Q #{args}]
+  run %Q[#{emacs_cmd} -Q -L . #{args}]
 end
 
 def emacs_test args
