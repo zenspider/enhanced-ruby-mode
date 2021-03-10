@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 (require 'ert)
 (require 'ert-x)
 (require 'paren)                        ; for show-paren tests & helper
