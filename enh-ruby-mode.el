@@ -241,7 +241,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
 (defconst enh-ruby-symbol-re (concat "[" enh-ruby-symbol-chars "]"))
 
 (defconst enh-ruby-defun-beg-keywords
-  '("class" "module" "def")
+  '("class" "module" "def" "define_method")
   "Keywords at the beginning of definitions.")
 
 (defconst enh-ruby-defun-beg-re
