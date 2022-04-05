@@ -147,6 +147,23 @@ p a
 })
   end
 
+  def test_endless_def
+    assert_parse(%q{
+«@b»«10»def«0» «10»self«0».«9»m«0» «@e»«12»=«0» ident
+
+«@b»«10»def«0» «9»m«0» «@e»«12»=«0» ident
+
+«@b»«10»def«0» «9»m«@l»«0»(a«@r») «@e»«12»=«0» ident
+
+«@b»«10»def«0» «9»m«@l»«0»(«12»*«0»a, «12»**«0»k, «12»&«0»b«@r») «@e»«12»=«0» ident
+
+«@b»«10»def«0» «9»m«@l»«0»(«12»...«@r»«0») «@e»«12»=«0» ident
+
+«@b»«10»def«0» «9»m«0» «@e»«12»=«0»
+«@c»  ident
+})
+  end
+
   def test_heredoc_followed_by_if_arg
     assert_parse(%q{
 «0»bob«@l»(«11»<<-END«0», «@b»«10»if«0» a

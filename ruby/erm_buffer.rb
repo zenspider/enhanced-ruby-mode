@@ -49,6 +49,8 @@ class ErmBuffer
         case parser.mode
         when :predef, :expdef then
           # do nothing
+        when :def
+          parser.mode = :postdef
         else
           parser.mode = nil
         end
@@ -514,9 +516,11 @@ class ErmBuffer
     end
 
     def on_lparen tok
+      debug_on tok
       newmode = case mode
                 when :def then
                   self.mode = nil
+                  :def
                 when :predef then
                   self.mode = :expdef
                   :predef
@@ -558,6 +562,9 @@ class ErmBuffer
             when :def, :predef then
               add :ident, tok
             else
+              if mode == :postdef && tok == '='
+                indent :e
+              end
               add :op, tok, tok.size, false, :cont
             end
           end
