@@ -112,6 +112,21 @@
   (string-should-indent-like-ruby
    ":a\nb\n.c"))
 
+(enh-deftest enh-ruby-indent-def-endless ()
+  (with-deep-indent nil
+   (string-should-indent "class Foo\ndef foo = z\ndef bar = y\nend\n"
+                         "class Foo\n  def foo = z\n  def bar = y\nend\n")))
+
+(enh-deftest enh-ruby-indent-def-endless/params ()
+  (with-deep-indent nil
+   (string-should-indent "class Foo\ndef foo(a) = z\ndef bar = y\nend\n"
+                         "class Foo\n  def foo(a) = z\n  def bar = y\nend\n")))
+
+(enh-deftest enh-ruby-indent-def-endless/args-forward ()
+  (with-deep-indent nil
+   (string-should-indent "class Foo\ndef foo(...) = z\ndef bar = y\nend\n"
+                         "class Foo\n  def foo(...) = z\n  def bar = y\nend\n")))
+
 (enh-deftest enh-ruby-indent-def-after-private ()
   (with-deep-indent nil
    (string-should-indent "class Foo\nprivate def foo\nx\nend\nend\n"
