@@ -293,10 +293,10 @@ Warning: does not play well with command ‘electric-indent-mode’."
     (modify-syntax-entry ?#  "<"  table)
     (modify-syntax-entry ?\n ">"  table)
     (modify-syntax-entry ?\\ "\\" table)
-    (modify-syntax-entry ?$  "."  table)
+    (modify-syntax-entry ?$  "'"  table)
     (modify-syntax-entry ??  "_"  table)
     (modify-syntax-entry ?_  "_"  table)
-    (modify-syntax-entry ?:  "_"  table)
+    (modify-syntax-entry ?:  "'"  table)
     (modify-syntax-entry ?<  "."  table)
     (modify-syntax-entry ?>  "."  table)
     (modify-syntax-entry ?&  "."  table)
@@ -314,10 +314,6 @@ Warning: does not play well with command ‘electric-indent-mode’."
     (modify-syntax-entry ?\} "){" table)
     (modify-syntax-entry ?\[ "(]" table)
     (modify-syntax-entry ?\] ")[" table)
-
-    ;; https://github.com/zenspider/enhanced-ruby-mode/issues/182
-    (modify-syntax-entry ?$  "'"  table)
-    (modify-syntax-entry ?:  "'"  table)
     (modify-syntax-entry ?@  "'"  table)
 
     table)
