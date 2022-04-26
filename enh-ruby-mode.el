@@ -314,6 +314,12 @@ Warning: does not play well with command ‘electric-indent-mode’."
     (modify-syntax-entry ?\} "){" table)
     (modify-syntax-entry ?\[ "(]" table)
     (modify-syntax-entry ?\] ")[" table)
+
+    ;; https://github.com/zenspider/enhanced-ruby-mode/issues/182
+    (modify-syntax-entry ?$  "'"  table)
+    (modify-syntax-entry ?:  "'"  table)
+    (modify-syntax-entry ?@  "'"  table)
+
     table)
   "Syntax table used by ‘enh-ruby-mode’ buffers.")
 
