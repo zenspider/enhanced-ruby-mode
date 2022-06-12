@@ -84,7 +84,7 @@
   "CONTENTS is a template specifying expected paren highlighting.
 GfooG means expect foo be green (matching parens), RfooR means
 red (mismatched parens), and | is point. No G/R tags means expect
-no erm highlighting (i.e. delgate to normal paren-mode)"
+no erm highlighting (i.e. delegate to normal paren-mode)"
   (with-temp-buffer
     (insert contents)
     (goto-char (point-min))
