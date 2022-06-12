@@ -1202,7 +1202,7 @@ With ARG, do it that many times."
          (point))))))
 
 (defun enh-ruby-beginning-of-defun (&optional arg)
-  "Move backward across expression (sexp) looking for a definition begining.
+  "Move backward across expression (sexp) looking for a definition beginning.
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
@@ -1241,7 +1241,7 @@ With ARG, do it that many times."
 (set-advertised-calling-convention 'enh-ruby-indent-exp '() "2022-04-26")
 
 (defun enh-ruby-beginning-of-block (&optional arg)
-  "Move backward across one expression (sexp) looking for a block begining.
+  "Move backward across one expression (sexp) looking for a block beginning.
 With ARG, do it that many times."
   (interactive "^p")
   (unless arg (setq arg 1))
@@ -1630,7 +1630,7 @@ Used for inserting file-local-variables and sending in bug reports."
               (default-value sym))))
 
 (defun enh-ruby--changed-vars-with (pattern)
-  "Return all changed defcustom varibles that match PATTERN.
+  "Return all changed defcustom variables that match PATTERN.
 Used for inserting file-local-variables and sending in bug reports."
   (seq-remove
    #'enh-ruby--variable-standard-p
