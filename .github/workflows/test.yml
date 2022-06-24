@@ -25,7 +25,7 @@ jobs:
           version: ${{matrix.emacs_version}}
 
       - name: Check out project
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Ubuntu Hates Ruby
         run: sudo gem update -N --system 3.0.3
