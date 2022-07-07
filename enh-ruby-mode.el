@@ -43,7 +43,7 @@
 ;; file after putting it on your load path:
 ;;
 ;;    (add-to-list 'load-path "(path-to)/Enhanced-Ruby-Mode") ; must be added after any path containing old ruby-mode
-;;    (setq enh-ruby-program "(path-to-ruby1.9)/bin/ruby") ; so that still works if ruby points to ruby1.8
+;;    (setq enh-ruby-program "(path-to-ruby)/bin/ruby") ; so that still works if ruby points to ruby1.8
 ;;
 
 (require 'cl-lib)                       ; for cdddr, caddr
@@ -403,8 +403,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
           "sleep"
           "srand")
         'symbols))
-     (1 font-lock-builtin-face))
-    )
+     (1 font-lock-builtin-face)))
   "Additional expressions to highlight in ‘enh-ruby-mode’.")
 
 (defconst enh-ruby-font-names
@@ -559,8 +558,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
                  (insert coding-system)))
               ((looking-at "\\s *#.*coding\\s *[:=]"))
               ((equal "utf-8" coding-system) 'do-nothing) ; hack? should check version?
-              (t (insert "# -*- coding: " coding-system " -*-\n"))
-              )))))
+              (t (insert "# -*- coding: " coding-system " -*-\n")))))))
 
 (defvar erm-ruby-process nil "The current erm process where Emacs is interacting with.")
 (defvar erm-response     nil "Private variable.")
@@ -1380,8 +1378,7 @@ With ARG, do it that many times."
                       "\n}"
                     "\nend")))))
     (insert text)
-    (enh-ruby-indent-line)
-    ))
+    (enh-ruby-indent-line)))
 
 (defun enh-ruby-previous-indent-change (pos)
   (and pos
@@ -1393,8 +1390,7 @@ With ARG, do it that many times."
                 (get-text-property (1- pos) 'indent)
                 (1- pos))
            (enh-ruby-previous-indent-change (previous-single-property-change pos 'indent))
-           (point-min)
-           )))
+           (point-min))))
 
 (defun enh-ruby-next-indent-change (pos)
   (and pos (setq pos (1+ pos))
@@ -1448,13 +1444,11 @@ With ARG, do it that many times."
 
         (while ipos
           (put-text-property (cadr ipos) (1+ (cadr ipos)) 'indent (car ipos))
-          (setq ipos (cddr ipos))
-          )
+          (setq ipos (cddr ipos)))
 
         (while rpos
           (remove-text-properties (car rpos) (cadr rpos) '(font-lock-face nil))
-          (setq rpos (cddr rpos))
-          ))
+          (setq rpos (cddr rpos))))
 
       (while (setq list (cdr list))
         (let ((face (nth (caar list) enh-ruby-font-names))
@@ -1467,8 +1461,7 @@ With ARG, do it that many times."
   (save-excursion
     (dolist (ol (overlays-in (point-min) (point-max)))
     (when (and (overlayp ol) (overlay-get ol 'erm-syn-overlay))
-        (delete-overlay ol)
-        ))
+        (delete-overlay ol)))
     (goto-char (point-min))
     (let ((warn-count 0)
           (error-count 0)
@@ -1524,8 +1517,7 @@ With ARG, do it that many times."
             (overlay-put ov 'erm-syn-overlay  t)
             (overlay-put ov 'priority (if (eq 'erm-syn-warnline face) 99 100)))
 
-          (setq last-line line-no)
-          ))
+          (setq last-line line-no)))
       (if (eq (+ error-count warn-count) 0)
           (setq e-w nil)
         (setq e-w (format ":%d/%d" error-count warn-count)))
@@ -1570,8 +1562,7 @@ With ARG, do it that many times."
                   (with-current-buffer (car erm-reparse-list)
                     (setq erm-reparse-list (cdr erm-reparse-list))
                     (enh-ruby-fontify-buffer))
-                (erm-do-syntax-check)
-                ))))
+                (erm-do-syntax-check)))))
 
      ((eq ?c cmd)
       (unless need-syntax-check-p
