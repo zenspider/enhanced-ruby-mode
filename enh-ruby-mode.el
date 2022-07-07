@@ -426,10 +426,13 @@ Warning: does not play well with command ‘electric-indent-mode’."
 ;;; Code:
 
 ;;;###autoload
-(defun enh/symbol-or-null-p (x)
+(defun enh-symbol-or-null-p (x)
   "Return true if X is either a symbol or null. Used for defcustom safe check."
   (or (symbolp x)
       (null x)))
+
+(define-obsolete-variable-alias 'enh/symbol-or-null-p
+                                'enh-symbol-or-null-p "2022-07-07")
 
 ;;;###autoload
 (define-derived-mode enh-ruby-mode prog-mode "EnhRuby"
