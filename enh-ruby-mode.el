@@ -616,6 +616,14 @@ Warning: does not play well with command ‘electric-indent-mode’."
         (with-current-buffer buffer (setq need-syntax-check-p nil)))
       (erm-reset-syntax-buffers (cdr list)))))
 
+(defun erm-ruby-program-version ()
+  "Display the current version of ERM-RUBY-PROGRAM"
+  (interactive)
+  (let* ((command (format "%s -v" enh-ruby-program))
+         (version (shell-command-to-string command))
+         (version (second (split-string version))))
+   (message "erm-ruby-program -v = %s" version)))
+
 (defun erm-reset ()
   "Reset all ‘enh-ruby-mode’ buffers and restart the ruby parser."
   (interactive)
