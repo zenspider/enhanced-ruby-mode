@@ -9,7 +9,7 @@
 ;; URL: http://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
 ;; Keywords: languages, elisp, ruby
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "25.1"))
 ;; Version: 1.2.0
 
 ;; This file is not part of GNU Emacs.
