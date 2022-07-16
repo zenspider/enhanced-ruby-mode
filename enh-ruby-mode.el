@@ -6,7 +6,7 @@
 
 ;; Author: Geoff Jacobsen
 ;; Maintainer: Ryan Davis
-;; URL: http://github.com/zenspider/Enhanced-Ruby-Mode
+;; URL: https://github.com/zenspider/Enhanced-Ruby-Mode
 ;; Created: Sep 18 2010
 ;; Keywords: languages, elisp, ruby
 ;; Package-Requires: ((emacs "25.1"))
@@ -205,7 +205,8 @@ Warning: does not play well with command ‘electric-indent-mode’."
   :group 'enh-ruby)
 
 (defvar enh-ruby-use-ruby-mode-show-parens-config nil
-  "This flag has no effect anymore as ERM supports command ‘show-paren-mode’ directly.")
+  "This flag has no effect anymore as ERM supports command
+‘show-paren-mode’ directly.")
 
 (make-obsolete-variable 'enh-ruby-use-ruby-mode-show-parens-config nil "2018-04-03")
 
@@ -664,7 +665,8 @@ Warning: does not play well with command ‘electric-indent-mode’."
     (enh-ruby-fontify-buffer)))
 
 (defun enh-ruby-local-enable-extra-keywords ()
-  "If the variable `ruby-extra-keywords' is buffer local then enable the keywords for current buffer."
+  "If the variable `ruby-extra-keywords' is buffer local then
+enable the keywords for current buffer."
   (when (local-variable-p 'enh-ruby-extra-keywords)
       (process-send-string (erm-ruby-get-process)
                            (concat "x"
@@ -1161,7 +1163,9 @@ not treated as modifications to the buffer."
     messages))
 
 (defun enh-ruby-find-error (&optional warnings)
-  "Search back, then forward for a syntax error/warning. Display contents in mini-buffer. Optional WARNINGS will highlight warnings instead of errors. (I think)."
+  "Search back, then forward for a syntax error/warning. Display
+contents in mini-buffer. Optional WARNINGS will highlight
+warnings instead of errors. (I think)."
   (interactive "^P")
   (let (messages
         (face (if warnings 'erm-syn-warnline 'erm-syn-errline))
@@ -1240,7 +1244,7 @@ With ARG, do it that many times."
   (enh-ruby-backward-sexp 1)
   (forward-line 0))
 
-(defun enh-ruby-indent-exp (&optional shutup-p)
+(defun enh-ruby-indent-exp (&optional _shutup-p)
   "Indent each line in the balanced expression following point syntactically."
   (interactive "*P")
   (erm-wait-for-parse)
@@ -1661,17 +1665,22 @@ stuff by changing vars over and over."
         (enh-ruby--variable-values pairs)))
 
 (defun enh-ruby-add-file-local-variables ()
-  "Insert all currently customized variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
+  "Insert all currently customized variables for this mode as
+file-local variables. This is mainly for providing a complete
+example in a bug report."
   (interactive)
   (enh-ruby--add-fl-variables (enh-ruby--changed-vars-with "enh-ruby")))
 
 (defun enh-ruby-add-all-file-local-variables ()
-  "Insert all variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
+  "Insert all variables for this mode as file-local variables. This
+is mainly for providing a complete example in a bug report."
   (interactive)
   (enh-ruby--add-fl-variables (enh-ruby--all-vars-with "enh-ruby")))
 
 (defun enh-ruby-add-indent-file-local-variables ()
-  "Insert all indent variables for this mode as file-local variables. This is mainly for providing a complete example in a bug report."
+  "Insert all indent variables for this mode as file-local
+variables. This is mainly for providing a complete example in a
+bug report."
   (interactive)
   (enh-ruby--add-fl-variables (enh-ruby--all-vars-with "enh-ruby.*indent")))
 
