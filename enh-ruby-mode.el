@@ -88,7 +88,7 @@
   :type '(radio (const :tag "None" nil)
                 (const :tag "Errors" errors)
                 (const :tag "Errors and warnings" errors-and-warnings))
-  :safe #'enh/symbol-or-null-p
+  :safe #'enh-symbol-or-null-p
   :group 'enh-ruby)
 
 (defcustom enh-ruby-comment-column 32
@@ -124,7 +124,7 @@
           (and (listp xs)
            (cl-every (lambda (x)
                        (and (symbolp (car x))
-                            (enh/symbol-or-null-p (cdr x))))
+                            (enh-symbol-or-null-p (cdr x))))
                      xs)))
   :group 'enh-ruby)
 
