@@ -623,7 +623,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
   (interactive)
   (let* ((command (format "%s -v" enh-ruby-program))
          (version (shell-command-to-string command))
-         (version (second (split-string version))))
+         (version (cl-second (split-string version))))
    (message "erm-ruby-program -v = %s" version)))
 
 (defun erm-reset ()
