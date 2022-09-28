@@ -1,8 +1,7 @@
 ;;; enh-ruby-mode.el --- Major mode for editing Ruby files  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012 -- Ryan Davis
-;; Copyright (C) 2010, 2011, 2012
-;;   Geoff Jacobsen
+;; Copyright (C) 2012-2022+ -- Ryan Davis
+;; Copyright (C) 2010-2012 Geoff Jacobsen
 
 ;; Author: Geoff Jacobsen
 ;; Maintainer: Ryan Davis
