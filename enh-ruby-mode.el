@@ -1626,7 +1626,7 @@ Used for inserting file-local-variables and sending in bug reports."
                            (get symbol 'standard-value))
                   (add-to-list 'mode-vars symbol))))
     (sort mode-vars
-          'symbol<)))
+          (lambda (a b) (string< (symbol-name a) (symbol-name b))))))
 
 (defun enh-ruby--variable-standard-p (sym)
   (and (equal (custom-variable-state sym (symbol-value sym))
