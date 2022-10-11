@@ -570,11 +570,8 @@ Warning: does not play well with command ‘electric-indent-mode’."
 (defun erm-ruby-get-process ()
   "Return (or create) the current ruby parser process."
   (when (and erm-ruby-process (not (equal (process-status erm-ruby-process) 'run)))
-    (let ((message (and erm-parsing-p erm-response)))
-      (erm-reset)
-      (if message
-          (error "%s" message)
-        (throw 'interrupted t))))
+    (erm-reset)
+    (throw 'interrupted t))
   (unless erm-ruby-process
     (let ((process-connection-type nil))
       (setq erm-ruby-process
