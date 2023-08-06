@@ -16,8 +16,9 @@ jobs:
     strategy:
       matrix:
         emacs_version:
-          - 26.3
-          - snapshot
+          - 28.2
+          - 29.1
+
     steps:
       - name: Set up Emacs
         uses: purcell/setup-emacs@master
@@ -26,9 +27,6 @@ jobs:
 
       - name: Check out project
         uses: actions/checkout@v3
-
-      - name: Ubuntu Hates Ruby
-        run: sudo gem update -N --system 3.0.3
 
       - name: Version Info
         run: |
