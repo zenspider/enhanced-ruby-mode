@@ -977,8 +977,11 @@ not treated as modifications to the buffer."
                      (offset (if (char-equal opening-char ?{)
                                  enh-ruby-hanging-brace-indent-level
                                enh-ruby-hanging-paren-indent-level)))
-                (cond ((and chained-stmt-p (not enh-ruby-bounce-deep-indent)) (- proposed-col offset))
-                      ((< proposed-col opening-col) (- proposed-col offset))
+                (cond ((and chained-stmt-p
+                            (not enh-ruby-bounce-deep-indent))
+                       (- proposed-col offset))
+                      ((< proposed-col opening-col)
+                       (- proposed-col offset))
                       (t opening-col))))))
 
          ((or (memq face '(font-lock-string-face enh-ruby-heredoc-delimiter-face))
@@ -1366,7 +1369,7 @@ With ARG, do it that many times."
 
           (cond ((looking-at "end")     ; move past end/}/]/)
                  (forward-word 1))
-                ((looking-at "}\\|)\\|]")
+                ((looking-at "[]})]")
                  (forward-char 1))))
 
         (setq i (1- i)))))))
