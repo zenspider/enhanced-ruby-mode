@@ -13,7 +13,7 @@ module Markup
   # Parses marked-up code and returns [raw_sexp, code]
   # raw_sexp follows the same format as the return value of ErmBuffer::Parser#parse.
   def parse_markup(str)
-    code = ""
+    code = +""
     indent_stack = []
     result = Hash.new { |h, k| h[k] = [] }
     last_tag = nil
