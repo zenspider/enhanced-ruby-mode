@@ -34,6 +34,8 @@ task :clean do
   rm_f Dir["**/*~", "**/*.elc"]
 end
 
+task :test => %w[ test:ruby test:elisp ]
+
 namespace :test do
   desc "Run tests for Ruby"
   task :ruby do
