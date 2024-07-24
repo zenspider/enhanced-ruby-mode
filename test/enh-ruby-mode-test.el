@@ -2,15 +2,27 @@
   (add-to-list 'load-path default-directory)
   (load "./helper" nil t))
 
-(local-set-key (kbd "C-c C-r")
-               (lambda ()
-                 (interactive)
-                 (require 'ert)
-                 (setq enh-tests nil)
-                 (ert-delete-all-tests)
-                 (load-file "../enh-ruby-mode.el")
-                 (eval-buffer)
-                 (ert-run-tests-interactively t)))
+(defun erm-run-current-test ()
+  (interactive)
+  (require 'ert)
+  (setq enh-tests nil)
+  (ert-delete-all-tests)
+  (load-file "../enh-ruby-mode.el")
+  (eval-buffer)
+  (let ((ert-debug-on-error t))
+    (ert-run-tests-interactively (lisp-current-defun-name))))
+
+(defun erm-run-all-tests ()
+  (interactive)
+  (require 'ert)
+  (setq enh-tests nil)
+  (ert-delete-all-tests)
+  (load-file "../enh-ruby-mode.el")
+  (eval-buffer)
+  (ert-run-tests-interactively t))
+
+(local-set-key (kbd "C-c C-r") #'erm-run-all-tests)
+(local-set-key (kbd "C-c M-r") #'erm-run-current-test)
 
 ;; In batch mode, face-attribute returns 'unspecified,
 ;; and it causes wrong-number-of-arguments errors.
