@@ -1048,7 +1048,14 @@ not treated as modifications to the buffer."
       (setq col (- pos start-pos -1))
 
       (cond
-       ((eq prop 'l)                    ; TODO: comment wtf these mean
+       ;; 'l - [, (, {, %w/%i open  or | goalpost open
+       ;; 'r - ], ), }, %w/%i close or | goalpost close
+       ;; 'b - begin, def, case, if
+       ;; 'd - do, {, embexpr (interpolation) start
+       ;; 'e - end, embexpr (interpolation) end, close block }
+       ;; 's - statement start on BACKDENT_KW else/when/rescue etc
+       ;; 'c - continue - period followed by return (or other way around?)
+       ((memq prop '(l))
         (let ((shallow-indent
                (if (char-equal (char-after pos) ?{)
                    (+ enh-ruby-hanging-brace-indent-level indent)
@@ -1317,17 +1324,17 @@ With ARG, do it that many times."
            (prop (get-text-property pos 'indent))
            (count 0))
 
-      (unless (or (eq prop 'r) (eq prop 'e))
+      (unless (memq prop '(r e))
         (setq prop (and (setq pos (enh-ruby-previous-indent-change pos))
                         (get-text-property pos 'indent))))
 
       (while (< 0 (setq count
                         (cond
-                         ((or (eq prop 'l) (eq prop 'b) (eq prop 'd)) (1- count))
-                         ((or (eq prop 'r) (eq prop 'e)) (1+ count))
-                         ((eq prop 'c) count)
-                         ((eq prop 's) (if (= 0 count) 1 count))
-                         (t 0))))
+                         ((memq prop '(l b d)) (1- count))
+                         ((memq prop '(r e))   (1+ count))
+                         ((eq prop 'c)         count)
+                         ((eq prop 's)         (if (= 0 count) 1 count))
+                         (t                    0))))
         (goto-char pos)
         (setq prop (and (setq pos (enh-ruby-previous-indent-change pos))
                         (get-text-property pos 'indent))))
