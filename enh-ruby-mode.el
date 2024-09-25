@@ -1310,7 +1310,9 @@ With ARG, do it that many times."
                   (enh-ruby-forward-sexp 1)
                   (setq pos (point))
                   (setq prop (get-text-property (- pos 3) 'indent))
-                  (and (< pos (point-max)) (not (eq prop 'e))))))
+                  (and (< pos (point-max)) (not (or (eq prop 'e) ; closers
+                                                    (eq prop 'r))
+                                                )))))
        (point)))))
 
 (defun enh-ruby-backward-sexp (&optional arg)
