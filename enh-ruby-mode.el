@@ -1343,6 +1343,25 @@ With ARG, do it that many times."
 
       (goto-char (if prop pos (point-min))))))
 
+;; 'l - [, (, {, %w/%i open  or | goalpost open
+;; 'r - ], ), }, %w/%i close or | goalpost close
+;; 'b - begin, def, case, if
+;; 'd - do, {, embexpr (interpolation) start
+;; 'e - end, embexpr (interpolation) end, close block }
+;; 's - statement start on BACKDENT_KW else/when/rescue etc
+;; 'c - continue - period followed by return (or other way around?)
+
+;; backwards: l b d s?
+;; forwards r e
+
+;; C-M-a           enh-ruby-beginning-of-defun
+;; C-M-p           enh-ruby-beginning-of-block
+;; C-M-e           enh-ruby-end-of-defun
+;; C-M-n           enh-ruby-end-of-block
+;; C-M-q           enh-ruby-indent-exp
+;; C-M-h           enh-ruby-mark-defun
+;; C-M-u           enh-ruby-up-sexp
+
 (defun enh-ruby-forward-sexp (&optional arg)
   "Move backward across one balanced expression (sexp).
 With ARG, do it that many times."
