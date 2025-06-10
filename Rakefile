@@ -1,6 +1,6 @@
-task :default => %w[clean test:all compile]
+task :default => %w[clean compile test:all]
 
-el_files = Rake::FileList['**/*.el']
+el_files = Rake::FileList['**/enh-ruby-mode*.el']
 
 def run cmd
   sh cmd do |good|
