@@ -1328,6 +1328,7 @@ With ARG, do it that many times."
 
       (unless (memq prop '(r e))
         (setq prop (and (setq pos (enh-ruby-previous-indent-change pos))
+                        (goto-char pos) ;; TODO: remove?
                         (get-text-property pos 'indent))))
 
       (while (< 0 (setq count
