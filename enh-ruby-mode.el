@@ -1299,6 +1299,7 @@ With ARG, do it that many times."
 (defun enh-ruby-end-of-block (&optional arg)
   "Move forwards across one balanced expression (sexp) looking for a block end.
 With ARG, do it that many times."
+  ;; this is totally broken for {} blocks! see the -3 below
   (interactive "^p")
   (unless arg (setq arg 1))
   (let (prop
