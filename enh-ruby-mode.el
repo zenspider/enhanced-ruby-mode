@@ -565,7 +565,7 @@ Warning: does not play well with command ‘electric-indent-mode’."
 
 (defvar erm-ruby-process nil "The current erm process where Emacs is interacting with.")
 (defvar erm-response     nil "Private variable.")
-(defvar erm-parsing-p    nil "Parsing: t, nil, 'a (all?), 'p (partial?).")
+(defvar erm-parsing-p    nil "Parsing: t, nil, \\='a (all?), \\='p (partial?).")
 
 (defun erm-ruby-get-process ()
   "Return (or create) the current ruby parser process."
