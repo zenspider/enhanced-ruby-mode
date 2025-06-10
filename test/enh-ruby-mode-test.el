@@ -41,15 +41,80 @@
    (enh-ruby-backward-sexp 1)
    (line-should-equal "def foo")))
 
-(enh-deftest enh-ruby-backward-sexp-test-inner ()
+(enh-deftest enh-ruby-backward-sexp-test--ruby ()
+  (with-temp-ruby-string
+   "def foo\n  xxx\nend\n"
+
+   (goto-char (point-max))
+   (enh-ruby-backward-sexp 1)
+   (rest-of-line-should-equal "def foo")))
+
+(enh-deftest enh-ruby-backward-sexp-test-inner--erm ()
   :expected-result :failed
   (with-temp-enh-rb-string
    "def backward_sexp\n  \"string #{expr \"another\"} word\"\nend\n"
 
+   ;; DESIRED:
+   ;; def backward_sexp\n  \"string #{expr \"another\"} word\"\nend\n
+   ;;                                                      ^ HERE
+   ;;                                                   ^ to here
+   ;;                                ^ to here
+   ;;                       ^ to here
+   ;; ^ to here
+
    (search-forward " word")
-   (move-end-of-line nil)
-   (enh-ruby-backward-sexp 2)
-   (line-should-equal "\"string #{expr \"another\"} word\"")))
+   (rest-of-line-should-equal "\"")
+
+   ;; DESIRED:
+   (enh-ruby-backward-sexp)
+   (rest-of-line-should-equal "word\"")
+   ;; (enh-ruby-backward-sexp)
+   ;; (rest-of-line-should-equal "#{expr \"another\"} word\"")
+   ;; (enh-ruby-backward-sexp)
+   ;; (rest-of-line-should-equal "\"string #{expr \"another\"} word\"")
+   ;; (enh-ruby-backward-sexp)
+   ;; (rest-of-line-should-equal "def backward_sexp")
+
+   ;; CURRENT:
+   ;; def backward_sexp\n  \"string #{expr \"another\"} word\"\nend\n
+   ;;                                                      ^ HERE
+   ;;                                ^ to here
+   ;; ^ to here
+
+   ;; CURRENT:
+
+   (enh-ruby-backward-sexp)
+   (rest-of-line-should-equal "{expr \"another\"} word\"")
+
+   (enh-ruby-backward-sexp)
+   (rest-of-line-should-equal "def backward_sexp")
+   ))
+
+(enh-deftest enh-ruby-backward-sexp-test-inner--ruby ()
+  :expected-result :failed
+  (with-temp-ruby-string
+   "def backward_sexp\n  \"string #{expr \"another\"} word\"\nend\n"
+   ;;                                                      ^ here
+   ;;                     ^ to here
+   ;;^ NOT HERE
+   (search-forward " word")
+   ;; (move-end-of-line nil)
+
+   (rest-of-line-should-equal "\"")
+
+   (enh-ruby-backward-sexp)
+   (rest-of-line-should-equal "word\"")
+
+   (enh-ruby-backward-sexp)
+   (rest-of-line-should-equal "{expr \"another\"} word\"")
+
+   (enh-ruby-backward-sexp)
+   (rest-of-line-should-equal "string #{expr \"another\"} word\"")
+
+   ;; this blows out: (scan-error "Containing expression ends prematurely" 21 21)
+   ;; (enh-ruby-backward-sexp)
+   ;; (rest-of-line-should-equal "\"string #{expr \"another\"} word\"")
+   ))
 
 (enh-deftest enh-ruby-forward-sexp-test ()
   (with-temp-enh-rb-string
@@ -57,7 +122,7 @@
 
    (enh-ruby-forward-sexp 1)
    (forward-char 2)
-   (line-should-equal "def backward_sexp")))
+   (rest-of-line-should-equal "def backward_sexp")))
 
 (enh-deftest enh-ruby-up-sexp-test ()
   (with-temp-enh-rb-string
