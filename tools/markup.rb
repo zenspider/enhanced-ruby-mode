@@ -10,6 +10,7 @@ Options:
   --help
   --no-indent
   --no-highlight
+  -v
     HERE
 
   exit
@@ -17,7 +18,8 @@ end
 
 options = {
   indent: !ARGV.delete("--no-indent"),
-  highlight: !ARGV.delete("--no-highlight")
+  highlight: !ARGV.delete("--no-highlight"),
+  verbose: ARGV.delete("-v"),
 }
 
 src = ARGF.read

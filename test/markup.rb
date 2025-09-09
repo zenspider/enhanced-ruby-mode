@@ -85,6 +85,7 @@ module Markup
       :indent    => true,
       :highlight => true,
       :close_tag  => false,
+      :verbose => false,
     }.merge(options)
 
     indents, highlights = parsed_sexp[0][3..-1], parsed_sexp[1..-1]
@@ -105,18 +106,51 @@ module Markup
       end
     end
 
+    faces = # maps to enh-ruby-font-names
+      %w[
+         »
+         «STRING
+         «TYPE
+         «VAR
+         «COMMENT
+         «CONSTANT
+         «STRING
+         «STRINGQ
+         «REGEXPQ
+         «FUNCTION
+         «KW
+         «HEREDOC
+         «OP
+         «REGEXP
+        ]
+
+    tags.map! { |tag, index|
+      tag = faces[$1.to_i] if tag =~ /«(\d+)»/
+      [tag, index]
+    } if options[:verbose]
+
+    indent_tags = {
+      "l" => "OPEN",     # - [, (, {, %w/%i open  or | goalpost open
+      "r" => "CLOSE",    # - ], ), }, %w/%i close or | goalpost close
+      "b" => "BEGIN",    # - begin/def/case/if
+      "e" => "END",      # - end / embexpr (interpolation) end / close block }
+      "d" => "DO",       # - do / {
+      "s" => "STMT",     # - statement start on BACKDENT_KW else/when/rescue etc
+      "c" => "CONTINUE", # - continue - period followed by return
+    }
+
+    tags.map! { |tag, index|
+      tag = "«@#{indent_tags[$1]}»" if tag =~ /«@(.)»/
+      [tag, index]
+    } if options[:verbose]
+
     markup = code.dup
     offset = 0
     tags.sort_by { |(tag, index)|
       # Sort tags like «/close»«@indent»«open» for human-readability.
-      type = case tag[1]
-             when "/" # close tag
-               0
-             when "@" # indent tag
-               1
-             else     # open tag
-               2
-             end
+      # tags: 0 = close, 1 = indent, 2 = open
+      type = tag.match?(%r%^.@%) ? 0 : tag.match?(%r%^./%) ? 1 : 2
+
       [index, type]
     }.each do |(tag, index)|
       markup.insert(index - 1 + offset, tag)
