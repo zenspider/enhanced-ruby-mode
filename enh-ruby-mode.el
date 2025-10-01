@@ -1591,14 +1591,14 @@ With ARG, do it that many times."
                   (error t)))
           (if interrupted-p
               (setq erm-full-parse-p t)
-
             (if erm-full-parse-p
                 (enh-ruby-fontify-buffer)
-              (if (car erm-reparse-list)
-                  (with-current-buffer (car erm-reparse-list)
-                    (setq erm-reparse-list (cdr erm-reparse-list))
-                    (enh-ruby-fontify-buffer))
-                (erm-do-syntax-check)))))
+              (let ((current (car erm-reparse-list)))
+                (if current
+                    (with-current-buffer current
+                      (setq erm-reparse-list (cdr erm-reparse-list))
+                      (enh-ruby-fontify-buffer))
+                  (erm-do-syntax-check))))))
 
      ((eq ?c cmd)
       (unless need-syntax-check-p
